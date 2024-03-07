@@ -1,0 +1,47 @@
+#
+# buildspec.yml
+#
+
+version: 0.2
+
+env:
+  variables:
+    results-bucket: libra-lambda-deployable
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.x
+#    commands:
+
+  pre_build:
+    commands:
+      - BUILD_VERSION=$(date --date="@$(echo ${CODEBUILD_START_TIME} | cut -c1-10)" +"%Y%m%d%H%M%S")
+      - COMMIT_TAG=gitcommit-${CODEBUILD_RESOLVED_SOURCE_VERSION}
+
+  build:
+    commands:
+      #
+      # build the assets
+      #
+      - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
+      - make
+      - cd ${CODEBUILD_SRC_DIR}/libra-mailer
+      - make
+      #
+      # copy to the results bucket
+      #
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
+      #
+      # create the git commit tag file
+      #
+      - touch ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${results-bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
+
+#  post_build:
+#    commands:
+
+#
+# end of file
+#
