@@ -31,8 +31,8 @@ phases:
       #
       # copy to the results bucket
       #
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip
       #
       # create the git commit tag file
       #
