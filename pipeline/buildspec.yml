@@ -38,6 +38,10 @@ phases:
       #
       - touch ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git
       - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${results_bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
+      #
+      # make the latest folder
+      #
+      - aws s3 sync s3://${results_bucket}/${BUILD_VERSION} s3://${results_bucket}/latest --delete --quiet
 
 #  post_build:
 #    commands:
