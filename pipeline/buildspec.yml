@@ -6,7 +6,7 @@ version: 0.2
 
 env:
   variables:
-    results-bucket: libra-lambda-deployable
+    results_bucket: libra-lambda-deployable
 
 phases:
   install:
@@ -31,13 +31,13 @@ phases:
       #
       # copy to the results bucket
       #
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results-bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip
       #
       # create the git commit tag file
       #
       - touch ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${results-bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${results_bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
 
 #  post_build:
 #    commands:
