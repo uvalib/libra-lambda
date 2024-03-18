@@ -1,0 +1,34 @@
+#
+# deployspec.yml
+#
+
+version: 0.2
+
+env:
+  variables:
+    deploy_bucket: libra-lambda-deployable
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.x
+#    commands:
+
+#  pre_build:
+#    commands:
+
+  build:
+    commands:
+      #
+      # libra-event-audit function
+      - aws lambda update-function-code --function-name uva-libra-event-audit-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-event-audit/deployment.zip
+      #
+      # libra-mailer function
+      - aws lambda update-function-code --function-name uva-libra-mailer-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-mailer/deployment.zip
+
+#  post_build:
+#    commands:
+
+#
+# end of file
+#
