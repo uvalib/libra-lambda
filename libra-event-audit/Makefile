@@ -6,15 +6,19 @@ GOGET = $(GOCMD) get
 GOMOD = $(GOCMD) mod
 GOFMT = $(GOCMD) fmt
 GOVET = $(GOCMD) vet
-BINNAME = bootstrap
+BINNAME = cmd
+DEPLOYNAME = bootstrap
 
-build: linux 
+build: cmdline
 
-all: linux
+all: cmdline deployable
 
-linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc -o bin/$(BINNAME) *.go
-	cd bin; zip deployment.zip $(BINNAME)
+cmdline:
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -tags cmdline -o bin/$(BINNAME)
+
+deployable:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
+	cd bin; zip deployment.zip $(DEPLOYNAME)
 
 clean:
 	$(GOCLEAN)

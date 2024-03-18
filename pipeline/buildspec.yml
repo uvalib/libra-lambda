@@ -25,9 +25,9 @@ phases:
       # build the assets
       #
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
-      - make
+      - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
-      - make
+      - make deployable
       #
       # copy to the results bucket
       #
