@@ -20,6 +20,9 @@ phases:
   build:
     commands:
       #
+      # libra-doi function
+      - aws lambda update-function-code --function-name uva-libra-doi-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-doi/deployment.zip
+      #
       # libra-event-audit function
       - aws lambda update-function-code --function-name uva-libra-event-audit-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-event-audit/deployment.zip
       #

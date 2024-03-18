@@ -24,6 +24,8 @@ phases:
       #
       # build the assets
       #
+      - cd ${CODEBUILD_SRC_DIR}/libra-doi
+      - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
       - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
@@ -31,6 +33,7 @@ phases:
       #
       # copy to the results bucket
       #
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
       #
