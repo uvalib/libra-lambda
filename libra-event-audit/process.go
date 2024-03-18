@@ -15,7 +15,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// convert to librabus event
 	ev, err := uvalibrabus.MakeBusEvent(rawMsg)
 	if err != nil {
-		fmt.Printf("ERROR: unmarshaling libra bus event (%s)", err.Error())
+		fmt.Printf("ERROR: unmarshaling libra bus event (%s)\n", err.Error())
 		return err
 	}
 

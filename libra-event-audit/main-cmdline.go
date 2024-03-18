@@ -9,7 +9,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"os"
 )
@@ -43,6 +42,7 @@ func main() {
 	err := process(messageId, source, pl)
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	fmt.Printf("INFO: terminating normally\n")
