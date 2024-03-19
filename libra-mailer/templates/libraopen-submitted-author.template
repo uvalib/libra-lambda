@@ -1,19 +1,20 @@
-<p>Dear {{.Recipient}},</p>
-<p>Congratulations on depositing your work via Libra, the University of Virginia's scholarly repository.</p>
+Dear {{.Recipient}},
 
-<% if @embargo_release_date.present? %>
-<p>The title and abstract for the work "<%= @title %>" will be available for immediate access. After your embargo ends on <%= date_formatter(@embargo_release_date) %>, the files for "<%= @title %>" will be available for <%= @visibility_after_embargo %> access.
-<% else %>
-<p>The work "<%= @title %>"" will be available immediately for <%= @visibility %> access.
-<% end %>
+Congratulations on depositing your work via Libra, the University of Virginia's scholarly repository.
 
-<p>You have opted to grant to users of your work the following re-use rights: <%= @rights_name %>.</p>
-<p>The permanent location for your work (the DOI) is <a href="<%= @doi_url %>"><%= @doi_url %></a>.</p>
-<p>Always provide this exact link when sharing your work with colleagues, collaborators, and on social media.
-<strong>If your work did not receive a DOI (e.g. there is no link above), please contact us immediately at</strong> <%= MAIL_SENDER %>.</p>
-<p>Approximately 1 hour after depositing and opening your work, you may check that the title and abstract was successfully added to the Library's collection by searching for the work’s title or author name in VIRGO, the UVA online library catalog.</p>
-<p></p>
-<p>Best Regards,</p>
-<p>Scholarly Repository Services, University of Virginia Library</p>
+{{if .EmbargoReleaseDate}}
+The title and abstract for the work "{{.Title}}" will be available for immediate access. After your embargo ends on {{.EmbargoReleaseDate}}, the files for "{{.Title}}" will be available for <%= @visibility_after_embargo %> access.
+{{else}}
+The work "{{.Title}}"" will be available immediately for {{.Visibility}} access.
+{{end}}
 
-<p><%= {{.Sender}} %></p>
+You have opted to grant to users of your work the following re-use rights: {{.License}}.
+The permanent location for your work (the DOI) is <a href="{{.Doi}}">{{.Doi}}</a>.
+Always provide this exact link when sharing your work with colleagues, collaborators, and on social media.
+<strong>If your work did not receive a DOI (e.g. there is no link above), please contact us immediately at</strong> {{.Sender}}.
+Approximately 1 hour after depositing and opening your work, you may check that the title and abstract was successfully added to the Library's collection by searching for the work’s title or author name in VIRGO, the UVA online library catalog.
+
+Best Regards,
+Scholarly Repository Services, University of Virginia Library
+
+{{.Sender}}
