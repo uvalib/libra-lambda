@@ -26,6 +26,9 @@ phases:
       # libra-event-audit function
       - aws lambda update-function-code --function-name uva-libra-event-audit-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-event-audit/deployment.zip
       #
+      # libra-ingest function
+      - aws lambda update-function-code --function-name uva-libra-ingest-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-ingest/deployment.zip
+      #
       # libra-mailer function
       - aws lambda update-function-code --function-name uva-libra-mailer-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-mailer/deployment.zip
 
