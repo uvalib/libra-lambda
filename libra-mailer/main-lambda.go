@@ -23,7 +23,7 @@ func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		var mbEvent events.EventBridgeEvent
 		err := json.Unmarshal([]byte(message.Body), &mbEvent)
 		if err != nil {
-			fmt.Printf("ERROR: unmarshaling event bridge event (%s)", err.Error())
+			fmt.Printf("ERROR: unmarshaling event bridge event (%s)\n", err.Error())
 			return err
 		}
 
