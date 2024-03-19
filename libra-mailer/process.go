@@ -67,9 +67,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		// we send notifications for libraetd events only
 		switch obj.Namespace() {
 		case libraEtdNamespace:
-			mail := ETD_OPTIONAL_CAN_DEPOSIT
+			mail := ETD_OPTIONAL_INVITATION
 			if strings.HasPrefix(fields["source"], "sis") {
-				mail = ETD_SIS_CAN_DEPOSIT
+				mail = ETD_SIS_INVITATION
 			}
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
 

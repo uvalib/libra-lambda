@@ -22,8 +22,8 @@ var templates embed.FS
 type emailType int
 
 const (
-	ETD_OPTIONAL_CAN_DEPOSIT emailType = iota
-	ETD_SIS_CAN_DEPOSIT
+	ETD_OPTIONAL_INVITATION emailType = iota
+	ETD_SIS_INVITATION
 	ETD_SUBMITTED_AUTHOR
 	ETD_SUBMITTED_ADVISOR
 	OPEN_SUBMITTED_AUTHOR
@@ -34,12 +34,12 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	var templateFile string
 	var subject string
 	switch theType {
-	case ETD_OPTIONAL_CAN_DEPOSIT:
-		templateFile = "templates/libraetd-optional-can-deposit.template"
+	case ETD_OPTIONAL_INVITATION:
+		templateFile = "templates/libraetd-optional-invitation.template"
 		subject = "Access to upload your approved thesis to Libra"
 
-	case ETD_SIS_CAN_DEPOSIT:
-		templateFile = "templates/libraetd-sis-can-deposit.template"
+	case ETD_SIS_INVITATION:
+		templateFile = "templates/libraetd-sis-invitation.template"
 		subject = "Access to upload your approved thesis or dissertation to Libra"
 
 	case ETD_SUBMITTED_AUTHOR:
