@@ -5,8 +5,11 @@
 package main
 
 import (
+	"bytes"
 	"embed"
+	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
+	"text/template"
 )
 
 // templates holds our email templates
@@ -27,61 +30,64 @@ const (
 
 func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyStoreObject) (string, string, error) {
 
-	var template string
+	var templateFile string
 	var subject string
 	switch theType {
 	case ETD_OPTIONAL_CAN_DEPOSIT:
-		template = "templates/libraetd-optional-can-deposit.template"
-		subject = ""
+		templateFile = "templates/libraetd-optional-can-deposit.template"
+		subject = "Access to upload your approved thesis to Libra"
 
 	case ETD_SIS_CAN_DEPOSIT:
-		template = "templates/libraetd-sis-can-deposit.template"
-		subject = ""
+		templateFile = "templates/libraetd-sis-can-deposit.template"
+		subject = "Access to upload your approved thesis or dissertation to Libra"
 
 	case ETD_SUBMITTED_AUTHOR:
-		template = "templates/libraetd-submitted-author.template"
-		subject = ""
+		templateFile = "templates/libraetd-submitted-author.template"
+		subject = "Successful deposit of your thesis or dissertation"
 
 	case ETD_SUBMITTED_ADVISOR:
-		template = "templates/libraetd-submitted-advisor.template"
-		subject = ""
+		templateFile = "templates/libraetd-submitted-advisor.template"
+		subject = "Successful deposit of your student's thesis"
 
 	case OPEN_SUBMITTED_AUTHOR:
-		template = "templates/libraopen-submitted-author.template"
-		subject = ""
+		templateFile = "templates/libraopen-submitted-author.template"
+		subject = "Work successfully deposited to Libra"
 
 	default:
+		return "", "", fmt.Errorf("unsupported email type")
+	}
+
+	// read the template
+	templateStr, err := templates.ReadFile(templateFile)
+	if err != nil {
+		return "", "", err
+	}
+
+	// parse the templateFile
+	tmpl, err := template.New("email").Parse(string(templateStr))
+	if err != nil {
+		return "", "", err
 	}
 
 	type EmailAttributes struct {
-		Recipient   string
-		FailedCount int
-		Details     string
+		Recipient string
+		Sender    string
 	}
 
-	//
-	//	// parse the template
-	//	tmpl, err := template.New("email").Parse(cfg.EmailTemplate)
-	//	if err != nil {
-	//		return "", err
-	//	}
-	//
 	//	// populate the attributes
-	//	attribs := EmailAttributes{
-	//		Recipient: cfg.EmailRecipient,
-	//		FailedCount: len(messageList),
-	//	}
-	//
-	//	// render the template
-	//	var renderedBuffer bytes.Buffer
-	//	err = tmpl.Execute(&renderedBuffer, attribs)
-	//	if err != nil {
-	//		return "", err
-	//	}
-	//
-	//return subject, renderedBuffer.String(), nil
-	// TEMP
-	return subject, template, nil
+	attribs := EmailAttributes{
+		Recipient: work.Fields()["depositor"],
+		Sender:    cfg.EmailSender,
+	}
+
+	// render the templateFile
+	var renderedBuffer bytes.Buffer
+	err = tmpl.Execute(&renderedBuffer, attribs)
+	if err != nil {
+		return "", "", err
+	}
+
+	return subject, renderedBuffer.String(), nil
 }
 
 //

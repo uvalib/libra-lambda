@@ -43,7 +43,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	obj, err := getEasystoreObject(es, ev.Namespace, ev.Identifier)
 	if err != nil {
-		fmt.Printf("ERROR: getting object (%s)\n", err.Error())
+		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
@@ -57,7 +57,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// mail attributes
-	var mailRecipient string
 	var mailSubject string
 	var mailBody string
 
@@ -73,7 +72,8 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SIS_CAN_DEPOSIT, obj)
 
 		case libraOpenNamespace:
-			// do nothing, this is uninteresting
+			fmt.Printf("INFO: uninteresting namespace for event, ignoring\n")
+			return nil
 
 		default:
 			err = fmt.Errorf("unsupported namespace for object create event")
@@ -105,6 +105,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// send the mail
+	mailRecipient := fmt.Sprintf("%s@virginia.edu", fields["depositor"])
 	err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
 	if err != nil {
 		return err
