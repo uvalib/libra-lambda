@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
+	"strings"
 )
 
 // field name indicating email already sent
@@ -66,10 +67,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		// we send notifications for libraetd events only
 		switch obj.Namespace() {
 		case libraEtdNamespace:
-			// FIXME: distinguish between optional and SIS thesis
-
-			// FIXME: distinguish between SIS and optional emails
-			mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SIS_CAN_DEPOSIT, obj)
+			mail := ETD_OPTIONAL_CAN_DEPOSIT
+			if strings.HasPrefix(fields["source"], "sis") {
+				mail = ETD_SIS_CAN_DEPOSIT
+			}
+			mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
 
 		case libraOpenNamespace:
 			fmt.Printf("INFO: uninteresting namespace for event, ignoring\n")
@@ -106,6 +108,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// send the mail
 	mailRecipient := fmt.Sprintf("%s@virginia.edu", fields["depositor"])
+	if len(cfg.DebugRecipient) != 0 {
+		mailRecipient = cfg.DebugRecipient
+		mailSubject = fmt.Sprintf("[DEBUG] %s", mailSubject)
+	}
+
 	err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
 	if err != nil {
 		return err

@@ -14,8 +14,9 @@ type Config struct {
 	SMTPUser string // SMTP username
 	SMTPPass string // SMTP password
 
-	EmailSender string // the email sender
-	SendEmail   bool   // do we send or just log
+	EmailSender    string // the email sender
+	SendEmail      bool   // do we send or just log
+	DebugRecipient string // the debug recipient
 
 	// easystore configuration
 	EsDbHost     string // database host
@@ -117,6 +118,8 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	cfg.DebugRecipient = envWithDefault("DEBUG_RECIPIENT", "")
+
 	cfg.EsDbHost, err = ensureSet("ES_DBHOST")
 	if err != nil {
 		return nil, err
@@ -138,19 +141,20 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
-	fmt.Printf("[CONFIG] SMTPHost          = [%s]\n", cfg.SMTPHost)
-	fmt.Printf("[CONFIG] SMTPPort          = [%d]\n", cfg.SMTPPort)
-	fmt.Printf("[CONFIG] SMTPUser          = [%s]\n", cfg.SMTPUser)
-	fmt.Printf("[CONFIG] SMTPPass          = [%s]\n", cfg.SMTPPass)
+	fmt.Printf("[conf] SMTPHost       = [%s]\n", cfg.SMTPHost)
+	fmt.Printf("[conf] SMTPPort       = [%d]\n", cfg.SMTPPort)
+	fmt.Printf("[conf] SMTPUser       = [%s]\n", cfg.SMTPUser)
+	fmt.Printf("[conf] SMTPPass       = [%s]\n", cfg.SMTPPass)
 
-	fmt.Printf("[CONFIG] EmailSender       = [%s]\n", cfg.EmailSender)
-	fmt.Printf("[CONFIG] SendEmail         = [%t]\n", cfg.SendEmail)
+	fmt.Printf("[conf] EmailSender    = [%s]\n", cfg.EmailSender)
+	fmt.Printf("[conf] SendEmail      = [%t]\n", cfg.SendEmail)
+	fmt.Printf("[conf] DebugRecipient = [%s]\n", cfg.DebugRecipient)
 
-	fmt.Printf("[CONFIG] EsDbHost          = [%s]\n", cfg.EsDbHost)
-	fmt.Printf("[CONFIG] EsDbPort          = [%d]\n", cfg.EsDbPort)
-	fmt.Printf("[CONFIG] EsDbName          = [%s]\n", cfg.EsDbName)
-	fmt.Printf("[CONFIG] EsDbUser          = [%s]\n", cfg.EsDbUser)
-	fmt.Printf("[CONFIG] EsDbPassword      = [REDACTED]\n")
+	fmt.Printf("[conf] EsDbHost       = [%s]\n", cfg.EsDbHost)
+	fmt.Printf("[conf] EsDbPort       = [%d]\n", cfg.EsDbPort)
+	fmt.Printf("[conf] EsDbName       = [%s]\n", cfg.EsDbName)
+	fmt.Printf("[conf] EsDbUser       = [%s]\n", cfg.EsDbUser)
+	fmt.Printf("[conf] EsDbPassword   = [REDACTED]\n")
 
 	return &cfg, nil
 }

@@ -9,6 +9,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
+	"strings"
 	"text/template"
 )
 
@@ -70,14 +71,30 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	}
 
 	type EmailAttributes struct {
-		Recipient string
-		Sender    string
+		Advisee            string // FIXME
+		Availability       string // FIXME
+		BaseUrl            string // libra base URL
+		Degree             string // FIXME
+		Doi                string // work DOI
+		EmbargoReleaseDate string // embargo release date
+		IsSis              bool   // is this a SIS thesis
+		License            string // work license
+		Recipient          string // mail recipient
+		Sender             string // mail sender
+		Title              string // FIXME
+		Visibility         string // work visibility
 	}
 
 	//	// populate the attributes
+	fields := work.Fields()
 	attribs := EmailAttributes{
-		Recipient: work.Fields()["depositor"],
-		Sender:    cfg.EmailSender,
+		BaseUrl:            "https://bla.library.virginia.edu",
+		Doi:                fields["doi"],
+		EmbargoReleaseDate: fields["embargo-release"],
+		IsSis:              strings.HasPrefix(fields["source"], "sis"),
+		Recipient:          fields["depositor"],
+		Sender:             cfg.EmailSender,
+		Visibility:         fields["visibility"],
 	}
 
 	// render the templateFile
