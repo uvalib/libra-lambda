@@ -108,11 +108,11 @@ func loadConfiguration() (*Config, error) {
 	cfg.SMTPUser = envWithDefault("SMTP_USER", "")
 	cfg.SMTPPass = envWithDefault("SMTP_PASSWORD", "")
 
-	cfg.EmailSender, err = ensureSetAndNonEmpty("NOTIFY_EMAIL_SENDER")
+	cfg.EmailSender, err = ensureSetAndNonEmpty("EMAIL_SENDER")
 	if err != nil {
 		return nil, err
 	}
-	cfg.SendEmail, err = envToBool("NOTIFY_EMAIL_SEND")
+	cfg.SendEmail, err = envToBool("EMAIL_SEND")
 	if err != nil {
 		return nil, err
 	}
