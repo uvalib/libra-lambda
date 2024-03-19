@@ -1,4 +1,4 @@
-<p>Dear <%= @name %>,</p>
+<p>Dear {{.Recipient}},</p>
 
 <p>Congratulations on the successful completion of your department's pre-thesis requirements. You now have access to <a href="<%= ActionMailer::Base.default_url_options[:host] %>">upload your approved thesis to LIBRA</a>.</p>
 <p>After you log in to LIBRA, enter the title for your thesis as approved by your department. The title in LIBRA must match the title on record in your school or department or complies with your department's instructions. If it does not, the discrepancy may delay your departmental administrator's ability to verify successful completion of thesis requirements.</p>
@@ -11,4 +11,4 @@
 <p>Best Regards,</p>
 <p>Scholarly Repository Services, University of Virginia Library</p>
 
-<p><%= MAIL_SENDER %></p>
+<p><%= {{.Sender}} %></p>

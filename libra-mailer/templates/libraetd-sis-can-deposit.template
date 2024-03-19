@@ -1,4 +1,4 @@
-<p>Dear <%= @name %>,</p>
+<p>Dear {{.Recipient}},</p>
 <p>Congratulations on the successful defense of your thesis or dissertation. You now have access to <a href="<%= ActionMailer::Base.default_url_options[:host] %>">upload your approved thesis or dissertation to LIBRA</a>.</p>
 <p>After you log in to LIBRA, check the title displayed for your draft thesis or dissertation. The title in LIBRA must match the title as approved by your committee or advisor. If it does not, please report the discrepancy to your departmental administrator to make the corrections in SIS. You will receive a new email message from LIBRA when it has been corrected and you can proceed with your deposit.</p>
 <p>Review the <a href="http://www.library.virginia.edu/libra/etds/etds-checklist/">"Electronic Thesis/Dissertation (ETD) Submission Requirements Checklist"</a> before you upload your thesis or dissertation files. Please note that uploaded files may not be changed in any way once the submission process is complete.</p>
@@ -10,4 +10,5 @@
 <p></p>
 <p>Best Regards,</p>
 <p>Scholarly Repository Services, University of Virginia Library</p>
-<p><%= MAIL_SENDER %></p>
+
+<p><%= {{.Sender}} %></p>

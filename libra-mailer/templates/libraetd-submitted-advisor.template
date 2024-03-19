@@ -1,4 +1,4 @@
-<p>Dear <%= @advisor %>,</p>
+<p>Dear {{.Recipient}},</p>
 <p><%= @advisee %> has successfully deposited of a <%= @work.degree %> thesis to Libra, the University of Virginia's scholarly repository.</p>
 <p>This work will be available for <%= @availability %>. The author has opted to grant to users of this scholarship the following re-use rights: <%= @work.rights.join(' ') %>.</p>
 <p>The permanent URL for this scholarship is <a href="<%= @doi_link %>"><%= @doi_link %></a>.</p>
@@ -8,4 +8,5 @@
 <p></p>
 <p>Best Regards,</p>
 <p>Scholarly Repository Services, University of Virginia Library</p>
-<p><%= MAIL_SENDER %></p>
+
+<p><%= {{.Sender}} %></p>
