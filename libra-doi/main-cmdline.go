@@ -10,8 +10,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"os"
+
+	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
 func main() {
