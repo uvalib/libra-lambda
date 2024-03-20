@@ -14,10 +14,10 @@ build: cmdline
 all: cmdline deployable
 
 cmdline:
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GOBUILD) -tags cmdline -o bin/$(BINNAME)
+	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 $(GOBUILD) -tags cmdline -o bin/$(BINNAME)
 
 deployable:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
 	cd bin; zip deployment.zip $(DEPLOYNAME)
 
 clean:
