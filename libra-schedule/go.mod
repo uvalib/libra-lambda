@@ -4,7 +4,7 @@ go 1.21.7
 
 require (
 	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240305143104-8588381b12ba
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240320135050-911bc823e589
 )
 
 require (
