@@ -120,7 +120,7 @@ func loadConfiguration() (*Config, error) {
 
 	cfg.DebugRecipient = envWithDefault("DEBUG_RECIPIENT", "")
 
-	cfg.EsDbHost, err = ensureSet("ES_DBHOST")
+	cfg.EsDbHost, err = ensureSetAndNonEmpty("ES_DBHOST")
 	if err != nil {
 		return nil, err
 	}
@@ -128,15 +128,15 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.EsDbName, err = ensureSet("ES_DBNAME")
+	cfg.EsDbName, err = ensureSetAndNonEmpty("ES_DBNAME")
 	if err != nil {
 		return nil, err
 	}
-	cfg.EsDbUser, err = ensureSet("ES_DBUSER")
+	cfg.EsDbUser, err = ensureSetAndNonEmpty("ES_DBUSER")
 	if err != nil {
 		return nil, err
 	}
-	cfg.EsDbPassword, err = ensureSet("ES_DBPASSWORD")
+	cfg.EsDbPassword, err = ensureSetAndNonEmpty("ES_DBPASSWORD")
 	if err != nil {
 		return nil, err
 	}
