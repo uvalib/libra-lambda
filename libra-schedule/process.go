@@ -11,9 +11,7 @@ import (
 	"log"
 )
 
-// we treat libraETD and libraOpen events differently
 var libraEtdNamespace = "libraetd"
-var libraOpenNamespace = "libraopen"
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
@@ -45,14 +43,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// publish ETD namespace event
 	ev.Namespace = libraEtdNamespace
-	err = bus.PublishEvent(ev)
-	if err != nil {
-		log.Printf("ERROR: publishing event (%s)\n", err.Error())
-		return err
-	}
-
-	// publish Open namespace event
-	ev.Namespace = libraOpenNamespace
 	err = bus.PublishEvent(ev)
 	if err != nil {
 		log.Printf("ERROR: publishing event (%s)\n", err.Error())
