@@ -18,6 +18,10 @@ func newEasystore(cfg *Config) (uvaeasystore.EasyStore, error) {
 		DbUser:     cfg.EsDbUser,
 		DbPassword: cfg.EsDbPassword,
 		DbTimeout:  30, // probably fix me later
+
+		BusName:    cfg.BusName,
+		SourceName: cfg.SourceName,
+
 		//Log:        logger,
 	}
 

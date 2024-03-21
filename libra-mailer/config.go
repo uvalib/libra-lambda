@@ -9,14 +9,15 @@ import (
 // Config defines all of the service configuration parameters
 type Config struct {
 	// mailer configuration
+	EmailSender    string // the email sender
+	SendEmail      bool   // do we send or just log
+	DebugRecipient string // the debug recipient
+
+	// SMTP configuration
 	SMTPHost string // SMTP hostname
 	SMTPPort int    // SMTP port number
 	SMTPUser string // SMTP username
 	SMTPPass string // SMTP password
-
-	EmailSender    string // the email sender
-	SendEmail      bool   // do we send or just log
-	DebugRecipient string // the debug recipient
 
 	// easystore configuration
 	EsDbHost     string // database host
@@ -24,6 +25,10 @@ type Config struct {
 	EsDbName     string // database name
 	EsDbUser     string // database user
 	EsDbPassword string // database password
+
+	// message bus configuration
+	BusName    string // the message bus name
+	SourceName string // the event source name
 }
 
 func envWithDefault(env string, defaultValue string) string {
@@ -141,6 +146,9 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
+	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+
 	fmt.Printf("[conf] SMTPHost       = [%s]\n", cfg.SMTPHost)
 	fmt.Printf("[conf] SMTPPort       = [%d]\n", cfg.SMTPPort)
 	fmt.Printf("[conf] SMTPUser       = [%s]\n", cfg.SMTPUser)
@@ -155,6 +163,9 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] EsDbName       = [%s]\n", cfg.EsDbName)
 	fmt.Printf("[conf] EsDbUser       = [%s]\n", cfg.EsDbUser)
 	fmt.Printf("[conf] EsDbPassword   = [REDACTED]\n")
+
+	fmt.Printf("[conf] BusName        = [%s]\n", cfg.BusName)
+	fmt.Printf("[conf] SourceName     = [%s]\n", cfg.SourceName)
 
 	return &cfg, nil
 }
