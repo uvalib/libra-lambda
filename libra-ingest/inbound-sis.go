@@ -7,7 +7,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/uvalib/easystore/uvaeasystore"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -28,7 +30,17 @@ type InboundSisItem struct {
 	Degree      string `json:"degree"`
 }
 
-func inboundSis(config *Config, last string, auth string, client *http.Client) error {
+func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) error {
+	fmt.Printf("processing %d SIS item(s)\n", len(objs))
+
+	for _, o := range objs {
+		fmt.Printf("INFO: processing SIS #%s for %s/%s (%s)\n", o.Id, o.FirstName, o.LastName, o.ComputingId)
+	}
+
+	return nil
+}
+
+func inboundSis(config *Config, last string, auth string, client *http.Client) ([]InboundSisItem, error) {
 
 	// substitute values into url
 	url := strings.Replace(config.SisIngestUrl, "{:last}", last, 1)
@@ -36,18 +48,34 @@ func inboundSis(config *Config, last string, auth string, client *http.Client) e
 
 	payload, err := httpGet(url, client)
 	if err != nil {
-		return err
+		// special case of no items
+		if strings.Contains(err.Error(), "HTTP 404") == true {
+			return make([]InboundSisItem, 0), nil
+		}
+		return nil, err
 	}
 
 	resp := InboundSisResponse{}
 	err = json.Unmarshal(payload, &resp)
 	if err != nil {
 		fmt.Printf("ERROR: json unmarshal of InboundSisResponse (%s)\n", err.Error())
-		return err
+		return nil, err
 	}
 
-	fmt.Printf("received %d item(s)\n", len(resp.Details))
-	return nil
+	fmt.Printf("received %d SIS item(s)\n", len(resp.Details))
+	return resp.Details, nil
+}
+
+func lastSisId(objs []InboundSisItem) string {
+	last := "0"
+	for _, in := range objs {
+		l, _ := strconv.Atoi(last)
+		c, _ := strconv.Atoi(in.Id)
+		if c > l {
+			last = in.Id
+		}
+	}
+	return last
 }
 
 //

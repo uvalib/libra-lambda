@@ -8,8 +8,9 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
-	MintAuthUrl string // mint auth token endpoint
 
+	// service endpoint configuration
+	MintAuthUrl             string // mint auth token endpoint
 	SisIngestUrl            string // the sis ingest service
 	OptionalIngestUrl       string // the optional ingest service
 	SisIngestStateName      string // the sis ingest ssm state name
@@ -21,6 +22,21 @@ type Config struct {
 	EsDbName     string // database name
 	EsDbUser     string // database user
 	EsDbPassword string // database password
+
+	// message bus configuration
+	BusName    string // the message bus name
+	SourceName string // the event source name
+}
+
+func envWithDefault(env string, defaultValue string) string {
+	val, set := os.LookupEnv(env)
+
+	if set == false {
+		fmt.Printf("INFO: environment variable not set: [%s] using default value [%s]\n", env, defaultValue)
+		return defaultValue
+	}
+
+	return val
 }
 
 func ensureSet(env string) (string, error) {
@@ -113,6 +129,9 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
+	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+
 	fmt.Printf("[conf] MintAuthUrl             = [%s]\n", cfg.MintAuthUrl)
 
 	fmt.Printf("[conf] SisIngestUrl            = [%s]\n", cfg.SisIngestUrl)
@@ -125,6 +144,9 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] EsDbName                = [%s]\n", cfg.EsDbName)
 	fmt.Printf("[conf] EsDbUser                = [%s]\n", cfg.EsDbUser)
 	fmt.Printf("[conf] EsDbPassword            = [REDACTED]\n")
+
+	fmt.Printf("[conf] BusName                 = [%s]\n", cfg.BusName)
+	fmt.Printf("[conf] SourceName              = [%s]\n", cfg.SourceName)
 
 	return &cfg, nil
 }
