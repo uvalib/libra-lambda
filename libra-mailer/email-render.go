@@ -35,7 +35,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	var subject string
 	switch theType {
 	case ETD_OPTIONAL_INVITATION:
-		templateFile = "templates/libraetd-optional-invitation.template"
+		templateFile = "templates/solr-doc.template"
 		subject = "Access to upload your approved thesis to Libra"
 
 	case ETD_SIS_INVITATION:
@@ -70,7 +70,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 		return "", "", err
 	}
 
-	type EmailAttributes struct {
+	type Attributes struct {
 		Advisee            string // FIXME
 		Availability       string // FIXME
 		BaseUrl            string // libra base URL
@@ -87,7 +87,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 
 	//	// populate the attributes
 	fields := work.Fields()
-	attribs := EmailAttributes{
+	attribs := Attributes{
 		BaseUrl:            "https://bla.library.virginia.edu",
 		Doi:                fields["doi"],
 		EmbargoReleaseDate: fields["embargo-release"],
@@ -97,7 +97,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 		Visibility:         fields["visibility"],
 	}
 
-	// render the templateFile
+	// render the template
 	var renderedBuffer bytes.Buffer
 	err = tmpl.Execute(&renderedBuffer, attribs)
 	if err != nil {
