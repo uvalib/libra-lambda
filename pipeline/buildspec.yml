@@ -28,6 +28,8 @@ phases:
       - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
       - make deployable
+      - cd ${CODEBUILD_SRC_DIR}/libra-index
+      - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-ingest
       - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
@@ -37,10 +39,23 @@ phases:
       #
       # copy to the results bucket
       #
+      #
+      # libra-doi function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
+      #
+      # libra-event-audit function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
+      #
+      # libra-index function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
+      #
+      # libra-ingest function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-ingest/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-ingest/deployment.zip --quiet
+      #
+      # libra-mailer function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
+      #
+      # libra-schedule function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet
       #
       # create the git commit tag file
