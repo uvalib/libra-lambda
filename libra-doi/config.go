@@ -8,8 +8,7 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
-	// DOI service configuration
-	IdService IdServiceConfig
+	IDService  IDServiceConfig
 	DOIBaseURL string // base url for DOIs
 
 	// easystore configuration
@@ -18,12 +17,17 @@ type Config struct {
 	EsDbName     string // database name
 	EsDbUser     string // database user
 	EsDbPassword string // database password
+
+	BusName    string // name of the bus
+	SourceName string // name of the source
+
 }
 
-type IdServiceConfig struct {
-	BaseURL string
+// IDServiceConfig for DOI service
+type IDServiceConfig struct {
+	BaseURL  string
 	Shoulder string
-	User string
+	User     string
 	Password string
 }
 
@@ -100,23 +104,22 @@ func loadConfiguration() (*Config, error) {
 
 	var err error
 
-	cfg.IdService.BaseURL, err = ensureSet("ID_SERVICE_BASE")
+	cfg.IDService.BaseURL, err = ensureSet("ID_SERVICE_BASE")
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.IdService.Shoulder, err = ensureSet("ID_SERVICE_SHOULDER")
+	cfg.IDService.Shoulder, err = ensureSet("ID_SERVICE_SHOULDER")
 	if err != nil {
 		return nil, err
 	}
 
-
-	cfg.IdService.User, err = ensureSet("ID_SERVICE_USER")
+	cfg.IDService.User, err = ensureSet("ID_SERVICE_USER")
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.IdService.Password, err = ensureSet("ID_SERVICE_PASSWORD")
+	cfg.IDService.Password, err = ensureSet("ID_SERVICE_PASSWORD")
 	if err != nil {
 		return nil, err
 	}
@@ -147,12 +150,22 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
+	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
 	fmt.Printf("[conf] EsDbHost       = [%s]\n", cfg.EsDbHost)
 	fmt.Printf("[conf] EsDbPort       = [%d]\n", cfg.EsDbPort)
 	fmt.Printf("[conf] EsDbName       = [%s]\n", cfg.EsDbName)
 	fmt.Printf("[conf] EsDbUser       = [%s]\n", cfg.EsDbUser)
 	fmt.Printf("[conf] EsDbPassword   = [REDACTED]\n")
+	fmt.Printf("[conf] BusName        = [%s]\n", cfg.BusName)
+	fmt.Printf("[conf] SourceName     = [%s]\n", cfg.SourceName)
+
+	fmt.Printf("[conf] DOIBaseURL        = [%s]\n", cfg.DOIBaseURL)
+	fmt.Printf("[conf] IDServiceBase     = [%s]\n", cfg.IDService.BaseURL)
+	fmt.Printf("[conf] IDServiceShoulder = [%s]\n", cfg.IDService.Shoulder)
+	fmt.Printf("[conf] IDServiceUser     = [%s]\n", cfg.IDService.User)
+	fmt.Printf("[conf] IDServicePassword = [REDACTED]\n")
 
 	return &cfg, nil
 }

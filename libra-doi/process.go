@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
@@ -54,12 +55,28 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	if len(currentDOI) == 0 {
 		// No DOI present. Create one.
 		fmt.Printf("INFO: DOI blank\n")
+		doi, err := createDOI(cfg, obj)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println("New DOI: " + doi)
+
 	} else {
 		// Update DOI
 		fmt.Printf("INFO: DOI for %s = %s\n", ev.Identifier, currentDOI)
 	}
 
 	return nil
+}
+
+func createDOI(cfg *Config, obj uvaeasystore.EasyStoreObject) (string, error) {
+	return "todo", nil
+
+}
+
+func updateMetadata(cfg *Config, obj uvaeasystore.EasyStoreObject) (string, error) {
+	return "todo", nil
 }
 
 //
