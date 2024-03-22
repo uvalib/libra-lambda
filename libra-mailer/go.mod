@@ -4,7 +4,7 @@ go 1.21.7
 
 require (
 	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240314161028-c303dbcdcf98
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240322120357-bbe8d45c7111
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240305143104-8588381b12ba
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )

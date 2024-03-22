@@ -35,6 +35,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
+	// important, cleanup properly
+	defer es.Close()
+
 	obj, err := getEasystoreObject(es, ev.Namespace, ev.Identifier)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
@@ -55,7 +58,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		// Update DOI
 		fmt.Printf("INFO: DOI for %s = %s\n", ev.Identifier, currentDOI)
 	}
-
 
 	return nil
 }
