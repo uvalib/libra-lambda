@@ -32,7 +32,7 @@ func sendEmail(cfg *Config, subject string, recipient string, cc []string, body 
 	}
 
 	var dialer gomail.Dialer
-	fmt.Printf("INFO: sending '%s' email to '%s'\n", subject, recipient)
+	fmt.Printf("INFO: sending email to %s (%s)\n", recipient, subject)
 	if cfg.SMTPPass != "" {
 		fmt.Printf("INFO: sending email with auth\n")
 		dialer = gomail.Dialer{Host: cfg.SMTPHost, Port: cfg.SMTPPort, Username: cfg.SMTPUser, Password: cfg.SMTPPass}
