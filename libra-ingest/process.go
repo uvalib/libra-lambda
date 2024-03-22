@@ -32,6 +32,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// init the parameter client
 	err = initParameter()
 	if err != nil {
+		fmt.Printf("ERROR: creating ssm client (%s)\n", err.Error())
 		return err
 	}
 
