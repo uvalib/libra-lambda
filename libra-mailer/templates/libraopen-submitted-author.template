@@ -3,9 +3,9 @@ Dear {{.Recipient}},
 Congratulations on depositing your work via Libra, the University of Virginia's scholarly repository.
 
 {{if .EmbargoReleaseDate}}
-The title and abstract for the work "{{.Title}}" will be available for immediate access. After your embargo ends on {{.EmbargoReleaseDate}}, the files for "{{.Title}}" will be available for <%= @visibility_after_embargo %> access.
+The title and abstract for the work "{{.Doc.Title}}" will be available for immediate access. After your embargo ends on {{.EmbargoReleaseDate}}, the files for "{{.Doc.Title}}" will be available for {{.EmbargoReleaseVisibility}} access.
 {{else}}
-The work "{{.Title}}"" will be available immediately for {{.Visibility}} access.
+The work "{{.Doc.Title}}"" will be available immediately for {{.Visibility}} access.
 {{end}}
 
 You have opted to grant to users of your work the following re-use rights: {{.License}}.

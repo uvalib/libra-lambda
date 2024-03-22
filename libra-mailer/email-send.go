@@ -10,6 +10,12 @@ import (
 
 func sendEmail(cfg *Config, subject string, recipient string, cc []string, body string) error {
 
+	// special case for debug configurations
+	if len(cfg.DebugRecipient) != 0 {
+		recipient = cfg.DebugRecipient
+		subject = fmt.Sprintf("[DEBUG] %s", subject)
+	}
+
 	mail := gomail.NewMessage()
 	mail.SetHeader("MIME-version", "1.0")
 	mail.SetHeader("Content-Type", "text/plain; charset=\"UTF-8\"")

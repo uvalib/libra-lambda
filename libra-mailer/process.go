@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
-	"strings"
+	"time"
 )
 
 // field name indicating email already sent
@@ -71,7 +71,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		switch obj.Namespace() {
 		case libraEtdNamespace:
 			mail := ETD_OPTIONAL_INVITATION
-			if strings.HasPrefix(fields["source"], "sis") {
+			if fields["source"] == "sis" {
 				mail = ETD_SIS_INVITATION
 			}
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
@@ -88,9 +88,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		switch obj.Namespace() {
 		case libraEtdNamespace:
 			// FIXME: support advisor email too
+
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_AUTHOR, obj)
 
 		case libraOpenNamespace:
+
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, OPEN_SUBMITTED_AUTHOR, obj)
 
 		default:
@@ -111,21 +113,25 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// send the mail
 	mailRecipient := fmt.Sprintf("%s@virginia.edu", fields["depositor"])
-	if len(cfg.DebugRecipient) != 0 {
-		mailRecipient = cfg.DebugRecipient
-		mailSubject = fmt.Sprintf("[DEBUG] %s", mailSubject)
-	}
-
 	err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
 	if err != nil {
 		return err
 	}
 
+	// a special case, we also need to email the registrar
+	if ev.EventName == uvalibrabus.EventWorkPublish && obj.Namespace() == libraEtdNamespace {
+		mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_ADVISOR, obj)
+		//mailRecipient = //FIXME
+		//err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
+		//if err != nil {
+		//	return err
+		//}
+	}
+
 	// update the field to note that we have sent the email(s)
-	//fields[emailSentFieldName] = time.DateTime
-	//obj.SetFields(fields)
-	//return putEasystoreObject(es, obj)
-	return nil
+	fields[emailSentFieldName] = time.DateTime
+	obj.SetFields(fields)
+	return putEasystoreObject(es, obj)
 }
 
 //

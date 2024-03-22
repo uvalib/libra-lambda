@@ -9,7 +9,6 @@ import (
 	"embed"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
-	"strings"
 	"text/template"
 )
 
@@ -35,7 +34,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	var subject string
 	switch theType {
 	case ETD_OPTIONAL_INVITATION:
-		templateFile = "templates/solr-doc.template"
+		templateFile = "templates/libraetd-optional-invitation.template"
 		subject = "Access to upload your approved thesis to Libra"
 
 	case ETD_SIS_INVITATION:
@@ -70,28 +69,43 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 		return "", "", err
 	}
 
-	type Attributes struct {
-		Advisee            string // FIXME
-		Availability       string // FIXME
-		BaseUrl            string // libra base URL
-		Degree             string // FIXME
-		Doi                string // work DOI
-		EmbargoReleaseDate string // embargo release date
-		IsSis              bool   // is this a SIS thesis
-		License            string // work license
-		Recipient          string // mail recipient
-		Sender             string // mail sender
-		Title              string // FIXME
-		Visibility         string // work visibility
+	type Work struct {
+		Degree string // degree name
+		Title  string // work title
 	}
 
-	//	// populate the attributes
+	type Attributes struct {
+		Doc Work
+
+		Advisee                  string // for mail sent to registrar
+		Availability             string // FIXME
+		BaseUrl                  string // libra base URL
+		Doi                      string // work DOI
+		EmbargoReleaseDate       string // embargo release date
+		EmbargoReleaseVisibility string // FIXME
+		IsSis                    bool   // is this a SIS thesis
+		License                  string // work license
+		Recipient                string // mail recipient
+		Sender                   string // mail sender
+		Visibility               string // work visibility
+	}
+
+	// populate the work
+	doc := Work{
+		Degree: "placeholder degree", // FIXME
+		Title:  "placeholder title",  // FIXME
+	}
+
+	//	populate the attributes
 	fields := work.Fields()
 	attribs := Attributes{
+		Doc: doc,
+
+		Advisee:            fields["depositor"],
 		BaseUrl:            "https://bla.library.virginia.edu",
 		Doi:                fields["doi"],
 		EmbargoReleaseDate: fields["embargo-release"],
-		IsSis:              strings.HasPrefix(fields["source"], "sis"),
+		IsSis:              fields["source"] == "sis",
 		Recipient:          fields["depositor"],
 		Sender:             cfg.EmailSender,
 		Visibility:         fields["visibility"],

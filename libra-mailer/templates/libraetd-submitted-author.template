@@ -1,6 +1,6 @@
 Dear {{.Recipient}},
 
-Congratulations on successful deposit of your {{.Degree}} thesis to Libra, the University of Virginia's scholarly repository.
+Congratulations on successful deposit of your {{.Doc.Degree}} thesis to Libra, the University of Virginia's scholarly repository.
 The work you have deposited in Libra will be available for {{.Availability}}. You have opted to grant to users of your scholarship the following re-use rights: {{.License}}.
 {{if .IsSis}}
 	Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
