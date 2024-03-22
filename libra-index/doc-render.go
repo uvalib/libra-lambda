@@ -38,11 +38,13 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 		Doc Work
 	}
 
-	//	// populate the attributes
-	//fields := work.Fields()
+	//	populate the work
 	doc := Work{
 		Id: work.Id(),
 	}
+
+	//	populate the attributes
+	//fields := work.Fields()
 	attribs := Attributes{
 		Doc: doc,
 	}
