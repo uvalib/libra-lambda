@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
-	"log"
 )
 
 var libraEtdNamespace = "libraetd"
@@ -31,7 +30,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// create message bus client
 	bus, err := uvalibrabus.NewUvaBus(busCfg)
 	if err != nil {
-		log.Printf("ERROR: creating event bus client (%s)\n", err.Error())
+		fmt.Printf("ERROR: creating event bus client (%s)\n", err.Error())
 		return err
 	}
 	fmt.Printf("Using: %s@%s\n", cfg.SourceName, cfg.BusName)
@@ -45,7 +44,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	ev.Namespace = libraEtdNamespace
 	err = bus.PublishEvent(ev)
 	if err != nil {
-		log.Printf("ERROR: publishing event (%s)\n", err.Error())
+		fmt.Printf("ERROR: publishing event (%s)\n", err.Error())
 		return err
 	}
 
