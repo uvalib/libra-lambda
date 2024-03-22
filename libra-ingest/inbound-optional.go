@@ -38,15 +38,14 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		// new easystore object
 		eso := uvaeasystore.NewEasyStoreObject(namespace, "")
 
-		// timestamp
-		now := time.Now()
-		createDate := now.Format(time.RFC3339)
-
 		// add some fields
 		fields := uvaeasystore.DefaultEasyStoreFields()
 		fields["author"] = o.For
 		fields["depositor"] = o.For
-		fields["create-date"] = createDate
+		fields["create-date"] = time.Now().Format(time.RFC3339)
+		fields["source-id"] = fmt.Sprintf("optional:%s", o.Id)
+		fields["source"] = "optional"
+
 		eso.SetFields(fields)
 
 		// create the new object

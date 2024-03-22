@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.46.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.8
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.4
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240314161028-c303dbcdcf98
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240322120357-bbe8d45c7111
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240320135050-911bc823e589
 )
 
@@ -34,5 +34,6 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
+	github.com/uvalib/libra-metadata v0.0.0-20240315170823-7a62819ea523 // indirect
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 // indirect
 )

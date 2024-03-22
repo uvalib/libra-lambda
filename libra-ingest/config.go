@@ -135,7 +135,7 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] MintAuthUrl             = [%s]\n", cfg.MintAuthUrl)
 
 	fmt.Printf("[conf] SisIngestUrl            = [%s]\n", cfg.SisIngestUrl)
-	fmt.Printf("[conf] OptionalIngestUrl       = [%d]\n", cfg.OptionalIngestUrl)
+	fmt.Printf("[conf] OptionalIngestUrl       = [%s]\n", cfg.OptionalIngestUrl)
 	fmt.Printf("[conf] SisIngestStateName      = [%s]\n", cfg.SisIngestStateName)
 	fmt.Printf("[conf] OptionalIngestStateName = [%s]\n", cfg.OptionalIngestStateName)
 
