@@ -17,20 +17,28 @@ import (
 
 func HandleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 
+	var returnErr error
+
 	// loop through possible messages
 	for _, message := range sqsEvent.Records {
 		// convert to an eventbus event
 		var mbEvent events.EventBridgeEvent
 		err := json.Unmarshal([]byte(message.Body), &mbEvent)
 		if err != nil {
-			fmt.Printf("ERROR: unmarshaling event bridge event (%s)\n", err.Error())
-			return err
+			fmt.Printf("ERROR: unmarshaling event bridge event (%s), continuing\n", err.Error())
+			returnErr = err
+			continue
 		}
 
 		// process the message, in the event of an error, it is re-queued
-		return process(mbEvent.ID, mbEvent.Source, mbEvent.Detail)
+		err = process(mbEvent.ID, mbEvent.Source, mbEvent.Detail)
+		if err != nil {
+			fmt.Printf("ERROR: processing event bridge event (%s), continuing\n", err.Error())
+			returnErr = err
+		}
 	}
-	return nil
+
+	return returnErr
 }
 
 func main() {
