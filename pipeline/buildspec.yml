@@ -36,6 +36,8 @@ phases:
       - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-schedule
       - make deployable
+      - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
+      - make deployable
       #
       # copy to the results bucket
       #
@@ -57,6 +59,9 @@ phases:
       #
       # libra-schedule function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet
+      #
+      # libra-sis-notify function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-sis-notify/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-sis-notify/deployment.zip --quiet
       #
       # create the git commit tag file
       #

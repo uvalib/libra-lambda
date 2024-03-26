@@ -37,6 +37,9 @@ phases:
       #
       # libra-schedule function
       - aws lambda update-function-code --function-name uva-libra-schedule-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-schedule/deployment.zip
+      #
+      # libra-sis-notify function
+      - aws lambda update-function-code --function-name uva-libra-sis-notify-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-sis-notify/deployment.zip
 
 #  post_build:
 #    commands:
