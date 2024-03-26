@@ -1,4 +1,4 @@
-module github.com/uvalib/libra-ingest
+module github.com/uvalib/libra-schedule
 
 go 1.21.7
 

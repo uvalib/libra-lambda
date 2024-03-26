@@ -1,4 +1,4 @@
-module github.com/uvalib/libra-event-audit
+module github.com/uvalib/libra-mailer
 
 go 1.21.7
 
