@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 )
@@ -20,6 +21,8 @@ type Config struct {
 
 	BusName    string // name of the bus
 	SourceName string // name of the source
+
+	httpClient http.Client // shared http client
 
 }
 
