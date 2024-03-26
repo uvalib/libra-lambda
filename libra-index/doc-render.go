@@ -44,12 +44,49 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 	case libraOpenNamespace:
 		return renderOpen(cfg, tmpl, work)
-
-		//case libraEtdNamespace:
-		//		return renderEtd(cfg, tmpl, work)
+	case libraEtdNamespace:
+		return renderEtd(cfg, tmpl, work)
 	}
 
 	return nil, fmt.Errorf("unsupported namespace (%s)", work.Namespace())
+}
+
+func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
+	type Attributes struct {
+		Doi string // work DOI
+		Id  string // work identifier
+
+		Work librametadata.ETDWork
+	}
+
+	// extract the metadata
+	md := work.Metadata()
+	pl, err := md.Payload()
+	if err != nil {
+		return nil, err
+	}
+	meta, err := librametadata.ETDWorkFromBytes(pl)
+	if err != nil {
+		return nil, err
+	}
+
+	//	populate the attributes
+	fields := work.Fields()
+	attribs := Attributes{
+		Work: *meta,
+		Doi:  fields["doi"],
+		Id:   work.Id(),
+	}
+
+	// render the template
+	var renderedBuffer bytes.Buffer
+	err = tmpl.Execute(&renderedBuffer, attribs)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("%s\n", renderedBuffer.String())
+	return renderedBuffer.Bytes(), nil
 }
 
 func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {

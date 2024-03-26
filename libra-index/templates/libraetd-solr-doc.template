@@ -1,0 +1,5 @@
+<add xmlns:l="http://language.data">
+   <doc>
+      <field name="id">{{ .Id }}</field>
+   </doc>
+</add>
