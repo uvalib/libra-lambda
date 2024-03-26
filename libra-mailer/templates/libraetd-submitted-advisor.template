@@ -1,6 +1,6 @@
 Dear {{.Recipient}},
 
-{{.Advisee}} has successfully deposited of a {{.Doc.Degree}} thesis to Libra, the University of Virginia's scholarly repository.
+{{.Advisee}} has successfully deposited of a {{.Work.Degree}} thesis to Libra, the University of Virginia's scholarly repository.
 This work will be available for {{.Availability}}. The author has opted to grant to users of this scholarship the following re-use rights: {{.License}}.
 The permanent URL for this scholarship is <a href="{{.Doi}}">{{.Doi}}</a>.
 Use  this exact link if you need to record the permanent URL of the thesis.

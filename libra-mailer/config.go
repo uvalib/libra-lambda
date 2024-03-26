@@ -8,6 +8,10 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
+	// configuration needed for mail content
+	EtdBaseUrl  string // etd application base URL
+	OpenBaseUrl string // open application base URL
+
 	// mailer configuration
 	EmailSender    string // the email sender
 	SendEmail      bool   // do we send or just log
@@ -103,6 +107,15 @@ func loadConfiguration() (*Config, error) {
 	var cfg Config
 
 	var err error
+	cfg.EtdBaseUrl, err = ensureSetAndNonEmpty("ETD_BASE_URL")
+	if err != nil {
+		return nil, err
+	}
+	cfg.OpenBaseUrl, err = ensureSetAndNonEmpty("OPEN_BASE_URL")
+	if err != nil {
+		return nil, err
+	}
+
 	cfg.SMTPHost, err = ensureSetAndNonEmpty("SMTP_HOST")
 	if err != nil {
 		return nil, err

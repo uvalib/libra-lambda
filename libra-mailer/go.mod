@@ -34,6 +34,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
+	github.com/uvalib/libra-metadata v0.0.0-20240315170823-7a62819ea523 // indirect
 	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )

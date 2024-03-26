@@ -9,7 +9,9 @@ import (
 	"embed"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
+	librametadata "github.com/uvalib/libra-metadata"
 	"text/template"
+	"time"
 )
 
 // templates holds our email templates
@@ -28,7 +30,16 @@ const (
 	OPEN_SUBMITTED_AUTHOR
 )
 
-func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyStoreObject) (string, string, error) {
+// values extracted from the work used by the template rendering
+type Work struct {
+	Degree string // degree name
+	Title  string // work title
+}
+
+// used for time stuff
+var location, _ = time.LoadLocation("America/New_York")
+
+func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasyStoreObject) (string, string, error) {
 
 	var templateFile string
 	var subject string
@@ -69,20 +80,15 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 		return "", "", err
 	}
 
-	type Work struct {
-		Degree string // degree name
-		Title  string // work title
-	}
-
 	type Attributes struct {
-		Doc Work
+		Work Work
 
 		Advisee                  string // for mail sent to registrar
-		Availability             string // FIXME
+		Availability             string // display version of visibility
 		BaseUrl                  string // libra base URL
 		Doi                      string // work DOI
 		EmbargoReleaseDate       string // embargo release date
-		EmbargoReleaseVisibility string // FIXME
+		EmbargoReleaseVisibility string // embargo release visibility
 		IsSis                    bool   // is this a SIS thesis
 		License                  string // work license
 		Recipient                string // mail recipient
@@ -91,24 +97,36 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	}
 
 	// populate the work
-	doc := Work{
-		Degree: "placeholder degree", // FIXME
-		Title:  "placeholder title",  // FIXME
+	work, err := extractAtributes(obj)
+	if err != nil {
+		return "", "", err
+	}
+
+	fields := obj.Fields()
+
+	// determine the availability string
+	availability := determineAvailability(fields)
+
+	// determine the base URL
+	baseUrl := cfg.EtdBaseUrl
+	if obj.Namespace() == libraOpenNamespace {
+		baseUrl = cfg.OpenBaseUrl
 	}
 
 	//	populate the attributes
-	fields := work.Fields()
 	attribs := Attributes{
-		Doc: doc,
+		Work: *work,
 
-		Advisee:            fields["depositor"],
-		BaseUrl:            "https://bla.library.virginia.edu",
-		Doi:                fields["doi"],
-		EmbargoReleaseDate: fields["embargo-release"],
-		IsSis:              fields["source"] == "sis",
-		Recipient:          fields["depositor"],
-		Sender:             cfg.EmailSender,
-		Visibility:         fields["visibility"],
+		Advisee:                  fields["depositor"],
+		Availability:             availability,
+		BaseUrl:                  baseUrl,
+		Doi:                      fields["doi"],
+		EmbargoReleaseDate:       fields["embargo-release"],
+		EmbargoReleaseVisibility: fields["embargo-release-visibility"],
+		IsSis:                    fields["source"] == "sis",
+		Recipient:                fields["depositor"],
+		Sender:                   cfg.EmailSender,
+		Visibility:               fields["visibility"],
 	}
 
 	// render the template
@@ -119,6 +137,84 @@ func emailSubjectAndBody(cfg *Config, theType emailType, work uvaeasystore.EasyS
 	}
 
 	return subject, renderedBuffer.String(), nil
+}
+
+func extractAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
+
+	switch obj.Namespace() {
+	case libraEtdNamespace:
+		return extractEtdAtributes(obj)
+	case libraOpenNamespace:
+		return extractOpenAtributes(obj)
+	default:
+		return nil, fmt.Errorf("unsupported namespace")
+	}
+}
+
+func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
+
+	// extract the metadata
+	md := obj.Metadata()
+	pl, err := md.Payload()
+	if err != nil {
+		return nil, err
+	}
+	meta, err := librametadata.ETDWorkFromBytes(pl)
+	if err != nil {
+		return nil, err
+	}
+
+	// populate the work
+	work := Work{
+		Degree: meta.Degree,
+		Title:  meta.Title,
+	}
+
+	return &work, nil
+}
+
+func extractOpenAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
+
+	// extract the metadata
+	md := obj.Metadata()
+	pl, err := md.Payload()
+	if err != nil {
+		return nil, err
+	}
+	meta, err := librametadata.OAWorkFromBytes(pl)
+	if err != nil {
+		return nil, err
+	}
+
+	// populate the work
+	work := Work{
+		Degree: "None", // no degree program for an open item
+		Title:  meta.Title,
+	}
+
+	return &work, nil
+}
+
+func determineAvailability(fields uvaeasystore.EasyStoreObjectFields) string {
+
+	ava := "public access immediately"
+
+	// if we have an embargo release date
+	if len(fields["embargo-release"]) != 0 {
+
+		format := "2006-01-02T15:04:05+00:00" // yeah, crap right
+		dt, err := time.ParseInLocation(format, fields["embargo-release"], location)
+		if err != nil {
+			return ava + " (cannot decode embargo release date)"
+		}
+
+		// are we still under embargo
+		if dt.After(time.Now()) {
+			ava = fmt.Sprintf("public access on %s", dt.Format("%B %-d, %Y"))
+		}
+	}
+
+	return ava
 }
 
 //

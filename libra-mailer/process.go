@@ -81,7 +81,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			return nil
 
 		default:
-			err = fmt.Errorf("unsupported namespace for object create event")
+			err = fmt.Errorf("unsupported namespace")
 		}
 
 	case uvalibrabus.EventWorkPublish:
