@@ -1,0 +1,167 @@
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
+	"time"
+)
+
+var maxHTTPRetries = 3
+var retrySleepTime = 100 * time.Millisecond
+
+func newHTTPClient(maxConnections int, timeout int) *http.Client {
+
+	return &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: maxConnections,
+		},
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+}
+
+func httpGet(url string, client *http.Client) ([]byte, error) {
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Printf("ERROR: GET %s failed with error (%s)\n", url, err)
+		return nil, err
+	}
+
+	var response *http.Response
+	count := 0
+	for {
+		start := time.Now()
+		response, err = client.Do(req)
+		duration := time.Since(start)
+		fmt.Printf("INFO: GET %s (elapsed %d ms)\n", url, duration.Milliseconds())
+
+		count++
+		if err != nil {
+			if canRetry(err) == false {
+				fmt.Printf("ERROR: GET %s failed with error (%s)\n", url, err)
+				return nil, err
+			}
+
+			// break when tried too many times
+			if count >= maxHTTPRetries {
+				return nil, err
+			}
+
+			fmt.Printf("ERROR: GET %s failed with error, retrying (%s)\n", url, err)
+
+			// sleep for a bit before retrying
+			time.Sleep(retrySleepTime)
+		} else {
+
+			defer response.Body.Close()
+
+			if response.StatusCode != http.StatusOK {
+				logLevel := "ERROR"
+				// log not found as informational instead of as an error
+				if response.StatusCode == http.StatusNotFound {
+					logLevel = "INFO"
+				}
+				fmt.Printf("%s: GET %s failed with status %d\n", logLevel, url, response.StatusCode)
+
+				body, _ := io.ReadAll(response.Body)
+
+				return body, fmt.Errorf("request returns HTTP %d", response.StatusCode)
+			} else {
+				body, err := io.ReadAll(response.Body)
+				if err != nil {
+					return nil, err
+				}
+
+				//fmt.Printf( body )
+				return body, nil
+			}
+		}
+	}
+}
+
+func httpPut(url string, client *http.Client) error {
+
+	req, err := http.NewRequest("PUT", url, nil)
+	if err != nil {
+		fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
+		return err
+	}
+
+	var response *http.Response
+	count := 0
+	for {
+		start := time.Now()
+		response, err = client.Do(req)
+		duration := time.Since(start)
+		fmt.Printf("INFO: PUT %s (elapsed %d ms)\n", url, duration.Milliseconds())
+
+		count++
+		if err != nil {
+			if canRetry(err) == false {
+				fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
+				return err
+			}
+
+			// break when tried too many times
+			if count >= maxHTTPRetries {
+				return err
+			}
+
+			fmt.Printf("ERROR: PUT %s failed with error, retrying (%s)\n", url, err)
+
+			// sleep for a bit before retrying
+			time.Sleep(retrySleepTime)
+		} else {
+
+			defer response.Body.Close()
+
+			if response.StatusCode != http.StatusOK {
+				logLevel := "ERROR"
+				// log not found as informational instead of as an error
+				if response.StatusCode == http.StatusNotFound {
+					logLevel = "INFO"
+				}
+				fmt.Printf("%s: PUT %s failed with status %d\n", logLevel, url, response.StatusCode)
+
+				_, _ = io.ReadAll(response.Body)
+
+				return fmt.Errorf("request returns HTTP %d", response.StatusCode)
+			} else {
+				_, _ = io.ReadAll(response.Body)
+				return nil
+			}
+		}
+	}
+}
+
+// examines the error and decides if it can be retried
+func canRetry(err error) bool {
+
+	if strings.Contains(err.Error(), "operation timed out") == true {
+		return true
+	}
+
+	if strings.Contains(err.Error(), "Client.Timeout exceeded") == true {
+		return true
+	}
+
+	if strings.Contains(err.Error(), "write: broken pipe") == true {
+		return true
+	}
+
+	if strings.Contains(err.Error(), "no such host") == true {
+		return true
+	}
+
+	if strings.Contains(err.Error(), "network is down") == true {
+		return true
+	}
+
+	return false
+}
+
+//
+// end of file
+//

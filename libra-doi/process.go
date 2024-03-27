@@ -141,9 +141,10 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("Work: %+v\n", work)
+	fmt.Printf("Metadata: %+v\n", work)
+	fmt.Printf("Fields: %+v\n", fields)
 
-	cfg.httpClient = *newHttpClient(1, 30)
+	cfg.httpClient = *newHTTPClient(1, 30)
 
 	payload := PayloadData{}
 	payload.Data.TypeName = "dois"
@@ -159,6 +160,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		Creators:     parseAuthor(work.Author),
 		Contributors: parseAdvisors(work.Advisors),
 		Subjects:     parseKeywords(work.Keywords),
+		RightsList:   []RightsData{{}},
 
 		Affiliation: UVAAffiliation(),
 	}
@@ -239,7 +241,7 @@ func parseAuthor(author librametadata.StudentData) []PersonData {
 	person.NameType = "Personal"
 	person.Affiliation = AffiliationData{Name: author.Institution}
 
-	//
+	// Check for ORCID Accoun
 	if false && len(author.ORCID) > 0 {
 		person.NameIdentifiers = NameIdentifierData{
 			SchemeURI:            "https://orcid.org",
@@ -250,6 +252,13 @@ func parseAuthor(author librametadata.StudentData) []PersonData {
 
 	person.Affiliation = UVAAffiliation()
 
+	return []PersonData{person}
+
+}
+
+func parseAdvisors(contributors []librametadata.ContributorData) []PersonData {
+
+	var person PersonData
 	//Check for ORCID Account here
 	if false {
 		person.NameIdentifiers = NameIdentifierData{
@@ -258,13 +267,6 @@ func parseAuthor(author librametadata.StudentData) []PersonData {
 			NameIdentifierScheme: "ORCID",
 		}
 	}
-	return []PersonData{person}
-
-}
-
-func parseAdvisors(contributors []librametadata.ContributorData) []PersonData {
-
-	var person PersonData
 	return []PersonData{person}
 
 }
