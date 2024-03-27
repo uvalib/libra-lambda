@@ -4,17 +4,18 @@ go 1.21.7
 
 require (
 	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240322120357-bbe8d45c7111
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240320135050-911bc823e589
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240327131914-a55fc2a01fc5
+	github.com/uvalib/libra-metadata v0.0.0-20240327140303-254ee1bdc407
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240325152856-57ba633b6d1b
 )
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.26.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.1 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.27.8 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.8 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.15.4 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.16.12 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.27.9 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.9 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.16.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
@@ -33,6 +34,5 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
-	github.com/uvalib/libra-metadata v0.0.0-20240315170823-7a62819ea523 // indirect
-	golang.org/x/exp v0.0.0-20240318143956-a85f2c67cd81 // indirect
+	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 )
