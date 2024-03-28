@@ -20,7 +20,7 @@ func notifySis(config *Config, fields uvaeasystore.EasyStoreObjectFields, auth s
 	url = strings.Replace(url, "{:auth}", auth, 1)
 	url = strings.Replace(url, "{:doi}", doi, 1)
 
-	return httpPut(url, client)
+	return httpPut(client, url, nil)
 }
 
 //

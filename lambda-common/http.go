@@ -83,6 +83,8 @@ func httpGet(client *http.Client, url string) ([]byte, error) {
 
 func httpPut(client *http.Client, url string, payload []byte) error {
 
+	// FIXME, create reader for buffer if defined
+	
 	req, err := http.NewRequest("PUT", url, nil)
 	if err != nil {
 		fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
