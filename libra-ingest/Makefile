@@ -7,11 +7,14 @@ GOMOD = $(GOCMD) mod
 GOFMT = $(GOCMD) fmt
 GOVET = $(GOCMD) vet
 BINNAME = cmd
+COMMON = ../lambda-common
 DEPLOYNAME = bootstrap
 
-build: cmdline
+build: common cmdline
 
-all: cmdline deployable
+linux: common deployable
+
+all: common cmdline deployable
 
 cmdline:
 	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 $(GOBUILD) -tags cmdline -o bin/$(BINNAME)
@@ -19,6 +22,14 @@ cmdline:
 deployable:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
 	cd bin; zip deployment.zip $(DEPLOYNAME)
+
+common:
+	-ln -s $(COMMON)/auth.go . 2> /dev/null || true
+	-ln -s $(COMMON)/easystore.go . 2> /dev/null || true
+	-ln -s $(COMMON)/http.go . 2> /dev/null || true
+	-ln -s $(COMMON)/main-cmdline.go . 2> /dev/null || true
+	-ln -s $(COMMON)/main-lambda.go . 2> /dev/null || true
+	-ln -s $(COMMON)/parameter.go . 2> /dev/null || true
 
 clean:
 	$(GOCLEAN)

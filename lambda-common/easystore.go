@@ -28,6 +28,12 @@ func newEasystore(cfg *Config) (uvaeasystore.EasyStore, error) {
 	return uvaeasystore.NewEasyStore(config)
 }
 
+func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject) error {
+
+	_, err := es.Create(obj)
+	return err
+}
+
 func getEasystoreObject(es uvaeasystore.EasyStore, namespace string, identifier string) (uvaeasystore.EasyStoreObject, error) {
 
 	// we just want the fields and the metadata

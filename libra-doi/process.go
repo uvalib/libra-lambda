@@ -144,7 +144,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	fmt.Printf("Metadata: %+v\n", work)
 	fmt.Printf("Fields: %+v\n", fields)
 
-	cfg.httpClient = *newHTTPClient(1, 30)
+	cfg.httpClient = *newHttpClient(1, 30)
 
 	payload := PayloadData{}
 	payload.Data.TypeName = "dois"

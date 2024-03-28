@@ -25,17 +25,17 @@ phases:
       # build the assets
       #
       - cd ${CODEBUILD_SRC_DIR}/libra-doi
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-index
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-ingest
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-schedule
-      - make deployable
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
       - make linux
       #

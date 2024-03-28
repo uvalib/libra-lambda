@@ -10,6 +10,7 @@ easystore.go
 http.go
 main-cmdline.go
 main-lambda.go
+parameter.go
 
 # dont ignore common directory
 !libra-sis-notify
