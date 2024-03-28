@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"time"
 )
@@ -50,7 +51,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// important, cleanup properly
 	defer es.Close()
 
-	obj, err := getEasystoreObject(es, ev.Namespace, ev.Identifier)
+	obj, err := getEasystoreObject(es, ev.Namespace, ev.Identifier, uvaeasystore.Fields)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
@@ -74,7 +75,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// update the field to note that we have notified SIS
 	fields[sisNotifiedFieldName] = time.DateTime
 	obj.SetFields(fields)
-	return putEasystoreObject(es, obj)
+	return putEasystoreObject(es, obj, uvaeasystore.Fields)
 }
 
 //

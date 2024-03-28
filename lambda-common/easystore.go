@@ -34,16 +34,16 @@ func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStore
 	return err
 }
 
-func getEasystoreObject(es uvaeasystore.EasyStore, namespace string, identifier string) (uvaeasystore.EasyStoreObject, error) {
+func getEasystoreObject(es uvaeasystore.EasyStore, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
 
 	// we just want the fields and the metadata
-	return es.GetByKey(namespace, identifier, uvaeasystore.Fields)
+	return es.GetByKey(namespace, identifier, what)
 }
 
-func putEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject) error {
+func putEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject, what uvaeasystore.EasyStoreComponents) error {
 
 	// update the fields
-	_, err := es.Update(obj, uvaeasystore.Fields)
+	_, err := es.Update(obj, what)
 	return err
 }
 
