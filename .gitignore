@@ -3,3 +3,13 @@
 */bin/
 */tmp/
 go.work*
+
+# ignore common files
+auth.go
+easystore.go
+http.go
+main-cmdline.go
+main-lambda.go
+
+# dont ignore common directory
+!libra-sis-notify
