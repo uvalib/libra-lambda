@@ -15,7 +15,7 @@ type AuthResponse struct {
 	Token   string `json:"token"`
 }
 
-func getAuthToken(url string, client *http.Client) (string, error) {
+func getAuthToken(client *http.Client, url string) (string, error) {
 
 	payload, err := httpGet(url, client)
 	if err != nil {

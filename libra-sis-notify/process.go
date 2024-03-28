@@ -59,7 +59,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// get a new http client and get an auth token
 	httpClient := newHttpClient(1, 30)
-	token, err := getAuthToken(cfg.MintAuthUrl, httpClient)
+	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
 	if err != nil {
 		return err
 	}

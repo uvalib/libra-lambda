@@ -13,22 +13,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-var s3Client *s3.Client
-
-func initS3() error {
+func newS3Client() (*s3.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	s3Client = s3.NewFromConfig(cfg)
-	return nil
+	return s3.NewFromConfig(cfg), nil
 }
 
-func putS3(bucket string, key string, buffer []byte) error {
+func putS3(client *s3.Client, bucket string, key string, buffer []byte) error {
 
 	fmt.Printf("DEBUG: uploading s3://%s/%s\n", bucket, key)
 
-	_, err := s3Client.PutObject(context.TODO(),
+	_, err := client.PutObject(context.TODO(),
 		&s3.PutObjectInput{
 			Bucket: aws.String(bucket),
 			Key:    aws.String(key),

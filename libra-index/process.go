@@ -35,7 +35,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// init the S3 client
-	err = initS3()
+	s3, err := newS3Client()
 	if err != nil {
 		fmt.Printf("ERROR: creating S3 client (%s)\n", err.Error())
 		return err
@@ -69,7 +69,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	bucketKey = strings.Replace(bucketKey, "{:year}", year, 1)
 
 	// upload to S3
-	err = putS3(cfg.BucketName, bucketKey, buf)
+	err = putS3(s3, cfg.BucketName, bucketKey, buf)
 	if err != nil {
 		fmt.Printf("ERROR: uploading (%s)\n", err.Error())
 		return err

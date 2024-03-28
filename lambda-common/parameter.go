@@ -11,19 +11,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
 )
 
-var ssmClient *ssm.Client
-
-func initParameter() error {
+func newParameterClient() (*ssm.Client, error) {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	ssmClient = ssm.NewFromConfig(cfg)
-	return nil
+	return ssm.NewFromConfig(cfg), nil
 }
 
-func getParameter(name string) (string, error) {
-	param, err := ssmClient.GetParameter(context.Background(),
+func getParameter(client *ssm.Client, name string) (string, error) {
+	param, err := client.GetParameter(context.Background(),
 		&ssm.GetParameterInput{
 			Name:           aws.String(name),
 			WithDecryption: aws.Bool(false),
@@ -36,8 +33,8 @@ func getParameter(name string) (string, error) {
 	return *param.Parameter.Value, nil
 }
 
-func setParameter(name string, value string) error {
-	_, err := ssmClient.PutParameter(context.Background(),
+func setParameter(client *ssm.Client, name string, value string) error {
+	_, err := client.PutParameter(context.Background(),
 		&ssm.PutParameterInput{
 			Name:      aws.String(name),
 			Value:     aws.String(value),

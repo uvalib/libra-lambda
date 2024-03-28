@@ -30,18 +30,18 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// init the parameter client
-	err = initParameter()
+	ssm, err := newParameterClient()
 	if err != nil {
 		fmt.Printf("ERROR: creating ssm client (%s)\n", err.Error())
 		return err
 	}
 
 	// get our state information
-	optionalLastProcessed, err := getParameter(cfg.OptionalIngestStateName)
+	optionalLastProcessed, err := getParameter(ssm, cfg.OptionalIngestStateName)
 	if err != nil {
 		return err
 	}
-	sisLastProcessed, err := getParameter(cfg.SisIngestStateName)
+	sisLastProcessed, err := getParameter(ssm, cfg.SisIngestStateName)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// get a new http client and get an auth token
 	httpClient := newHttpClient(1, 30)
-	token, err := getAuthToken(cfg.MintAuthUrl, httpClient)
+	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		optionalLast := lastOptionalId(optionalList)
 		if optionalLastProcessed != optionalLast {
 			fmt.Printf("INFO: last OPT = [%s]\n", optionalLast)
-			err = setParameter(cfg.OptionalIngestStateName, optionalLast)
+			err = setParameter(ssm, cfg.OptionalIngestStateName, optionalLast)
 			if err != nil {
 				fmt.Printf("ERROR: setting parameter (%s)\n", err.Error())
 				return err
@@ -114,7 +114,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		sisLast := lastSisId(sisList)
 		if sisLastProcessed != sisLast {
 			fmt.Printf("INFO: last SIS = [%s]\n", sisLast)
-			err = setParameter(cfg.SisIngestStateName, sisLast)
+			err = setParameter(ssm, cfg.SisIngestStateName, sisLast)
 			if err != nil {
 				fmt.Printf("ERROR: setting parameter (%s)\n", err.Error())
 				return err
