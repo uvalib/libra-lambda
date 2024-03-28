@@ -12,6 +12,8 @@ DEPLOYNAME = bootstrap
 
 build: common cmdline
 
+linux: common deployable
+
 all: common cmdline deployable
 
 cmdline:

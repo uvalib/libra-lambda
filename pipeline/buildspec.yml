@@ -37,7 +37,7 @@ phases:
       - cd ${CODEBUILD_SRC_DIR}/libra-schedule
       - make deployable
       - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
-      - make deployable
+      - make linux
       #
       # copy to the results bucket
       #
