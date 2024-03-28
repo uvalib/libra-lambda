@@ -34,6 +34,8 @@ phases:
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
       - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-orcid
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-schedule
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
@@ -56,6 +58,9 @@ phases:
       #
       # libra-mailer function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
+      #
+      # libra-orcid function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-orcid/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-orcid/deployment.zip --quiet
       #
       # libra-schedule function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet

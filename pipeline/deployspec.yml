@@ -35,6 +35,9 @@ phases:
       # libra-mailer function
       - aws lambda update-function-code --function-name uva-libra-mailer-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-mailer/deployment.zip
       #
+      # libra-orcid function
+      - aws lambda update-function-code --function-name uva-libra-orcid-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-orcid/deployment.zip
+      #
       # libra-schedule function
       - aws lambda update-function-code --function-name uva-libra-schedule-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-schedule/deployment.zip
       #
