@@ -17,7 +17,7 @@ type AuthResponse struct {
 
 func getAuthToken(client *http.Client, url string) (string, error) {
 
-	payload, err := httpGet(url, client)
+	payload, err := httpGet(client, url)
 	if err != nil {
 		return "", err
 	}

@@ -21,7 +21,7 @@ func newHttpClient(maxConnections int, timeout int) *http.Client {
 	}
 }
 
-func httpGet(url string, client *http.Client) ([]byte, error) {
+func httpGet(client *http.Client, url string) ([]byte, error) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -81,7 +81,7 @@ func httpGet(url string, client *http.Client) ([]byte, error) {
 	}
 }
 
-func httpPut(url string, client *http.Client) error {
+func httpPut(client *http.Client, url string, payload []byte) error {
 
 	req, err := http.NewRequest("PUT", url, nil)
 	if err != nil {

@@ -65,7 +65,7 @@ func inboundOptional(config *Config, last string, auth string, client *http.Clie
 	url := strings.Replace(config.OptionalIngestUrl, "{:last}", last, 1)
 	url = strings.Replace(url, "{:auth}", auth, 1)
 
-	payload, err := httpGet(url, client)
+	payload, err := httpGet(client, url)
 	if err != nil {
 		// special case of no items
 		if strings.Contains(err.Error(), "HTTP 404") == true {

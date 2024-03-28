@@ -83,7 +83,7 @@ func inboundSis(config *Config, last string, auth string, client *http.Client) (
 	url := strings.Replace(config.SisIngestUrl, "{:last}", last, 1)
 	url = strings.Replace(url, "{:auth}", auth, 1)
 
-	payload, err := httpGet(url, client)
+	payload, err := httpGet(client, url)
 	if err != nil {
 		// special case of no items
 		if strings.Contains(err.Error(), "HTTP 404") == true {
