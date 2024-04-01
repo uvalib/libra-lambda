@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -83,9 +84,11 @@ func httpGet(client *http.Client, url string) ([]byte, error) {
 
 func httpPut(client *http.Client, url string, payload []byte) error {
 
-	// FIXME, create reader for buffer if defined
-	
-	req, err := http.NewRequest("PUT", url, nil)
+	var reader *bytes.Reader
+	if payload != nil {
+		bytes.NewReader(payload)
+	}
+	req, err := http.NewRequest("PUT", url, reader)
 	if err != nil {
 		fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
 		return err
