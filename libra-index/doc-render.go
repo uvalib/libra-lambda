@@ -60,6 +60,10 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	}
 
 	// extract the metadata
+	if work.Metadata() == nil {
+		return nil, ErrNoMetadata
+	}
+
 	md := work.Metadata()
 	pl, err := md.Payload()
 	if err != nil {
@@ -100,6 +104,10 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	}
 
 	// extract the metadata
+	if work.Metadata() == nil {
+		return nil, ErrNoMetadata
+	}
+
 	md := work.Metadata()
 	pl, err := md.Payload()
 	if err != nil {

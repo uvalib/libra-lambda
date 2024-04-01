@@ -7,6 +7,7 @@ go.work*
 # ignore common/shared files
 auth.go
 easystore.go
+errors.go
 http.go
 main-cmdline.go
 main-lambda.go

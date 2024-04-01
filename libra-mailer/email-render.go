@@ -154,6 +154,10 @@ func extractAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// extract the metadata
+	if obj.Metadata() == nil {
+		return nil, ErrNoMetadata
+	}
+
 	md := obj.Metadata()
 	pl, err := md.Payload()
 	if err != nil {
@@ -176,6 +180,10 @@ func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 func extractOpenAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// extract the metadata
+	if obj.Metadata() == nil {
+		return nil, ErrNoMetadata
+	}
+
 	md := obj.Metadata()
 	pl, err := md.Payload()
 	if err != nil {

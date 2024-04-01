@@ -130,6 +130,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fields := eso.Fields()
 
+	if eso.Metadata() == nil {
+		fmt.Printf("ERROR: unable to get metadata paload from respose: %s", ErrNoMetadata.Error())
+		return ErrNoMetadata
+	}
+
 	mdBytes, err := eso.Metadata().Payload()
 	if err != nil {
 		fmt.Printf("ERROR: unable to get metadata paload from respose: %s", err.Error())
