@@ -61,6 +61,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 
 	// extract the metadata
 	if work.Metadata() == nil {
+		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
 		return nil, ErrNoMetadata
 	}
 
@@ -105,6 +106,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 
 	// extract the metadata
 	if work.Metadata() == nil {
+		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
 		return nil, ErrNoMetadata
 	}
 

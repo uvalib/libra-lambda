@@ -155,6 +155,7 @@ func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// extract the metadata
 	if obj.Metadata() == nil {
+		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", obj.Namespace(), obj.Id())
 		return nil, ErrNoMetadata
 	}
 
@@ -181,6 +182,7 @@ func extractOpenAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// extract the metadata
 	if obj.Metadata() == nil {
+		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", obj.Namespace(), obj.Id())
 		return nil, ErrNoMetadata
 	}
 
