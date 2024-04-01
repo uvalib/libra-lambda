@@ -37,40 +37,99 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 
 	var returnErr error
 	for _, o := range objs {
-		fmt.Printf("INFO: processing SIS #%s for %s/%s (%s)\n", o.InboundId, o.FirstName, o.LastName, o.ComputingId)
+		fmt.Printf("INFO: processing SIS # %s for %s\n", o.InboundId, o.ComputingId)
 
-		// FIXME, match against existing SIS entry
-
-		// new easystore object
-		eso := uvaeasystore.NewEasyStoreObject(namespace, "")
-
-		// add some fields
+		sourceId := fmt.Sprintf("sis:%s", o.Id)
 		fields := uvaeasystore.DefaultEasyStoreFields()
-		fields["author"] = o.ComputingId
-		fields["depositor"] = o.ComputingId
-		fields["create-date"] = time.Now().Format(time.RFC3339)
-		fields["source-id"] = fmt.Sprintf("sis:%s", o.Id)
-		fields["source"] = "sis"
-		eso.SetFields(fields)
+		fields["source-id"] = sourceId
 
-		meta := librametadata.ETDWork{}
-		meta.Degree = o.Degree
-		meta.Title = o.Title
-		meta.Author = librametadata.StudentData{
-			ComputeID:   o.ComputingId,
-			FirstName:   o.FirstName,
-			LastName:    o.LastName,
-			Program:     o.Department,
-			Institution: "University of Virginia",
-		}
-		eso.SetMetadata(meta)
-
-		// create the new object
-		err := createEasystoreObject(es, eso)
+		// try and find an existing object
+		esrs, err := getEasystoreObjectsByFields(es, namespace, fields, uvaeasystore.Fields+uvaeasystore.Metadata)
 		if err != nil {
-			fmt.Printf("ERROR: creating easystore object, continuing (%s)\n", err.Error())
+			fmt.Printf("ERROR: finding easystore object, continuing (%s)\n", err.Error())
 			returnErr = err
 			continue
+		}
+
+		// did we find an existing object?
+		if esrs.Count() == 1 {
+			eso, err := esrs.Next()
+			if err != nil {
+				fmt.Printf("ERROR: finding easystore object, continuing (%s)\n", err.Error())
+				returnErr = err
+				continue
+			}
+
+			// ensure the work is in draft state
+			if eso.Fields()["draft"] == "true" {
+
+				// if we have a metadata payload
+				if eso.Metadata() != nil {
+					esomd := eso.Metadata()
+					pl, err := esomd.Payload()
+					if err != nil {
+						fmt.Printf("ERROR: getting metadata from easystore object [%s/%s], continuing (%s)\n", eso.Namespace(), eso.Id(), err.Error())
+						returnErr = err
+						continue
+					}
+
+					md, err := librametadata.ETDWorkFromBytes(pl)
+					if err != nil {
+						fmt.Printf("ERROR: unmarshaling metadata from easystore object [%s/%s], continuing (%s)\n", eso.Namespace(), eso.Id(), err.Error())
+						returnErr = err
+						continue
+					}
+
+					// is this a title update
+					if md.Title != o.Title {
+						fmt.Printf("INFO: title update for unpublished work [%s/%s]\n", eso.Namespace(), eso.Id())
+						md.Title = o.Title
+
+						eso.SetMetadata(md)
+						err = putEasystoreObject(es, eso, uvaeasystore.Metadata)
+						if err != nil {
+							fmt.Printf("ERROR: updating easystore object [%s/%s], continuing (%s)\n", eso.Namespace(), eso.Id(), err.Error())
+							returnErr = err
+							continue
+						}
+					}
+				} else {
+					fmt.Printf("ERROR: sis update but work has missing metadata [%s/%s], ignoring\n", eso.Namespace(), eso.Id())
+				}
+			} else {
+				fmt.Printf("WARNING: sis update for published work [%s/%s], ignoring\n", eso.Namespace(), eso.Id())
+			}
+		} else {
+			// we did not find an existing one, create a new easystore object
+			eso := uvaeasystore.NewEasyStoreObject(namespace, "")
+
+			// add some fields
+			fields["author"] = o.ComputingId
+			fields["depositor"] = o.ComputingId
+			fields["create-date"] = time.Now().Format(time.RFC3339)
+			fields["source-id"] = sourceId
+			fields["source"] = "sis"
+			eso.SetFields(fields)
+
+			meta := librametadata.ETDWork{}
+			meta.Degree = o.Degree
+			meta.Title = o.Title
+			meta.Author = librametadata.StudentData{
+				ComputeID:   o.ComputingId,
+				FirstName:   o.FirstName,
+				LastName:    o.LastName,
+				Program:     o.Department,
+				Institution: "University of Virginia",
+			}
+			eso.SetMetadata(meta)
+
+			// create the new object
+			err := createEasystoreObject(es, eso)
+			if err != nil {
+				fmt.Printf("ERROR: creating easystore object, continuing (%s)\n", err.Error())
+				returnErr = err
+				continue
+			}
 		}
 	}
 
