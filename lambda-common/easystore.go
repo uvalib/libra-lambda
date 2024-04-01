@@ -34,7 +34,7 @@ func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStore
 	return err
 }
 
-func getEasystoreObject(es uvaeasystore.EasyStore, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
+func getEasystoreObjectByKey(es uvaeasystore.EasyStore, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
 
 	// we just want the fields and the metadata
 	return es.GetByKey(namespace, identifier, what)
