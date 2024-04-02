@@ -53,15 +53,18 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 	type Attributes struct {
-		Doi string // work DOI
-		Id  string // work identifier
+		Doi       string // work DOI
+		Id        string // work identifier
+		TitleSort string // field used by SOLR for sorting/grouping
+		Title2Key string // field used by SOLR for sorting/grouping
+		Title3Key string // field used by SOLR for sorting/grouping
 
 		Work librametadata.ETDWork
 	}
 
 	// extract the metadata
 	if work.Metadata() == nil {
-		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
+		fmt.Printf("ERROR: unable to get metadata payload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
 		return nil, ErrNoMetadata
 	}
 
@@ -77,10 +80,16 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 
 	//	populate the attributes
 	fields := work.Fields()
+	languages := []string{meta.Language}
+	titleForSort := titleSort(meta.Title, languages)
+	title2Key := titleForSort + titleSuffix(meta.Author.FirstName, meta.Author.LastName)
 	attribs := Attributes{
-		Work: *meta,
-		Doi:  fields["doi"],
-		Id:   work.Id(),
+		Work:      *meta,
+		Doi:       fields["doi"],
+		Id:        work.Id(),
+		TitleSort: titleForSort,
+		Title2Key: title2Key,
+		Title3Key: title2Key, // same as above
 	}
 
 	// render the template
@@ -97,16 +106,19 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 	type Attributes struct {
-		Doi     string // work DOI
-		Id      string // work identifier
-		PubYear string // publication year
+		Doi       string // work DOI
+		Id        string // work identifier
+		PubYear   string // publication year
+		TitleSort string // field used by SOLR for sorting/grouping
+		Title2Key string // field used by SOLR for sorting/grouping
+		Title3Key string // field used by SOLR for sorting/grouping
 
 		Work librametadata.OAWork
 	}
 
 	// extract the metadata
 	if work.Metadata() == nil {
-		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
+		fmt.Printf("ERROR: unable to get metadata payload for ns/oid [%s/%s]\n", work.Namespace(), work.Id())
 		return nil, ErrNoMetadata
 	}
 
@@ -122,11 +134,16 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 
 	//	populate the attributes
 	fields := work.Fields()
+	titleForSort := titleSort(meta.Title, meta.Languages)
+	title2Key := titleForSort + titleSuffix(meta.Authors[0].FirstName, meta.Authors[0].LastName)
 	attribs := Attributes{
-		Work:    *meta,
-		Doi:     fields["doi"],
-		Id:      work.Id(),
-		PubYear: "YYYY", // TODO
+		Work:      *meta,
+		Doi:       fields["doi"],
+		Id:        work.Id(),
+		PubYear:   extractYYMMDD(meta.PublicationDate),
+		TitleSort: titleForSort,
+		Title2Key: title2Key,
+		Title3Key: title2Key, // same as above
 	}
 
 	// render the template

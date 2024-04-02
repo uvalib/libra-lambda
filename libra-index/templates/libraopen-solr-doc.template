@@ -15,9 +15,9 @@
       <field name="published_date">{{ .Work.PublicationDate }}</field>
       <field name="published_tsearch_stored">{{ .Work.Publisher }}, {{ .PubYear }}</field>
       <field name="title_tsearch_stored">{{ .Work.Title }}</field>
-      <field name="title_ssort_stored">TODO</field>
-      <field name="work_title2_key_ssort_stored">TODO</field>
-      <field name="work_title3_key_ssort_stored">TODO</field>
+      <field name="title_ssort_stored">{{ .TitleSort }}</field>
+      <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
+      <field name="work_title3_key_ssort_stored">{{ .Title3Key }}</field>
 {{ range $a := .Work.Authors }}
       <field name="author_tsearch_stored">{{ $a.FirstName }} {{ $a.LastName }}</field>
       <field name="author_facet_f_stored">{{ $a.LastName }}, {{ $a.FirstName }}</field>
