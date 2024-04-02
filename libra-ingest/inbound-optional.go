@@ -36,7 +36,7 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		fmt.Printf("INFO: processing optional #%s for %s\n", o.Id, o.For)
 
 		// new easystore object
-		eso := uvaeasystore.NewEasyStoreObject(namespace, "")
+		eso := uvaeasystore.NewEasyStoreObject(libraEtdNamespace, "")
 
 		// add some fields
 		fields := uvaeasystore.DefaultEasyStoreFields()

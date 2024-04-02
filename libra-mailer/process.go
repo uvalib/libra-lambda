@@ -15,10 +15,6 @@ import (
 // field name indicating email already sent
 var emailSentFieldName = "email-sent"
 
-// we treat libraETD and libraOpen events differently
-var libraEtdNamespace = "libraetd"
-var libraOpenNamespace = "libraopen"
-
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event

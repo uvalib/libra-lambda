@@ -10,8 +10,6 @@ import (
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
-var libraEtdNamespace = "libraetd"
-
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, string(rawMsg))

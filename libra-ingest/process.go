@@ -10,8 +10,6 @@ import (
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
-var namespace = "libraetd"
-
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event

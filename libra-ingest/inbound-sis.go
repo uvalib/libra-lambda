@@ -44,7 +44,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 		fields["source-id"] = sourceId
 
 		// try and find an existing object
-		esrs, err := getEasystoreObjectsByFields(es, namespace, fields, uvaeasystore.Fields+uvaeasystore.Metadata)
+		esrs, err := getEasystoreObjectsByFields(es, libraEtdNamespace, fields, uvaeasystore.Fields+uvaeasystore.Metadata)
 		if err != nil {
 			fmt.Printf("ERROR: finding easystore object, continuing (%s)\n", err.Error())
 			returnErr = err
@@ -101,7 +101,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			}
 		} else {
 			// we did not find an existing one, create a new easystore object
-			eso := uvaeasystore.NewEasyStoreObject(namespace, "")
+			eso := uvaeasystore.NewEasyStoreObject(libraEtdNamespace, "")
 
 			// add some fields
 			fields["author"] = o.ComputingId

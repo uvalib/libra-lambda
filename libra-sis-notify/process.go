@@ -12,9 +12,6 @@ import (
 	"time"
 )
 
-// we treat libraETD and libraOpen events differently
-var libraEtdNamespace = "libraetd"
-
 // field name indicating sis notified
 var sisNotifiedFieldName = "sis-sent"
 
