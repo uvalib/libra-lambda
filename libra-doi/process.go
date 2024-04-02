@@ -131,13 +131,13 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	fields := eso.Fields()
 
 	if eso.Metadata() == nil {
-		fmt.Printf("ERROR: unable to get metadata paload for ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
+		fmt.Printf("ERROR: unable to get metadata payload for ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
 		return ErrNoMetadata
 	}
 
 	mdBytes, err := eso.Metadata().Payload()
 	if err != nil {
-		fmt.Printf("ERROR: unable to get metadata paload from respose: %s\n", err.Error())
+		fmt.Printf("ERROR: unable to get metadata payload from respose: %s\n", err.Error())
 		return err
 	}
 	work, err := librametadata.ETDWorkFromBytes(mdBytes)
