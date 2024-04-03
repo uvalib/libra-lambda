@@ -3,6 +3,7 @@
 */bin/
 */tmp/
 go.work*
+env.*
 
 # ignore common/shared files
 auth.go
