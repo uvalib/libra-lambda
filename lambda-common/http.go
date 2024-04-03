@@ -82,16 +82,16 @@ func httpGet(client *http.Client, url string) ([]byte, error) {
 	}
 }
 
-func httpPut(client *http.Client, url string, payload []byte) error {
+func httpPut(client *http.Client, url string, payload []byte) ([]byte, error) {
 
 	var reader *bytes.Reader
 	if payload != nil {
-		bytes.NewReader(payload)
+		reader = bytes.NewReader(payload)
 	}
 	req, err := http.NewRequest("PUT", url, reader)
 	if err != nil {
 		fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
-		return err
+		return nil, err
 	}
 
 	var response *http.Response
@@ -106,12 +106,12 @@ func httpPut(client *http.Client, url string, payload []byte) error {
 		if err != nil {
 			if canRetry(err) == false {
 				fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
-				return err
+				return nil, err
 			}
 
 			// break when tried too many times
 			if count >= maxHttpRetries {
-				return err
+				return nil, err
 			}
 
 			fmt.Printf("ERROR: PUT %s failed with error, retrying (%s)\n", url, err)
@@ -130,12 +130,17 @@ func httpPut(client *http.Client, url string, payload []byte) error {
 				}
 				fmt.Printf("%s: PUT %s failed with status %d\n", logLevel, url, response.StatusCode)
 
-				_, _ = ioutil.ReadAll(response.Body)
+				body, _ := ioutil.ReadAll(response.Body)
 
-				return fmt.Errorf("request returns HTTP %d", response.StatusCode)
+				return body, fmt.Errorf("request returns HTTP %d", response.StatusCode)
 			} else {
-				_, _ = ioutil.ReadAll(response.Body)
-				return nil
+				body, err := ioutil.ReadAll(response.Body)
+				if err != nil {
+					return nil, err
+				}
+
+				//fmt.Printf( body )
+				return body, nil
 			}
 		}
 	}
