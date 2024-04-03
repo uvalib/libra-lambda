@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,6 +13,11 @@ import (
 type Config struct {
 	IDService  IDServiceConfig
 	DOIBaseURL string // base url for DOIs
+
+	ETDNamespace  Namespace
+	OpenNamespace Namespace
+
+	ResourceTypes []ResourceType
 
 	// easystore configuration
 	EsDbHost     string // database host
@@ -24,6 +31,20 @@ type Config struct {
 
 	httpClient http.Client // shared http client
 
+}
+
+// Namespace such as libraopen or libraetd
+type Namespace struct {
+	Name string
+	Path string
+}
+
+type ResourceType struct {
+	Value    string
+	Label    string
+	Category string
+	Oa       bool
+	Etd      bool
 }
 
 // IDServiceConfig for DOI service
@@ -130,6 +151,26 @@ func loadConfiguration() (*Config, error) {
 	cfg.DOIBaseURL, err = ensureSet("DOI_BASE_URL")
 	if err != nil {
 		return nil, err
+	}
+
+	cfg.OpenNamespace = Namespace{
+		Name: "libraopen",
+		Path: "oa",
+	}
+	cfg.ETDNamespace = Namespace{
+		Name: "libraetd",
+		Path: "etd",
+	}
+
+	log.Printf("INFO: load resource types")
+	bytes, err := os.ReadFile("./data/resourceTypes.json")
+	if err != nil {
+		log.Printf("ERROR: unable to load resourceTypes: %s", err.Error())
+	} else {
+		err = json.Unmarshal(bytes, &cfg.ResourceTypes)
+		if err != nil {
+			log.Printf("ERROR: unable to parse resourceTypes.json: %s", err.Error())
+		}
 	}
 
 	cfg.EsDbHost, err = ensureSet("ES_DBHOST")

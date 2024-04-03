@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/uvalib/easystore/uvaeasystore"
 	librametadata "github.com/uvalib/libra-metadata"
@@ -48,7 +49,7 @@ type RightsData struct {
 	Rights string `json:"rights"`
 }
 type FundingData struct {
-	Funding string `json:"funding"`
+	FunderName string `json:"funderName"`
 }
 type TypeData struct {
 	ResourceType        string `json:"resourceType"`
@@ -63,6 +64,7 @@ type AttributesData struct {
 	// For a new record, Datacite generate a DOI when empty
 	DOI               string            `json:"doi,omitempty"`
 	Prefix            string            `json:"prefix"`
+	URL               string            `json:"url"`
 	Titles            []TitleData       `json:"titles"`
 	Descriptions      []DescriptionData `json:"descriptions"`
 	Creators          []PersonData      `json:"creators"`
@@ -73,7 +75,6 @@ type AttributesData struct {
 	Types             []TypeData        `json:"types"`
 	Dates             []DateData        `json:"dates"`
 	PublicationYear   string            `json:"publicationYear"`
-	URL               string            `json:"url"`
 	Publisher         string            `json:"publisher"`
 
 	Affiliation AffiliationData `json:"affiliation"`
@@ -95,7 +96,7 @@ func UVAAffiliation() AffiliationData {
 	}
 }
 
-func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
+func process(messageID string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event
 	ev, err := uvalibrabus.MakeBusEvent(rawMsg)
@@ -104,7 +105,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, ev.String())
+	fmt.Printf("EVENT %s from:%s -> %s\n", messageID, messageSrc, ev.String())
 
 	// load configuration
 	cfg, err := loadConfiguration()
@@ -137,38 +138,36 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	mdBytes, err := eso.Metadata().Payload()
 	if err != nil {
-		fmt.Printf("ERROR: unable to get metadata payload from respose: %s\n", err.Error())
-		return err
-	}
-	work, err := librametadata.ETDWorkFromBytes(mdBytes)
-	if err != nil {
-		fmt.Printf("ERROR: unable to process paypad from work %s\n", err.Error())
+		fmt.Printf("ERROR: unable to get metadata payload from response: %s\n", err.Error())
 		return err
 	}
 
-	fmt.Printf("Metadata: %+v\n", work)
 	fmt.Printf("Fields: %+v\n", fields)
 
-	cfg.httpClient = *newHttpClient(1, 30)
+	var payload PayloadData
+	if ev.Namespace == cfg.ETDNamespace.Name {
+		work, err := librametadata.ETDWorkFromBytes(mdBytes)
+		if err != nil {
+			fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
+			return err
+		}
 
-	payload := PayloadData{}
-	payload.Data.TypeName = "dois"
-	payload.Data.Attributes = AttributesData{
-		// string replace doi with blank
-		DOI:    strings.Replace(fields["doi"], "doi:", "", 1),          // bare DOI
-		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
-		Titles: []TitleData{{Title: work.Title}},
-		Descriptions: []DescriptionData{{
-			Description:     work.Abstract,
-			DescriptionType: "Abstract",
-		}},
-		Creators:     parseAuthor(work.Author),
-		Contributors: parseAdvisors(work.Advisors),
-		Subjects:     parseKeywords(work.Keywords),
-		RightsList:   []RightsData{{}},
+		fmt.Printf("Metadata: %+v\n", work)
+		payload = createETDPayload(work, cfg, fields)
 
-		Affiliation: UVAAffiliation(),
+	} else if ev.Namespace == cfg.OpenNamespace.Name {
+		work, err := librametadata.OAWorkFromBytes(mdBytes)
+		if err != nil {
+			fmt.Printf("ERROR: unable to process OA Work  %s\n", err.Error())
+			return err
+		}
+
+		fmt.Printf("Metadata: %+v\n", work)
+		payload = createOAPayload(work, cfg, fields)
 	}
+	cfg.httpClient = *newHttpClient(1, 30)
+	fmt.Printf("Payload: %+v\n", payload)
+
 	//      if work.description.present?
 	//        attributes['descriptions'] = [{
 	//          description: work.description,
@@ -199,8 +198,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	//        }
 	//      }
 
-	fmt.Printf("%+v\n", payload)
-
 	// Check DOI
 	if len(fields["doi"]) == 0 {
 		// No DOI present. Create one.
@@ -218,6 +215,93 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	return nil
+}
+
+func getGeneralResourceType(cfg *Config, resourceTypeStr string) string {
+	for _, rt := range cfg.ResourceTypes {
+		if rt.Value == resourceTypeStr {
+			return rt.Category
+		}
+	}
+	return ""
+}
+
+func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) PayloadData {
+	var payload = PayloadData{}
+	payload.Data.TypeName = "dois"
+	payload.Data.Attributes = AttributesData{
+		// remove doi: prefix
+		DOI:    strings.Replace(fields["doi"], "doi:", "", 1),          // bare DOI
+		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
+		Titles: []TitleData{{Title: work.Title}},
+		Descriptions: []DescriptionData{{
+			Description:     work.Abstract,
+			DescriptionType: "Abstract",
+		}},
+		Creators:          []PersonData{parseContributor(work.Author)},
+		Contributors:      parseContributors(work.Advisors),
+		Subjects:          parseKeywords(work.Keywords),
+		RightsList:        []RightsData{{Rights: work.License}},
+		FundingReferences: parseSponsors(work.Sponsors),
+
+		Affiliation: UVAAffiliation(),
+		Types: []TypeData{{
+			ResourceTypeGeneral: "Text",
+			ResourceType:        "Dissertation",
+		}},
+	}
+	return payload
+}
+func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) PayloadData {
+	var payload = PayloadData{}
+	payload.Data.TypeName = "dois"
+	payload.Data.Attributes = AttributesData{
+		// remove doi: prefix
+		DOI:    strings.Replace(fields["doi"], "doi:", "", 1),          // bare DOI
+		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
+		Titles: []TitleData{{Title: work.Title}},
+		Descriptions: []DescriptionData{{
+			Description:     work.Abstract,
+			DescriptionType: "Abstract",
+		}},
+		Creators:          parseContributors(work.Authors),
+		Contributors:      parseContributors(work.Contributors),
+		Subjects:          parseKeywords(work.Keywords),
+		RightsList:        []RightsData{{Rights: work.License}},
+		FundingReferences: parseSponsors(work.Sponsors),
+
+		Affiliation: UVAAffiliation(),
+		Types: []TypeData{{
+			ResourceTypeGeneral: getGeneralResourceType(cfg, work.ResourceType),
+			ResourceType:        work.ResourceType,
+		}},
+		Publisher: work.Publisher,
+	}
+	addDates(&payload, fields["publish-date"])
+	return payload
+}
+
+func addDates(payload *PayloadData, dateStr string) {
+
+	parsedDate, err := time.Parse(time.RFC3339, dateStr)
+	if err != nil {
+		fmt.Printf("ERROR: unable to parse date %s\n", err.Error())
+		return
+	}
+
+	payload.Data.Attributes.Dates = []DateData{{
+		Date:     parsedDate.Format("2006-01-02"),
+		DateType: "Issued",
+	}}
+	payload.Data.Attributes.PublicationYear = parsedDate.Format("2006")
+}
+
+func parseSponsors(s []string) []FundingData {
+	fundingList := []FundingData{}
+	for _, sponsor := range s {
+		fundingList = append(fundingList, FundingData{FunderName: sponsor})
+	}
+	return fundingList
 }
 
 func parseKeywords(keywords []string) []SubjectData {
@@ -239,40 +323,34 @@ func updateMetadata(cfg *Config, obj uvaeasystore.EasyStoreObject) (string, erro
 	return "todo", nil
 }
 
-func parseAuthor(author librametadata.StudentData) []PersonData {
-	var person PersonData
-	person.GivenName = author.FirstName
-	person.FamilyName = author.LastName
-	person.NameType = "Personal"
-	person.Affiliation = AffiliationData{Name: author.Institution}
+func parseContributors(contributors []librametadata.ContributorData) []PersonData {
+	var contribList []PersonData
+	for _, contrib := range contributors {
+		contribList = append(contribList, parseContributor(contrib))
+	}
+	return contribList
+}
 
-	// Check for ORCID Accoun
-	if false && len(author.ORCID) > 0 {
+func parseContributor(contributor librametadata.ContributorData) PersonData {
+	var person PersonData
+	person.GivenName = contributor.FirstName
+	person.FamilyName = contributor.LastName
+	person.NameType = "Personal"
+	if len(contributor.ComputeID) > 0 {
+		person.Affiliation = UVAAffiliation()
+	} else {
+		person.Affiliation = AffiliationData{Name: contributor.Institution}
+	}
+
+	// Check for ORCID Account
+	if false && len(contributor.ORCID) > 0 {
 		person.NameIdentifiers = NameIdentifierData{
 			SchemeURI:            "https://orcid.org",
 			NameIdentifier:       "Author's ORCID",
 			NameIdentifierScheme: "ORCID",
 		}
 	}
-
-	person.Affiliation = UVAAffiliation()
-
-	return []PersonData{person}
-
-}
-
-func parseAdvisors(contributors []librametadata.ContributorData) []PersonData {
-
-	var person PersonData
-	//Check for ORCID Account here
-	if false {
-		person.NameIdentifiers = NameIdentifierData{
-			SchemeURI:            "https://orcid.org",
-			NameIdentifier:       "https://orcid.org/0000-0002-2222-3333",
-			NameIdentifierScheme: "ORCID",
-		}
-	}
-	return []PersonData{person}
+	return person
 
 }
 

@@ -1,0 +1,23 @@
+[
+   {"value": "Article", "label": "Article", "category": "JournalArticle", "oa": true, "etd": true},
+   {"value": "Audio", "label": "Audio", "category": "Sound", "oa": true, "etd": true},
+   {"value": "Book", "label": "Book", "category": "Book", "oa": true, "etd": true},
+   {"value": "Capstone Project", "label": "Capstone Project", "category": "", "oa": false, "etd": true},
+   {"value": "Conference Paper", "label": "Conference Paper", "category": "ConferencePaper", "oa": true, "etd": true},
+   {"value": "Dataset", "label": "Dataset", "category": "", "oa": false, "etd": true},
+   {"value": "Dissertation", "label": "Dissertation", "category": "", "oa": false, "etd": true},
+   {"value": "Educational Resource", "label": "Educational Resource", "category": "Other", "oa": true, "etd": false},
+   {"value": "Image", "label": "Image", "category": "Image", "oa": true, "etd": true},
+   {"value": "Journal", "label": "Journal", "category": "", "oa": false, "etd": true},
+   {"value": "Map or Cartographic Material", "label": "Map or Cartographic Material", "category": "Other", "oa": true, "etd": true},
+   {"value": "Masters Thesis", "label": "Masters Thesis", "category": "", "oa": false, "etd": true},
+   {"value": "Part of Book", "label": "Part of Book", "category": "BookChapter", "oa": true, "etd": true},
+   {"value": "Poster", "label": "Poster", "category": "Other", "oa": true, "etd": true},
+   {"value": "Presentation", "label": "Presentation", "category": "Event", "oa": true, "etd": true},
+   {"value": "Project", "label": "Project", "category": "Text", "oa": true, "etd": true},
+   {"value": "Report", "label": "Report", "category": "Report", "oa": true, "etd": true},
+   {"value": "Research Paper", "label": "Research Paper", "category": "Text", "oa": true, "etd": true},
+   {"value": "Software or Program Code", "label": "Software or Program Code", "category": "", "oa": false, "etd": true},
+   {"value": "Video", "label": "Video", "category": "Audiovisual", "oa": true, "etd": true},
+   {"value": "Other", "label": "Other", "category": "Other", "oa": true, "etd": true}
+]
