@@ -7,12 +7,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/uvalib/easystore/uvaeasystore"
-	"github.com/uvalib/libra-metadata"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/uvalib/easystore/uvaeasystore"
+	librametadata "github.com/uvalib/libra-metadata"
 )
 
 type InboundSisResponse struct {
@@ -114,7 +115,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			meta := librametadata.ETDWork{}
 			meta.Degree = o.Degree
 			meta.Title = o.Title
-			meta.Author = librametadata.StudentData{
+			meta.Author = librametadata.ContributorData{
 				ComputeID:   o.ComputingId,
 				FirstName:   o.FirstName,
 				LastName:    o.LastName,
