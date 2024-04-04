@@ -24,6 +24,12 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fmt.Printf("EVENT %s from:%s -> %s\n", messageID, messageSrc, ev.String())
 
+	// initial namespace validation
+	if ev.Namespace != libraEtdNamespace && ev.Namespace != libraOpenNamespace {
+		fmt.Printf("WARNING: unsupported namespace (%s), ignoring\n", ev.Namespace)
+		return nil
+	}
+
 	// load configuration
 	cfg, err := loadConfiguration()
 	if err != nil {
