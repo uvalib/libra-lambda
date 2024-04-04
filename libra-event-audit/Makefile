@@ -25,6 +25,7 @@ deployable:
 
 common:
 	-ln -s $(COMMON)/main-cmdline.go . 2> /dev/null || true
+	-ln -s $(COMMON)/main-lambda-eb.go . 2> /dev/null || true
 
 clean:
 	$(GOCLEAN)
