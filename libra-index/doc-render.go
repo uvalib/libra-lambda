@@ -106,12 +106,13 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 	type Attributes struct {
-		Doi       string // work DOI
-		Id        string // work identifier
-		PubYear   string // publication year
-		TitleSort string // field used by SOLR for sorting/grouping
-		Title2Key string // field used by SOLR for sorting/grouping
-		Title3Key string // field used by SOLR for sorting/grouping
+		Doi            string // work DOI
+		Id             string // work identifier
+		PoolAdditional string // additional pool information
+		PubYear        string // publication year
+		TitleSort      string // field used by SOLR for sorting/grouping
+		Title2Key      string // field used by SOLR for sorting/grouping
+		Title3Key      string // field used by SOLR for sorting/grouping
 
 		Work librametadata.OAWork
 	}
@@ -137,13 +138,14 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	titleForSort := titleSort(meta.Title, meta.Languages)
 	title2Key := titleForSort + titleSuffix(meta.Authors[0].FirstName, meta.Authors[0].LastName)
 	attribs := Attributes{
-		Work:      *meta,
-		Doi:       fields["doi"],
-		Id:        work.Id(),
-		PubYear:   extractYYMMDD(meta.PublicationDate),
-		TitleSort: titleForSort,
-		Title2Key: title2Key,
-		Title3Key: title2Key, // same as above
+		Work:           *meta,
+		Doi:            fields["doi"],
+		Id:             work.Id(),
+		PoolAdditional: poolAdditional(meta.ResourceType),
+		PubYear:        extractYYMMDD(meta.PublicationDate),
+		TitleSort:      titleForSort,
+		Title2Key:      title2Key,
+		Title3Key:      title2Key, // same as above
 	}
 
 	// render the template

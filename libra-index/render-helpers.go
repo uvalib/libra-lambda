@@ -105,6 +105,29 @@ func extractYYMMDD(date string) string {
 	return ""
 }
 
+// taken from https://github.com/uvalib/v4-libra-indexer/blob/master/libraoc/LibraOCToVirgo4.xsl
+func poolAdditional(resourceType string) string {
+
+	switch resourceType {
+	case "Audio":
+		return "sound_recordings"
+	case "Book":
+		return "catalog"
+	case "Image":
+		return "Visual Materials"
+	case "Journals":
+		return "serials"
+	case "Map or Cartographic Material":
+		return "maps"
+	case "Part of Book":
+		return "catalog"
+	case "Video":
+		return "video"
+	default:
+		return ""
+	}
+}
+
 //
 // end of file
 //

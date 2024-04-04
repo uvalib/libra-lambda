@@ -5,7 +5,10 @@
       <field name="source_f_stored">Libra Repository</field>
       <field name="digital_collection_f_stored">Libra Open Repository</field>
       <field name="data_source_f_stored">libraoc</field>
-      <field name="pool_f_stored">TODO</field>
+      <field name="pool_f_stored">thesis</field>
+      {{ if .PoolAdditional }}
+      <field name="pool_f_stored">{{ .PoolAdditional }}</field>
+      {{ end }}
       <field name="location_f_stored">Internet Materials</field>
       <field name="shadowed_location_f_stored">VISIBLE</field>
       <field name="uva_availability_f_stored">Online</field>
