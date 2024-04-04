@@ -5,6 +5,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"net/http"
 	"strings"
@@ -20,8 +21,15 @@ func notifySis(config *Config, fields uvaeasystore.EasyStoreObjectFields, auth s
 	url = strings.Replace(url, "{:auth}", auth, 1)
 	url = strings.Replace(url, "{:doi}", doi, 1)
 
-	_, err := httpPut(client, url, nil)
-	return err
+	buf, err := httpPut(client, url, nil)
+	if err != nil {
+		if buf != nil {
+			fmt.Printf("ERROR: failed response [%s]\n", string(buf))
+		}
+		return err
+	}
+
+	return nil
 }
 
 //

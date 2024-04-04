@@ -63,10 +63,12 @@ func updateAuthorOrcidActivity(config *Config, eso uvaeasystore.EasyStoreObject,
 		return "", err
 	}
 
-	//fmt.Printf("PUT PAYLOAD [%s]\n", string(pl))
-
 	buf, err := httpPut(client, url, pl)
 	if err != nil {
+		fmt.Printf("ERROR: failed payload [%s]\n", string(pl))
+		if buf != nil {
+			fmt.Printf("ERROR: failed response [%s]\n", string(buf))
+		}
 		return "", err
 	}
 
