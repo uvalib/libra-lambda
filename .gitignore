@@ -12,8 +12,9 @@ easystore.go
 http.go
 main-cmdline.go
 main-lambda.go
+orcid-get.go
 parameter.go
 s3.go
 
 # dont ignore common directory
-!libra-sis-notify
+!lambda-common/*.go

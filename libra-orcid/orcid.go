@@ -14,19 +14,6 @@ import (
 	"strings"
 )
 
-type OrcidDetailsResponse struct {
-	Status  int            `json:"status"`
-	Message string         `json:"message"`
-	Details []OrcidDetails `json:"results"`
-}
-
-type OrcidDetails struct {
-	ID    string `json:"id,omitempty"`
-	Cid   string `json:"cid,omitempty"`
-	Orcid string `json:"orcid,omitempty"`
-	URI   string `json:"uri,omitempty"`
-}
-
 type OrcidActivityUpdateResponse struct {
 	Status     int    `json:"status"`
 	Message    string `json:"message"`
@@ -94,48 +81,6 @@ func updateAuthorOrcidActivity(config *Config, eso uvaeasystore.EasyStoreObject,
 
 	// all good apparently
 	return resp.UpdateCode, nil
-}
-
-func getAuthorOrcidDetails(config *Config, eso uvaeasystore.EasyStoreObject, auth string, client *http.Client) (*OrcidDetails, error) {
-
-	// get author details
-	authorId, err := getWorkAuthor(eso)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(authorId) == 0 {
-		fmt.Printf("WARNING: cannot locate author\n")
-		return nil, nil
-	}
-
-	// substitute values into url
-	url := strings.Replace(config.OrcidGetDetailsUrl, "{:id}", authorId, 1)
-	url = strings.Replace(url, "{:auth}", auth, 1)
-
-	payload, err := httpGet(client, url)
-	if err != nil {
-		if strings.Contains(err.Error(), "HTTP 404") == true {
-			return nil, nil
-		}
-		return nil, err
-	}
-
-	resp := OrcidDetailsResponse{}
-	err = json.Unmarshal(payload, &resp)
-	if err != nil {
-		fmt.Printf("ERROR: json unmarshal of OrcidDetailsResponse (%s)\n", err.Error())
-		return nil, err
-	}
-
-	// if we have details, return them
-	if len(resp.Details) != 0 {
-		fmt.Printf("INFO: located ORCID [%s] for author [%s]\n", resp.Details[0].Orcid, authorId)
-		return &resp.Details[0], nil
-	}
-
-	// no error, nothing found
-	return nil, nil
 }
 
 func createUpdateSchema(eso uvaeasystore.EasyStoreObject) (*WorkSchema, error) {

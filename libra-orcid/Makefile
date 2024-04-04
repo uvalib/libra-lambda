@@ -30,6 +30,7 @@ common:
 	-ln -s $(COMMON)/http.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-cmdline.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-lambda.go . 2> /dev/null || true
+	-ln -s $(COMMON)/orcid-get.go . 2> /dev/null || true
 
 clean:
 	$(GOCLEAN)

@@ -50,6 +50,19 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
+	// get author details
+	authorId, err := getWorkAuthor(eso)
+	if err != nil {
+		fmt.Printf("ERROR: cannot locate author ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+		return err
+	}
+
+	if len(authorId) == 0 {
+		fmt.Printf("WARNING: cannot locate author ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
+		// noting to do
+		return nil
+	}
+
 	// get a new http client and get an auth token
 	httpClient := newHttpClient(1, 30)
 	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
@@ -57,16 +70,16 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// determine if we have ORCID details for the author
-	orcidDetails, err := getAuthorOrcidDetails(cfg, eso, token, httpClient)
+	// attempt to get ORCID for the author
+	orcid, err := getOrcidDetails(cfg.OrcidGetDetailsUrl, authorId, token, httpClient)
 	if err != nil {
-		fmt.Printf("ERROR: getting author ORCID details ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+		fmt.Printf("ERROR: getting %s ORCID details ns/oid [%s/%s] (%s)\n", authorId, ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
 	// if author does not have ORCID details, it's all over
-	if orcidDetails == nil {
-		fmt.Printf("INFO: no ORCID details for author of ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
+	if len(orcid) == 0 {
+		fmt.Printf("INFO: no ORCID details for %s ns/oid [%s/%s]\n", authorId, ev.Namespace, ev.Identifier)
 		return nil
 	}
 
@@ -74,9 +87,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	fields := eso.Fields()
 	updateCode := fields["orcid-update-code"]
 
-	newCode, err := updateAuthorOrcidActivity(cfg, eso, orcidDetails.Cid, updateCode, token, httpClient)
+	newCode, err := updateAuthorOrcidActivity(cfg, eso, authorId, updateCode, token, httpClient)
 	if err != nil {
-		fmt.Printf("ERROR: updating author ORCID activity ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+		fmt.Printf("ERROR: updating %s ORCID activity ns/oid [%s/%s] (%s)\n", authorId, ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
