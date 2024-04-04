@@ -21,7 +21,7 @@ cmdline:
 
 deployable:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
-	cd bin; zip deployment.zip $(DEPLOYNAME)
+	cd bin; zip -r deployment.zip $(DEPLOYNAME) data
 
 common: deploy-data
 	-ln -s $(COMMON)/definitions.go . 2> /dev/null || true
