@@ -108,7 +108,7 @@ func createUpdateSchema(eso uvaeasystore.EasyStoreObject) (*WorkSchema, error) {
 
 		schema.Authors = getEtdPersons(meta)
 		schema.Abstract = meta.Abstract
-		schema.PublicationDate = extractYYMMDD(meta.PublicationDate)
+		schema.PublicationDate = extractYYMMDD(fields["publish-date"])
 		schema.Title = meta.Title
 
 		schema.ResourceType = "supervised-student-publication"
@@ -125,8 +125,8 @@ func createUpdateSchema(eso uvaeasystore.EasyStoreObject) (*WorkSchema, error) {
 
 		schema.Authors = getOpenPersons(meta)
 		schema.Abstract = meta.Abstract
-		schema.PublicationDate = extractYYMMDD(meta.PublicationDate)
-		schema.ResourceType = MapResourceType(meta.ResourceType)
+		schema.PublicationDate = extractYYMMDD(fields["publish-date"])
+		schema.ResourceType = mapResourceType(meta.ResourceType)
 		schema.Title = meta.Title
 	}
 
@@ -185,7 +185,7 @@ func getOpenPersons(meta *librametadata.OAWork) []Person {
 	return persons
 }
 
-func MapResourceType(rt string) string {
+func mapResourceType(rt string) string {
 	switch rt {
 	case "Article":
 		return "journal-article"
