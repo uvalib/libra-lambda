@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 )
 
@@ -169,13 +168,7 @@ func loadConfiguration() (*Config, error) {
 
 	log.Printf("INFO: loading data/resourceTypes.json")
 
-	// os.Executable gives a more reliable relative path
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	exPath := filepath.Dir(ex)
-	bytes, err := os.ReadFile(exPath + "/data/resourceTypes.json")
+	bytes, err := os.ReadFile("./data/resourceTypes.json")
 	if err != nil {
 		log.Printf("ERROR: unable to load resourceTypes: %s", err.Error())
 	} else {
