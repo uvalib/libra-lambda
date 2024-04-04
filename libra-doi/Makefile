@@ -23,12 +23,18 @@ deployable:
 	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
 	cd bin; zip deployment.zip $(DEPLOYNAME)
 
-common:
+common: deploy-data
 	-ln -s $(COMMON)/definitions.go . 2> /dev/null || true
 	-ln -s $(COMMON)/easystore.go . 2> /dev/null || true
 	-ln -s $(COMMON)/http.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-cmdline.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-lambda-sqs.go . 2> /dev/null || true
+
+deploy-data:
+	mkdir -p bin/
+	rm -rf bin/data
+	mkdir -p bin/data
+	cp ./data/* bin/data
 
 clean:
 	$(GOCLEAN)
