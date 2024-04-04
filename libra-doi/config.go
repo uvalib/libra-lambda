@@ -163,7 +163,7 @@ func loadConfiguration() (*Config, error) {
 	}
 
 	log.Printf("INFO: load resource types")
-	bytes, err := os.ReadFile("./data/resourceTypes.json")
+	bytes, err := os.ReadFile("libra-doi/data/resourceTypes.json")
 	if err != nil {
 		log.Printf("ERROR: unable to load resourceTypes: %s", err.Error())
 	} else {
