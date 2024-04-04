@@ -166,8 +166,9 @@ func loadConfiguration() (*Config, error) {
 		Path: "etd",
 	}
 
-	log.Printf("INFO: load resource types")
-	bytes, err := os.ReadFile("libra-doi/data/resourceTypes.json")
+	log.Printf("INFO: loading data/resourceTypes.json")
+
+	bytes, err := os.ReadFile("./data/resourceTypes.json")
 	if err != nil {
 		log.Printf("ERROR: unable to load resourceTypes: %s", err.Error())
 	} else {
