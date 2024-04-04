@@ -153,7 +153,6 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 			ResourceType:        work.ResourceType,
 		}},
 		Publisher: work.Publisher,
-
 	}
 	addDates(&payload, fields["publish-date"])
 	return payload

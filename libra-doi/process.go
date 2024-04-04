@@ -83,6 +83,9 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		payload = createOAPayload(work, cfg, fields)
 	}
 
+	payload.Data.Attributes.URL =
+		fmt.Sprintf("%s/public/%s/%s", cfg.PublicURLBase, cfg.OAPublicShoulder, ev.Identifier)
+
 	if len(payload.Data.Attributes.DOI) == 0 &&
 		fields["draft"] == "false" {
 		// No DOI but the work is published
