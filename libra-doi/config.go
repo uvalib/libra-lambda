@@ -14,6 +14,10 @@ type Config struct {
 	IDService  IDServiceConfig
 	DOIBaseURL string // base url for DOIs
 
+	PublicURLBase     string // Base URL for public pages
+	OAPublicShoulder  string
+	ETDPublicShoulder string
+
 	ETDNamespace  Namespace
 	OpenNamespace Namespace
 
@@ -193,6 +197,18 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	cfg.PublicURLBase, err = ensureSet("PUBLIC_URL_BASE")
+	if err != nil {
+		return nil, err
+	}
+	cfg.OAPublicShoulder, err = ensureSet("OA_PUBLIC_SHOULDER")
+	if err != nil {
+		return nil, err
+	}
+	cfg.ETDPublicShoulder, err = ensureSet("ETD_PUBLIC_SHOULDER")
+	if err != nil {
+		return nil, err
+	}
 
 	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
 	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
@@ -210,6 +226,9 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] IDServiceShoulder = [%s]\n", cfg.IDService.Shoulder)
 	fmt.Printf("[conf] IDServiceUser     = [%s]\n", cfg.IDService.User)
 	fmt.Printf("[conf] IDServicePassword = [REDACTED]\n")
+
+	fmt.Printf("[conf] Public Libra OA URL format  = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.OAPublicShoulder)
+	fmt.Printf("[conf] Public Libra ETD URL format = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.ETDPublicShoulder)
 
 	return &cfg, nil
 }
