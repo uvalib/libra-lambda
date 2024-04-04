@@ -11,8 +11,8 @@ definitions.go
 easystore.go
 http.go
 main-cmdline.go
-main-lambda.go
 main-lambda-eb.go
+main-lambda-sqs.go
 orcid-get.go
 parameter.go
 s3.go
