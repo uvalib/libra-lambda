@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/uvalib/easystore/uvaeasystore"
 	librametadata "github.com/uvalib/libra-metadata"
 )
@@ -31,7 +33,7 @@ type DescriptionData struct {
 type PersonData struct {
 	GivenName       string               `json:"givenName"`
 	FamilyName      string               `json:"familyName"`
-	NameType        string               `json:"nameType"`
+	NameType        string               `json:"nameType,omitempty"`
 	ContributorType string               `json:"contributorType,omitempty"`
 	Affiliation     []AffiliationData    `json:"affiliation,omitempty"`
 	NameIdentifiers []NameIdentifierData `json:"nameIdentifiers,omitempty"`
@@ -42,13 +44,13 @@ type NameIdentifierData struct {
 	NameIdentifierScheme string `json:"nameIdentifierScheme"`
 }
 type SubjectData struct {
-	Subject string `json:"subject"`
+	Subject string `json:"subject,omitempty"`
 }
 type RightsData struct {
-	Rights string `json:"rights"`
+	Rights string `json:"rights,omitempty"`
 }
 type FundingData struct {
-	FunderName string `json:"funderName"`
+	FunderName string `json:"funderName,omitempty"`
 }
 type TypeData struct {
 	ResourceType        string `json:"resourceType,omitempty"`
@@ -108,17 +110,19 @@ func getGeneralResourceType(cfg *Config, resourceTypeStr string) string {
 func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
 	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
+	// remove http://doi... prefix
+	lastPath := regexp.MustCompile("[^/]+$")
+	bareDOI := lastPath.FindString(fields["doi"])
 	payload.Data.Attributes = AttributesData{
-		// remove doi: prefix
-		DOI:    strings.Replace(fields["doi"], "doi:", "", 1),          // bare DOI
+		DOI:    bareDOI,
 		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
 			DescriptionType: "Abstract",
 		}},
-		Creators:          []PersonData{parseContributor(work.Author)},
-		Contributors:      parseContributors(work.Advisors),
+		Creators:          []PersonData{parseContributor(work.Author, "")},
+		Contributors:      parseContributors(work.Advisors, "RelatedPerson"),
 		Subjects:          parseKeywords(work.Keywords),
 		RightsList:        []RightsData{{Rights: work.License}},
 		FundingReferences: parseSponsors(work.Sponsors),
@@ -136,17 +140,21 @@ func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasyst
 func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
 	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
+
+	// remove http://doi... prefix
+	lastPath := regexp.MustCompile("[^/]+$")
+	bareDOI := lastPath.FindString(fields["doi"])
+
 	payload.Data.Attributes = AttributesData{
-		// remove doi: prefix
-		DOI:    strings.Replace(fields["doi"], "doi:", "", 1),          // bare DOI
+		DOI:    bareDOI,
 		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
 			DescriptionType: "Abstract",
 		}},
-		Creators:          parseContributors(work.Authors),
-		Contributors:      parseContributors(work.Contributors),
+		Creators:          parseContributors(work.Authors, ""),
+		Contributors:      parseContributors(work.Contributors, "Other"),
 		Subjects:          parseKeywords(work.Keywords),
 		RightsList:        []RightsData{{Rights: work.License}},
 		FundingReferences: parseSponsors(work.Sponsors),
@@ -158,6 +166,7 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 		},
 		Publisher: work.Publisher,
 	}
+
 	addDates(&payload, fields["publish-date"])
 	return payload
 }
@@ -197,25 +206,31 @@ func parseKeywords(keywords []string) []SubjectData {
 
 func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
 	var response []byte
-	var httpMethod string
+	var httpMethod, path string
+
 	if len(payload.Data.Attributes.DOI) == 0 {
+		// no DOI
 		httpMethod = "POST"
+		path = "/dois"
+
 	} else {
+		// update existing
 		httpMethod = "PUT"
+		path = fmt.Sprintf("/dois/%s/%s", payload.Data.Attributes.Prefix, payload.Data.Attributes.DOI)
 	}
 
 	jsonPayload, _ := json.Marshal(payload)
 
-	req, err := http.NewRequest(httpMethod, cfg.IDService.BaseURL+"/dois", bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest(httpMethod, cfg.IDService.BaseURL+path, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
-	req.Header.Add("content-type", "application/json")
+	req.Header.Add("content-type", "application/vnd.api+json")
 	req.SetBasicAuth(cfg.IDService.User, cfg.IDService.Password)
 
-	response, err = httpPost(&cfg.httpClient, req)
-	//spew.Dump(response)
+	response, err = httpSend(&cfg.httpClient, req)
 	if err != nil {
+		spew.Dump(response)
 		return "", err
 	}
 
@@ -233,18 +248,19 @@ func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
 	return responseData.Data.ID, nil
 }
 
-func parseContributors(contributors []librametadata.ContributorData) []PersonData {
+func parseContributors(contributors []librametadata.ContributorData, typeName string) []PersonData {
 	var contribList []PersonData
 	for _, contrib := range contributors {
-		contribList = append(contribList, parseContributor(contrib))
+		contribList = append(contribList, parseContributor(contrib, typeName))
 	}
 	return contribList
 }
 
-func parseContributor(contributor librametadata.ContributorData) PersonData {
+func parseContributor(contributor librametadata.ContributorData, contribType string) PersonData {
 	var person PersonData
 	person.GivenName = contributor.FirstName
 	person.FamilyName = contributor.LastName
+	person.ContributorType = contribType
 	person.NameType = "Personal"
 	if len(contributor.ComputeID) > 0 {
 		person.Affiliation = []AffiliationData{UVAAffiliation()}

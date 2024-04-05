@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/uvalib/easystore/uvaeasystore"
@@ -101,18 +102,27 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		payload.Data.Attributes.Event = "publish"
 
 	} // else Datacite creates a draft by default
-	cfg.httpClient = *newHttpClient(1, 30)
+
 	spew.Dump(payload)
 
+	cfg.httpClient = *newHttpClient(1, 30)
 	// send to Datacite
 	doi, err := sendToDatacite(cfg, &payload)
 	if err != nil {
 		fmt.Printf("ERROR: sending to Datacite (%s)\n", err.Error())
 		return err
 	}
-	fmt.Printf("INFO: New DOI for %s is %s\n", ev.Identifier, doi)
 
-	// Got the DOI, now save it...
+	// Save the new DOI
+	if !strings.HasSuffix(fields["doi"], doi) {
+		fmt.Printf("INFO: New DOI for %s is %s\n", ev.Identifier, doi)
+		fields["doi"] = fmt.Sprintf("%s/%s", cfg.DOIBaseURL, doi)
+		eso.SetFields(fields)
+		return putEasystoreObject(es, eso, uvaeasystore.Fields)
+	}
+
+	// DOI update complete
+	fmt.Printf("INFO: Successfully updated\n")
 
 	return nil
 }

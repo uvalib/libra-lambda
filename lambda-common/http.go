@@ -147,7 +147,7 @@ func httpPut(client *http.Client, url string, payload []byte) ([]byte, error) {
 	}
 }
 
-func httpPost(client *http.Client, req *http.Request) ([]byte, error) {
+func httpSend(client *http.Client, req *http.Request) ([]byte, error) {
 
 	var response *http.Response
 	var err error
@@ -157,12 +157,12 @@ func httpPost(client *http.Client, req *http.Request) ([]byte, error) {
 		start := time.Now()
 		response, err = client.Do(req)
 		duration := time.Since(start)
-		fmt.Printf("INFO: POST %s (elapsed %d ms)\n", url, duration.Milliseconds())
+		fmt.Printf("INFO: %s %s (elapsed %d ms)\n", req.Method, url, duration.Milliseconds())
 
 		count++
 		if err != nil {
 			if canRetry(err) == false {
-				fmt.Printf("ERROR: POST %s failed with error (%s)\n", url, err)
+				fmt.Printf("ERROR: %s %s failed with error (%s)\n", req.Method, url, err)
 				return nil, err
 			}
 
@@ -171,7 +171,7 @@ func httpPost(client *http.Client, req *http.Request) ([]byte, error) {
 				return nil, err
 			}
 
-			fmt.Printf("ERROR: POST %s failed with error, retrying (%s)\n", url, err)
+			fmt.Printf("ERROR: %s %s failed with error, retrying (%s)\n", req.Method, url, err)
 
 			// sleep for a bit before retrying
 			time.Sleep(retrySleepTime)
@@ -185,7 +185,7 @@ func httpPost(client *http.Client, req *http.Request) ([]byte, error) {
 				if response.StatusCode == http.StatusNotFound {
 					logLevel = "INFO"
 				}
-				fmt.Printf("%s: POST %s failed with status %d\n", logLevel, url, response.StatusCode)
+				fmt.Printf("%s: %s %s failed with status %d\n", logLevel, req.Method, url, response.StatusCode)
 
 				body, _ := io.ReadAll(response.Body)
 
