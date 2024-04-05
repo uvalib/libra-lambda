@@ -4,8 +4,9 @@ go 1.21.7
 
 require (
 	github.com/aws/aws-lambda-go v1.46.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240403150022-38d79ce39869
-	github.com/uvalib/libra-metadata v0.0.0-20240403192441-0d45b7ced964
+	github.com/uvalib/libra-metadata v0.0.0-20240405123602-a54d2a70fae3
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240325152856-57ba633b6d1b
 )
 
@@ -34,5 +35,5 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
-	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
+	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0 // indirect
 )

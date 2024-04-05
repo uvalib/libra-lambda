@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -142,6 +143,61 @@ func httpPut(client *http.Client, url string, payload []byte) ([]byte, error) {
 				//fmt.Printf( body )
 				return body, nil
 			}
+		}
+	}
+}
+
+func httpPost(client *http.Client, req *http.Request) ([]byte, error) {
+
+	var response *http.Response
+	var err error
+	url := req.URL.String()
+	count := 0
+	for {
+		start := time.Now()
+		response, err = client.Do(req)
+		duration := time.Since(start)
+		fmt.Printf("INFO: POST %s (elapsed %d ms)\n", url, duration.Milliseconds())
+
+		count++
+		if err != nil {
+			if canRetry(err) == false {
+				fmt.Printf("ERROR: POST %s failed with error (%s)\n", url, err)
+				return nil, err
+			}
+
+			// break when tried too many times
+			if count >= maxHttpRetries {
+				return nil, err
+			}
+
+			fmt.Printf("ERROR: POST %s failed with error, retrying (%s)\n", url, err)
+
+			// sleep for a bit before retrying
+			time.Sleep(retrySleepTime)
+		} else {
+
+			defer response.Body.Close()
+
+			if response.StatusCode >= 300 {
+				logLevel := "ERROR"
+				// log not found as informational instead of as an error
+				if response.StatusCode == http.StatusNotFound {
+					logLevel = "INFO"
+				}
+				fmt.Printf("%s: POST %s failed with status %d\n", logLevel, url, response.StatusCode)
+
+				body, _ := io.ReadAll(response.Body)
+
+				return body, fmt.Errorf("request returns HTTP %d", response.StatusCode)
+			}
+
+			body, err := io.ReadAll(response.Body)
+			if err != nil {
+				return nil, err
+			}
+			//fmt.Printf( body )
+			return body, nil
 		}
 	}
 }

@@ -1,10 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/uvalib/easystore/uvaeasystore"
 	librametadata "github.com/uvalib/libra-metadata"
 )
@@ -13,9 +17,9 @@ import (
 
 type AffiliationData struct {
 	Name                        string `json:"name"`
-	SchemeURI                   string `json:"schemeUri"`
-	AffiliationIdentifier       string `json:"affiliationIdentifier"`
-	AffiliationIdentifierScheme string `json:"affiliationIdentifierScheme"`
+	SchemeURI                   string `json:"schemeUri,omitempty"`
+	AffiliationIdentifier       string `json:"affiliationIdentifier,omitempty"`
+	AffiliationIdentifierScheme string `json:"affiliationIdentifierScheme,omitempty"`
 }
 
 type TitleData struct {
@@ -26,12 +30,12 @@ type DescriptionData struct {
 	DescriptionType string `json:"descriptionType"`
 }
 type PersonData struct {
-	GivenName       string             `json:"givenName"`
-	FamilyName      string             `json:"familyName"`
-	NameType        string             `json:"nameType"`
-	ContributorType string             `json:"contributorType,omitempty"`
-	Affiliation     AffiliationData    `json:"affiliation,omitempty"`
-	NameIdentifiers NameIdentifierData `json:"nameIdentifier,omitempty"`
+	GivenName       string               `json:"givenName"`
+	FamilyName      string               `json:"familyName"`
+	NameType        string               `json:"nameType"`
+	ContributorType string               `json:"contributorType,omitempty"`
+	Affiliation     []AffiliationData    `json:"affiliation,omitempty"`
+	NameIdentifiers []NameIdentifierData `json:"nameIdentifiers,omitempty"`
 }
 type NameIdentifierData struct {
 	SchemeURI            string `json:"schemeUri"`
@@ -48,8 +52,8 @@ type FundingData struct {
 	FunderName string `json:"funderName"`
 }
 type TypeData struct {
-	ResourceType        string `json:"resourceType"`
-	ResourceTypeGeneral string `json:"resourceTypeGeneral"`
+	ResourceType        string `json:"resourceType,omitempty"`
+	ResourceTypeGeneral string `json:"resourceTypeGeneral,omitempty"`
 }
 type DateData struct {
 	Date     string `json:"date"`
@@ -62,22 +66,23 @@ type AttributesData struct {
 	Prefix            string            `json:"prefix"`
 	URL               string            `json:"url"`
 	Titles            []TitleData       `json:"titles"`
-	Descriptions      []DescriptionData `json:"descriptions"`
-	Creators          []PersonData      `json:"creators"`
-	Contributors      []PersonData      `json:"contributors"`
-	Subjects          []SubjectData     `json:"subjects"`
-	RightsList        []RightsData      `json:"rightsList"`
-	FundingReferences []FundingData     `json:"fundingReferences"`
-	Types             []TypeData        `json:"types"`
-	Dates             []DateData        `json:"dates"`
-	PublicationYear   string            `json:"publicationYear"`
-	Publisher         string            `json:"publisher"`
+	Descriptions      []DescriptionData `json:"descriptions,omitempty"`
+	Creators          []PersonData      `json:"creators,omitempty"`
+	Contributors      []PersonData      `json:"contributors,omitempty"`
+	Subjects          []SubjectData     `json:"subjects,omitempty"`
+	RightsList        []RightsData      `json:"rightsList,omitempty"`
+	FundingReferences []FundingData     `json:"fundingReferences,omitempty"`
+	Types             TypeData          `json:"types,omitempty"`
+	Dates             []DateData        `json:"dates,omitempty"`
+	PublicationYear   string            `json:"publicationYear,omitempty"`
+	Publisher         string            `json:"publisher,omitempty"`
 
 	Affiliation AffiliationData `json:"affiliation"`
 }
 
 type DataciteData struct {
 	Data struct {
+		ID         string         `json:"id,omitempty"`
 		TypeName   string         `json:"type"`
 		Attributes AttributesData `json:"attributes"`
 	} `json:"data"`
@@ -120,10 +125,10 @@ func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasyst
 		FundingReferences: parseSponsors(work.Sponsors),
 
 		Affiliation: UVAAffiliation(),
-		Types: []TypeData{{
+		Types: TypeData{
 			ResourceTypeGeneral: "Text",
 			ResourceType:        "Dissertation",
-		}},
+		},
 		Publisher: "University of Virginia",
 	}
 	addDates(&payload, fields["publish-date"])
@@ -148,10 +153,10 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 		FundingReferences: parseSponsors(work.Sponsors),
 
 		Affiliation: UVAAffiliation(),
-		Types: []TypeData{{
+		Types: TypeData{
 			ResourceTypeGeneral: getGeneralResourceType(cfg, work.ResourceType),
 			ResourceType:        work.ResourceType,
-		}},
+		},
 		Publisher: work.Publisher,
 	}
 	addDates(&payload, fields["publish-date"])
@@ -191,13 +196,42 @@ func parseKeywords(keywords []string) []SubjectData {
 
 }
 
-func createDOI(cfg *Config, obj uvaeasystore.EasyStoreObject) (string, error) {
-	return "todo", nil
+func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
+	var response []byte
+	var httpMethod string
+	if len(payload.Data.Attributes.DOI) == 0 {
+		httpMethod = "POST"
+	} else {
+		httpMethod = "PUT"
+	}
 
-}
+	jsonPayload, _ := json.Marshal(payload)
 
-func updateMetadata(cfg *Config, obj uvaeasystore.EasyStoreObject) (string, error) {
-	return "todo", nil
+	req, err := http.NewRequest(httpMethod, cfg.IDService.BaseURL+"/dois", bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("content-type", "application/json")
+	req.SetBasicAuth(cfg.IDService.User, cfg.IDService.Password)
+
+	response, err = httpPost(&cfg.httpClient, req)
+	spew.Dump(response)
+	if err != nil {
+		return "", err
+	}
+
+	// after success, we only care about the DOI here
+	type DataciteResponseData struct {
+		Data struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+	var responseData DataciteResponseData
+	err = json.Unmarshal(response, &responseData)
+	if err != nil {
+		return "", err
+	}
+	return responseData.Data.ID, nil
 }
 
 func parseContributors(contributors []librametadata.ContributorData) []PersonData {
@@ -214,18 +248,18 @@ func parseContributor(contributor librametadata.ContributorData) PersonData {
 	person.FamilyName = contributor.LastName
 	person.NameType = "Personal"
 	if len(contributor.ComputeID) > 0 {
-		person.Affiliation = UVAAffiliation()
+		person.Affiliation = []AffiliationData{UVAAffiliation()}
 	} else {
-		person.Affiliation = AffiliationData{Name: contributor.Institution}
+		person.Affiliation = []AffiliationData{{Name: contributor.Institution}}
 	}
 
 	// Check for ORCID Account
 	if false && len(contributor.ORCID) > 0 {
-		person.NameIdentifiers = NameIdentifierData{
+		person.NameIdentifiers = []NameIdentifierData{{
 			SchemeURI:            "https://orcid.org",
 			NameIdentifier:       "Author's ORCID",
 			NameIdentifierScheme: "ORCID",
-		}
+		}}
 	}
 	return person
 
