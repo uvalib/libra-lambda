@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -115,7 +114,7 @@ func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasyst
 	bareDOI := lastPath.FindString(fields["doi"])
 	payload.Data.Attributes = AttributesData{
 		DOI:    bareDOI,
-		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
+		Prefix: cfg.IDService.Shoulder,
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
@@ -147,7 +146,7 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 
 	payload.Data.Attributes = AttributesData{
 		DOI:    bareDOI,
-		Prefix: strings.Replace(cfg.IDService.Shoulder, "doi:", "", 1), // bare prefix numerals
+		Prefix: cfg.IDService.Shoulder,
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
