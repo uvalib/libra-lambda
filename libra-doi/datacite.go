@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/uvalib/easystore/uvaeasystore"
 	librametadata "github.com/uvalib/libra-metadata"
 )
@@ -215,7 +214,7 @@ func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
 	req.SetBasicAuth(cfg.IDService.User, cfg.IDService.Password)
 
 	response, err = httpPost(&cfg.httpClient, req)
-	spew.Dump(response)
+	//spew.Dump(response)
 	if err != nil {
 		return "", err
 	}

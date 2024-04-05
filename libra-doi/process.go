@@ -76,7 +76,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 			return err
 		}
 
-		spew.Dump(work)
+		//spew.Dump(work)
 		payload = createETDPayload(work, cfg, fields)
 
 	} else if ev.Namespace == cfg.OpenNamespace.Name {
@@ -86,7 +86,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 			return err
 		}
 
-		spew.Dump(work)
+		//spew.Dump(work)
 		payload = createOAPayload(work, cfg, fields)
 	}
 
