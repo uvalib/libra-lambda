@@ -46,7 +46,7 @@
       <field name="sponsoring_agency_tsearch_stored">{{ $s }}</field>
 {{ end }}
       <field name="rights_tsearchf_stored">{{ .Work.License }}</field>
-      <field name="rs_uri_a">TODO</field>
+      <field name="rs_uri_a">{{ .Work.LicenseURL }}</field>
       <field name="format_f_stored">{{ .Work.ResourceType }}</field>
       <field name="format_orig_tsearch_stored">{{ .Work.ResourceType }}</field>
       <field name="format_orig_tsearch_stored">{{ .Work.ResourceType }}</field>
