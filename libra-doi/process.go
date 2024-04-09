@@ -38,6 +38,12 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
+	cfg.httpClient = newHttpClient(1, 30)
+	cfg.AuthToken, err = getAuthToken(cfg.httpClient, cfg.MintAuthURL)
+	if err != nil {
+		return err
+	}
+
 	// easystore access
 	es, err := newEasystore(cfg)
 	if err != nil {
@@ -78,7 +84,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 
 		//spew.Dump(work)
-		payload = createETDPayload(work, cfg, fields)
+		payload = createETDPayload(work, fields)
 
 	} else if ev.Namespace == cfg.OpenNamespace.Name {
 		work, err := librametadata.OAWorkFromBytes(mdBytes)
@@ -88,7 +94,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 
 		//spew.Dump(work)
-		payload = createOAPayload(work, cfg, fields)
+		payload = createOAPayload(work, fields)
 	}
 
 	payload.Data.Attributes.URL =
@@ -105,9 +111,8 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 
 	spew.Dump(payload)
 
-	cfg.httpClient = *newHttpClient(1, 30)
 	// send to Datacite
-	doi, err := sendToDatacite(cfg, &payload)
+	doi, err := sendToDatacite(&payload)
 	if err != nil {
 		fmt.Printf("ERROR: sending to Datacite (%s)\n", err.Error())
 		return err

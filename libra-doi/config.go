@@ -33,7 +33,11 @@ type Config struct {
 	BusName    string // name of the bus
 	SourceName string // name of the source
 
-	httpClient http.Client // shared http client
+	OrcidGetDetailsURL string // URL for orcid-ws
+	AuthToken          string
+	MintAuthURL        string
+
+	httpClient *http.Client // shared http client
 
 }
 
@@ -43,6 +47,7 @@ type Namespace struct {
 	Path string
 }
 
+// ResourceType such as book, article, etc
 type ResourceType struct {
 	Value    string
 	Label    string
@@ -124,11 +129,16 @@ func envToBool(env string) (bool, error) {
 	return b, nil
 }
 
+var cfg Config
+
+// Cfg returns the global configuration
+func Cfg() Config {
+	return cfg
+}
+
 // loadConfiguration will load the service configuration from env/cmdline
 // and return a pointer to it. Any failures are fatal.
 func loadConfiguration() (*Config, error) {
-
-	var cfg Config
 
 	var err error
 
@@ -211,6 +221,15 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	cfg.OrcidGetDetailsURL, err = ensureSetAndNonEmpty("ORCID_GET_DETAILS_URL")
+	if err != nil {
+		return nil, err
+	}
+	cfg.MintAuthURL, err = ensureSetAndNonEmpty("MINT_AUTH_URL")
+	if err != nil {
+		return nil, err
+	}
+
 	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
 	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
@@ -227,6 +246,9 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] IDServiceShoulder = [%s]\n", cfg.IDService.Shoulder)
 	fmt.Printf("[conf] IDServiceUser     = [%s]\n", cfg.IDService.User)
 	fmt.Printf("[conf] IDServicePassword = [REDACTED]\n")
+
+	fmt.Printf("[conf] ORCIDGetDetailsURL        = [%s]\n", cfg.OrcidGetDetailsURL)
+	fmt.Printf("[conf] MintAuthURL        = [%s]\n", cfg.MintAuthURL)
 
 	fmt.Printf("[conf] Public Libra OA URL format  = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.OAPublicShoulder)
 	fmt.Printf("[conf] Public Libra ETD URL format = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.ETDPublicShoulder)

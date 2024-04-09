@@ -97,8 +97,8 @@ func UVAAffiliation() AffiliationData {
 	}
 }
 
-func getGeneralResourceType(cfg *Config, resourceTypeStr string) string {
-	for _, rt := range cfg.ResourceTypes {
+func getGeneralResourceType(resourceTypeStr string) string {
+	for _, rt := range Cfg().ResourceTypes {
 		if rt.Value == resourceTypeStr {
 			return rt.Category
 		}
@@ -106,7 +106,7 @@ func getGeneralResourceType(cfg *Config, resourceTypeStr string) string {
 	return ""
 }
 
-func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
+func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
 	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
 	// remove http://doi... prefix
@@ -114,7 +114,7 @@ func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasyst
 	bareDOI := lastPath.FindString(fields["doi"])
 	payload.Data.Attributes = AttributesData{
 		DOI:    bareDOI,
-		Prefix: cfg.IDService.Shoulder,
+		Prefix: Cfg().IDService.Shoulder,
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
@@ -136,7 +136,7 @@ func createETDPayload(work *librametadata.ETDWork, cfg *Config, fields uvaeasyst
 	addDates(&payload, fields["publish-date"])
 	return payload
 }
-func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
+func createOAPayload(work *librametadata.OAWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
 	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
 
@@ -146,7 +146,7 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 
 	payload.Data.Attributes = AttributesData{
 		DOI:    bareDOI,
-		Prefix: cfg.IDService.Shoulder,
+		Prefix: Cfg().IDService.Shoulder,
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
 			Description:     work.Abstract,
@@ -160,7 +160,7 @@ func createOAPayload(work *librametadata.OAWork, cfg *Config, fields uvaeasystor
 
 		Affiliation: UVAAffiliation(),
 		Types: TypeData{
-			ResourceTypeGeneral: getGeneralResourceType(cfg, work.ResourceType),
+			ResourceTypeGeneral: getGeneralResourceType(work.ResourceType),
 			ResourceType:        work.ResourceType,
 		},
 		Publisher: work.Publisher,
@@ -203,7 +203,7 @@ func parseKeywords(keywords []string) []SubjectData {
 
 }
 
-func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
+func sendToDatacite(payload *DataciteData) (string, error) {
 	var response []byte
 	var httpMethod, path string
 
@@ -220,14 +220,14 @@ func sendToDatacite(cfg *Config, payload *DataciteData) (string, error) {
 
 	jsonPayload, _ := json.Marshal(payload)
 
-	req, err := http.NewRequest(httpMethod, cfg.IDService.BaseURL+path, bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL+path, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Add("content-type", "application/vnd.api+json")
-	req.SetBasicAuth(cfg.IDService.User, cfg.IDService.Password)
+	req.SetBasicAuth(Cfg().IDService.User, Cfg().IDService.Password)
 
-	response, err = httpSend(&cfg.httpClient, req)
+	response, err = httpSend(Cfg().httpClient, req)
 	if err != nil {
 		spew.Dump(response)
 		return "", err
@@ -268,10 +268,15 @@ func parseContributor(contributor librametadata.ContributorData, contribType str
 	}
 
 	// Check for ORCID Account
-	if false && len(contributor.ORCID) > 0 {
+	orcid, err := getOrcidDetails(Cfg().OrcidGetDetailsURL, contributor.ComputeID, Cfg().AuthToken, Cfg().httpClient)
+	if err != nil {
+		fmt.Printf("WARN: unable to get ORCID details for %s\n", contributor.ComputeID)
+	}
+
+	if len(orcid) > 0 {
 		person.NameIdentifiers = []NameIdentifierData{{
+			NameIdentifier:       orcid,
 			SchemeURI:            "https://orcid.org",
-			NameIdentifier:       "Author's ORCID",
 			NameIdentifierScheme: "ORCID",
 		}}
 	}
