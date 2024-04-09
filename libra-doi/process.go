@@ -62,6 +62,13 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fields := eso.Fields()
 
+	if len(fields["doi"]) > 0 && strings.HasPrefix(fields["doi"], Cfg().DOIBaseURL) == false {
+		// doi exists but for the wrong environment.
+		// if a production DOI is sent to test
+		fmt.Printf("WARN: DOI %s has the wrong Datacite hostname for this environment (%s). ", fields["doi"], Cfg().DOIBaseURL)
+		return nil
+	}
+
 	if eso.Metadata() == nil {
 		fmt.Printf("ERROR: unable to get metadata payload for ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
 		return ErrNoMetadata
@@ -76,13 +83,30 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 	spew.Dump(fields)
 
 	var payload DataciteData
+
+	// If there is no DOI and the work is published, set the event to publish
+	if len(fields["doi"]) == 0 &&
+		fields["draft"] == "false" {
+		// No DOI and the work is published
+		payload.Data.Attributes.Event = "publish"
+
+	} else if len(fields["doi"]) == 0 && fields["draft"] == "true" &&
+		ev.Namespace != cfg.ETDNamespace.Name {
+		// Quit if draft with no DOI and not an ETD
+		fmt.Printf("INFO: Skipping draft work %s \n", ev.Identifier)
+		return nil
+
+	} else if len(fields["doi"]) > 0 && fields["draft"] == "true" {
+		// If the work has a DOI but is a draft, set the event to hide
+		payload.Data.Attributes.Event = "hide"
+	} // A draft is created when event is blank
+
 	if ev.Namespace == cfg.ETDNamespace.Name {
 		work, err := librametadata.ETDWorkFromBytes(mdBytes)
 		if err != nil {
 			fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
 			return err
 		}
-
 		//spew.Dump(work)
 		payload = createETDPayload(work, fields)
 
@@ -92,22 +116,12 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 			fmt.Printf("ERROR: unable to process OA Work  %s\n", err.Error())
 			return err
 		}
-
 		//spew.Dump(work)
 		payload = createOAPayload(work, fields)
 	}
 
 	payload.Data.Attributes.URL =
 		fmt.Sprintf("%s/public/%s/%s", cfg.PublicURLBase, cfg.OAPublicShoulder, ev.Identifier)
-
-	if len(payload.Data.Attributes.DOI) == 0 &&
-		fields["draft"] == "false" {
-		// No DOI but the work is published
-		// Maybe this should follow the bus event
-
-		payload.Data.Attributes.Event = "publish"
-
-	} // else Datacite creates a draft by default
 
 	spew.Dump(payload)
 
