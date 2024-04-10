@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/libra-metadata"
+	"strings"
 	"text/template"
+	"time"
 )
 
 // templates holds our templates
@@ -34,8 +36,14 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 		return nil, err
 	}
 
+	// create the function map
+	fMap := template.FuncMap{
+		"ToLower": strings.ToLower,
+		"ToUpper": strings.ToUpper,
+	}
+
 	// parse the templateFile
-	tmpl, err := template.New("doc").Parse(string(templateStr))
+	tmpl, err := template.New("doc").Funcs(fMap).Parse(string(templateStr))
 	if err != nil {
 		return nil, err
 	}
@@ -53,11 +61,14 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 	type Attributes struct {
-		Doi       string // work DOI
-		Id        string // work identifier
-		TitleSort string // field used by SOLR for sorting/grouping
-		Title2Key string // field used by SOLR for sorting/grouping
-		Title3Key string // field used by SOLR for sorting/grouping
+		Doi           string // work DOI
+		Id            string // work identifier
+		IndexDateTime string // current date/time
+		PubDate       string // publication year
+		PubYear       string // publication year
+		ReceivedDate  string // date received
+		TitleSort     string // field used by SOLR for sorting/grouping
+		Title2Key     string // field used by SOLR for sorting/grouping
 
 		Work librametadata.ETDWork
 	}
@@ -84,12 +95,15 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	titleForSort := titleSort(meta.Title, languages)
 	title2Key := titleForSort + titleSuffix(meta.Author.FirstName, meta.Author.LastName)
 	attribs := Attributes{
-		Work:      *meta,
-		Doi:       fields["doi"],
-		Id:        work.Id(),
-		TitleSort: titleForSort,
-		Title2Key: title2Key,
-		Title3Key: title2Key, // same as above
+		Work:          *meta,
+		Doi:           fields["doi"],
+		Id:            work.Id(),
+		IndexDateTime: time.Now().Format("20060102150405"),
+		PubDate:       fields["publish-date"],
+		PubYear:       extractYYMMDD(fields["publish-date"]),
+		ReceivedDate:  extractYYMMDD(fields["create-date"]),
+		TitleSort:     titleForSort,
+		Title2Key:     title2Key,
 	}
 
 	// render the template
