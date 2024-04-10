@@ -134,10 +134,26 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// Save the new DOI
 	if !strings.HasSuffix(fields["doi"], doi) {
-		fmt.Printf("INFO: New DOI for %s is %s\n", ev.Identifier, doi)
+		fmt.Printf("INFO: New DOI for [%s/%s] is %s\n", ev.Namespace, ev.Identifier, doi)
+
+		// Refresh easystore object
+		eso, err = getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Fields+uvaeasystore.Metadata)
+		if err != nil {
+			fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+			fmt.Printf("ERROR: DOI created but not saved for [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, doi)
+			return err
+		}
+		fields = eso.Fields()
+
 		fields["doi"] = fmt.Sprintf("%s/%s", cfg.DOIBaseURL, doi)
 		eso.SetFields(fields)
-		return putEasystoreObject(es, eso, uvaeasystore.Fields)
+		err = putEasystoreObject(es, eso, uvaeasystore.Fields)
+		if err != nil {
+			fmt.Printf("ERROR: unable to update object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+			fmt.Printf("ERROR: DOI created but not saved for [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, doi)
+			return err
+		}
+		return nil
 	}
 
 	// DOI update complete
