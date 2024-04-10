@@ -39,7 +39,6 @@
       <field name="date_indexed_f_stored">{{ .IndexDateTime }}</field>
       <field name="url_str_stored">{{ .Doi }}</field>
       <field name="url_label_str_stored">Access Online</field>
-      <field name="thumbnail_url_str_stored">TODO</field>
 {{ range $s := .Work.Sponsors }}
       <field name="sponsoring_agency_tsearch_stored">{{ $s }}</field>
 {{ end }}
