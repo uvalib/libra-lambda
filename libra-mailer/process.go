@@ -134,7 +134,12 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// update the field to note that we have sent the email(s)
 	fields[emailSentFieldName] = time.DateTime
 	obj.SetFields(fields)
-	return putEasystoreObject(es, obj, uvaeasystore.Fields)
+	err = putEasystoreObject(es, obj, uvaeasystore.Fields)
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+		return err
+	}
+	return nil
 }
 
 //

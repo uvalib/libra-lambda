@@ -97,7 +97,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	if newCode != updateCode {
 		fields["orcid-update-code"] = newCode
 		eso.SetFields(fields)
-		return putEasystoreObject(es, eso, uvaeasystore.Fields)
+		err = putEasystoreObject(es, eso, uvaeasystore.Fields)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err.Error())
+			return err
+		}
 	}
 
 	return nil
