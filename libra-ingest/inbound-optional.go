@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
+	"github.com/uvalib/libra-metadata"
 	"net/http"
 	"strconv"
 	"strings"
@@ -45,8 +46,13 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		fields["create-date"] = time.Now().Format(time.RFC3339)
 		fields["source-id"] = fmt.Sprintf("optional:%s", o.Id)
 		fields["source"] = "optional"
-
 		eso.SetFields(fields)
+
+		// add the metadata
+		meta := librametadata.ETDWork{}
+		meta.Degree = o.Degree
+		meta.Author.ComputeID = o.For
+		eso.SetMetadata(meta)
 
 		// create the new object
 		err := createEasystoreObject(es, eso)
