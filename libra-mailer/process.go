@@ -15,6 +15,8 @@ import (
 // field name indicating email already sent
 var emailSentFieldName = "email-sent"
 
+// should be "invitation-sent" or "submitted-sent"
+
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event
@@ -132,7 +134,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// update the field to note that we have sent the email(s)
-	fields[emailSentFieldName] = time.DateTime
+	fields[emailSentFieldName] = time.Now().Format(time.RFC3339)
 	obj.SetFields(fields)
 	err = putEasystoreObject(es, obj, uvaeasystore.Fields)
 	if err != nil {
