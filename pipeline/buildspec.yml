@@ -28,6 +28,8 @@ phases:
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
       - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-field-audit
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-index
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-ingest
@@ -49,6 +51,9 @@ phases:
       #
       # libra-event-audit function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
+      #
+      # libra-field-audit function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-field-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-field-audit/deployment.zip --quiet
       #
       # libra-index function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
