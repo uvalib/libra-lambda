@@ -18,7 +18,7 @@ func sendEmail(cfg *Config, subject string, recipient string, cc []string, body 
 
 	mail := gomail.NewMessage()
 	mail.SetHeader("MIME-version", "1.0")
-	mail.SetHeader("Content-Type", "text/plain; charset=\"UTF-8\"")
+	mail.SetHeader("Content-Type", "text/html; charset=\"UTF-8\"")
 	mail.SetHeader("Subject", subject)
 	mail.SetHeader("To", recipient)
 	mail.SetHeader("From", cfg.EmailSender)
