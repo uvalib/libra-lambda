@@ -12,9 +12,9 @@ import (
 )
 
 type UserDetailsResponse struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Details UserDetails `json:"user"`
+	Status  int          `json:"status"`
+	Message string       `json:"message"`
+	Details *UserDetails `json:"user"`
 }
 
 type UserDetails struct {
@@ -47,13 +47,13 @@ func getUserDetails(url string, cid string, auth string, client *http.Client) (*
 	}
 
 	// if we have details, return them
-	//if len(resp.Details) != 0 {
-	//	fmt.Printf("INFO: located ORCID [%s] for cid [%s]\n", resp.Details[0].Orcid, cid)
-	//	return resp.Details[0].Orcid, nil
-	//}
+	if resp.Details != nil {
+		fmt.Printf("INFO: located details for cid [%s]\n", cid)
+		return resp.Details, nil
+	}
 
-	// no error
-	return &resp.Details, nil
+	// no error, nothing found
+	return nil, nil
 }
 
 //

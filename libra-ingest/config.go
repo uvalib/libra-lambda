@@ -11,6 +11,7 @@ type Config struct {
 
 	// service endpoint configuration
 	MintAuthUrl             string // mint auth token endpoint
+	UserInfoUrl             string // the user information service
 	SisIngestUrl            string // the sis ingest service
 	OptionalIngestUrl       string // the optional ingest service
 	SisIngestStateName      string // the sis ingest ssm state name
@@ -90,6 +91,10 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	cfg.UserInfoUrl, err = ensureSetAndNonEmpty("USER_INFO_URL")
+	if err != nil {
+		return nil, err
+	}
 
 	cfg.SisIngestUrl, err = ensureSetAndNonEmpty("SIS_INGEST_URL")
 	if err != nil {
@@ -133,6 +138,7 @@ func loadConfiguration() (*Config, error) {
 	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
 	fmt.Printf("[conf] MintAuthUrl             = [%s]\n", cfg.MintAuthUrl)
+	fmt.Printf("[conf] UserInfoUrl             = [%s]\n", cfg.UserInfoUrl)
 
 	fmt.Printf("[conf] SisIngestUrl            = [%s]\n", cfg.SisIngestUrl)
 	fmt.Printf("[conf] OptionalIngestUrl       = [%s]\n", cfg.OptionalIngestUrl)
