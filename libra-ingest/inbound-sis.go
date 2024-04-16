@@ -106,13 +106,14 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 
 			// add some fields
 			fields["author"] = o.ComputingId
-			fields["depositor"] = o.ComputingId
+			fields["depositor"] = fmt.Sprintf("%s@virginia.edu", o.ComputingId)
 			fields["create-date"] = time.Now().Format(time.RFC3339)
 			fields["source-id"] = sourceId
 			fields["source"] = "sis"
 			eso.SetFields(fields)
 
 			meta := librametadata.ETDWork{}
+			meta.Department = o.Department
 			meta.Degree = o.Degree
 			meta.Title = o.Title
 			meta.Author = librametadata.ContributorData{
