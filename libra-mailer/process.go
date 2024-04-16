@@ -12,11 +12,6 @@ import (
 	"time"
 )
 
-// field name indicating email already sent
-var emailSentFieldName = "email-sent"
-
-// should be "invitation-sent" or "submitted-sent"
-
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event
@@ -59,11 +54,8 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// object fields contain useful state information
 	fields := obj.Fields()
 
-	// have we already sent the email
-	if len(fields[emailSentFieldName]) != 0 {
-		fmt.Printf("INFO: email already sent, ignoring\n")
-		return nil
-	}
+	// field we add to ensure we do not mail more than once
+	emailSentFieldName := "unknown"
 
 	// mail attributes
 	var mailSubject string
@@ -71,7 +63,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// check the event type
 	switch ev.EventName {
-	case uvalibrabus.EventObjectCreate:
+	case uvalibrabus.EventObjectCreate, uvalibrabus.EventCommandMailInvite:
 		// we send notifications for libraetd events only
 		switch obj.Namespace() {
 		case libraEtdNamespace:
@@ -79,6 +71,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			if fields["source"] == "sis" {
 				mail = ETD_SIS_INVITATION
 			}
+			emailSentFieldName = "invitation-sent"
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
 
 		case libraOpenNamespace:
@@ -89,15 +82,17 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			err = fmt.Errorf("unsupported namespace")
 		}
 
-	case uvalibrabus.EventWorkPublish:
+	case uvalibrabus.EventWorkPublish, uvalibrabus.EventCommandMailSuccess:
 		switch obj.Namespace() {
 		case libraEtdNamespace:
 			// FIXME: support advisor email too
 
+			emailSentFieldName = "submitted-sent"
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_AUTHOR, obj)
 
 		case libraOpenNamespace:
 
+			emailSentFieldName = "submitted-sent"
 			mailSubject, mailBody, err = emailSubjectAndBody(cfg, OPEN_SUBMITTED_AUTHOR, obj)
 
 		default:
@@ -114,6 +109,14 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	if err != nil {
 		fmt.Printf("ERROR: %s\n", err.Error())
 		return err
+	}
+
+	// final check to make sure we do not resend an email unless commanded to do so
+	if ev.EventName == uvalibrabus.EventObjectCreate || ev.EventName == uvalibrabus.EventWorkPublish {
+		if len(fields[emailSentFieldName]) != 0 {
+			fmt.Printf("INFO: email already sent, ignoring\n")
+			return nil
+		}
 	}
 
 	// send the mail
