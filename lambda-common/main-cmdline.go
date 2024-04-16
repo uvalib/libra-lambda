@@ -8,10 +8,12 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"os"
+
+	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
 func main() {
@@ -21,12 +23,14 @@ func main() {
 	var eventName string
 	var namespace string
 	var objectId string
+	var detail string
 
 	flag.StringVar(&messageId, "messageid", "0-0-0-0", "Message identifier")
 	flag.StringVar(&source, "source", "the.source", "Message source")
 	flag.StringVar(&eventName, "eventname", "", "Event name")
 	flag.StringVar(&namespace, "namespace", "", "Object namespace")
 	flag.StringVar(&objectId, "objid", "", "Object identifier")
+	flag.StringVar(&detail, "detail", "", "Event detail, usually json")
 	flag.Parse()
 
 	if len(eventName) == 0 || len(namespace) == 0 || len(objectId) == 0 {
@@ -38,6 +42,7 @@ func main() {
 	ev.EventName = eventName
 	ev.Namespace = namespace
 	ev.Identifier = objectId
+	ev.Detail = json.RawMessage(detail)
 
 	pl, _ := ev.Serialize()
 	err := process(messageId, source, pl)
