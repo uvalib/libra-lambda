@@ -59,6 +59,7 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		meta := librametadata.ETDWork{}
 		meta.Department = o.Department
 		meta.Degree = o.Degree
+		meta.Title = "Enter your title here"
 		meta.Author.ComputeID = o.For
 		meta.Author.Department = o.Department
 		meta.Author.Institution = "University of Virginia"
