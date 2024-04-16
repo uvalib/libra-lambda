@@ -34,7 +34,7 @@ type InboundSisItem struct {
 }
 
 func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) error {
-	fmt.Printf("processing %d SIS item(s)\n", len(objs))
+	fmt.Printf("INFO: processing %d SIS item(s)\n", len(objs))
 
 	var returnErr error
 	for _, o := range objs {
@@ -160,7 +160,7 @@ func inboundSis(config *Config, last string, auth string, client *http.Client) (
 		return nil, err
 	}
 
-	fmt.Printf("received %d SIS item(s)\n", len(resp.Details))
+	fmt.Printf("INFO: received %d SIS item(s)\n", len(resp.Details))
 	return resp.Details, nil
 }
 
