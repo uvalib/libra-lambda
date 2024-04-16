@@ -65,7 +65,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 	if len(fields["doi"]) > 0 && strings.HasPrefix(fields["doi"], Cfg().DOIBaseURL) == false {
 		// doi exists but for the wrong environment.
 		// if a production DOI is sent to test
-		fmt.Printf("WARN: DOI %s has the wrong Datacite hostname for this environment (%s). ", fields["doi"], Cfg().DOIBaseURL)
+		fmt.Printf("WARNING: DOI %s has the wrong Datacite hostname for this environment (%s). ", fields["doi"], Cfg().DOIBaseURL)
 		return nil
 	}
 

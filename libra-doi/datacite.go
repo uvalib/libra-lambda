@@ -174,7 +174,7 @@ func addDates(payload *DataciteData, publishDate string) {
 
 	parsedDate, err := time.Parse(time.RFC3339, publishDate)
 	if err != nil {
-		fmt.Printf("WARN: unable to parse date %s\n", err.Error())
+		fmt.Printf("WARNING: unable to parse date %s\n", err.Error())
 		return
 	}
 
@@ -270,7 +270,7 @@ func parseContributor(contributor librametadata.ContributorData, contribType str
 	// Check for ORCID Account
 	orcid, err := getOrcidDetails(Cfg().OrcidGetDetailsURL, contributor.ComputeID, Cfg().AuthToken, Cfg().httpClient)
 	if err != nil {
-		fmt.Printf("WARN: unable to get ORCID details for %s\n", contributor.ComputeID)
+		fmt.Printf("WARNING: unable to get ORCID details for %s\n", contributor.ComputeID)
 	}
 
 	if len(orcid) > 0 {
