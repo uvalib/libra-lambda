@@ -29,8 +29,8 @@ type InboundOptionalItem struct {
 	Degree     string `json:"degree"`
 }
 
-func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.EasyStore) error {
-	fmt.Printf("processing %d optional item(s)\n", len(objs))
+func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.EasyStore, auth string, client *http.Client) error {
+	fmt.Printf("INFO: processing %d optional item(s)\n", len(objs))
 
 	var returnErr error
 	for _, o := range objs {
@@ -48,18 +48,34 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		fields["source"] = "optional"
 		eso.SetFields(fields)
 
+		user, err := getUserDetails(cfg.UserInfoUrl, o.For, auth, client)
+		if err != nil {
+			fmt.Printf("ERROR: looking up user, continuing (%s)\n", err.Error())
+			returnErr = err
+			continue
+		}
+
 		// add the metadata
 		meta := librametadata.ETDWork{}
 		meta.Department = o.Department
 		meta.Degree = o.Degree
 		meta.Author.ComputeID = o.For
+		meta.Author.Department = o.Department
+		meta.Author.Institution = "University of Virginia"
+
+		if user != nil {
+			meta.Author.FirstName = user.FirstName
+			meta.Author.LastName = user.LastName
+		}
+
 		eso.SetMetadata(meta)
 
 		// create the new object
-		err := createEasystoreObject(es, eso)
+		err = createEasystoreObject(es, eso)
 		if err != nil {
 			fmt.Printf("ERROR: creating easystore object, continuing (%s)\n", err.Error())
 			returnErr = err
+			continue
 		}
 	}
 
@@ -88,7 +104,7 @@ func inboundOptional(config *Config, last string, auth string, client *http.Clie
 		return nil, err
 	}
 
-	fmt.Printf("received %d optional item(s)\n", len(resp.Details))
+	fmt.Printf("INFO: received %d optional item(s)\n", len(resp.Details))
 	return resp.Details, nil
 }
 

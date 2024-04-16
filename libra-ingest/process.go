@@ -89,7 +89,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	defer es.Close()
 
 	// process inbound optional items
-	err = processOptional(cfg, optionalList, es)
+	err = processOptional(cfg, optionalList, es, token, httpClient)
 	if err != nil {
 		return err
 	}
