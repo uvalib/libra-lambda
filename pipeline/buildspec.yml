@@ -24,11 +24,11 @@ phases:
       #
       # build the assets
       #
+      - cd ${CODEBUILD_SRC_DIR}/libra-audit
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-doi
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
-      - make linux
-      - cd ${CODEBUILD_SRC_DIR}/libra-field-audit
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-index
       - make linux
@@ -46,14 +46,14 @@ phases:
       # copy to the results bucket
       #
       #
+      # libra-audit function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-audit/deployment.zip --quiet
+      #
       # libra-doi function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
       #
       # libra-event-audit function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
-      #
-      # libra-field-audit function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-field-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-field-audit/deployment.zip --quiet
       #
       # libra-index function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
