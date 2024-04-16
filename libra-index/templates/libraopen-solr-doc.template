@@ -10,7 +10,7 @@
       <field name="pool_f_stored">{{ .PoolAdditional }}</field>
       {{ end }}
       <field name="location_f_stored">Internet Materials</field>
-      <field name="shadowed_location_f_stored">VISIBLE</field>
+      <field name="shadowed_location_f_stored">{{ .Visibility }}</field>
       <field name="uva_availability_f_stored">Online</field>
       <field name="anon_availability_f_stored">Online</field>
       <field name="published_daterange">{{ .PubYear }}</field>

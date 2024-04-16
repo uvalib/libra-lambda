@@ -5,6 +5,7 @@
 package main
 
 import (
+	"github.com/uvalib/easystore/uvaeasystore"
 	"regexp"
 	"strings"
 )
@@ -126,6 +127,27 @@ func poolAdditional(resourceType string) string {
 	default:
 		return ""
 	}
+}
+
+// visibility in the index
+func workVisibility(fields uvaeasystore.EasyStoreObjectFields) string {
+
+	// possible results
+	hidden := "HIDDEN"
+	visible := "VISIBLE"
+
+	// all draft works are hidden
+	if fields["draft"] == "true" {
+		return hidden
+	}
+
+	// restricted works are hidden
+	if fields["default-visibility"] == "restricted" {
+		return hidden
+	}
+
+	// must be visible then
+	return visible
 }
 
 //

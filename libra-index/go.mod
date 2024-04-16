@@ -8,8 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240411133422-fa321d3d2147
-	github.com/uvalib/libra-metadata v0.0.0-20240415155233-27ae068e41db
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240325152856-57ba633b6d1b
+	github.com/uvalib/libra-metadata v0.0.0-20240415185307-75fea509a389
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240416170310-0936c3e9bc76
 )
 
 require (
@@ -34,5 +34,5 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
-	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8 // indirect
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
 )

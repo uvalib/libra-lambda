@@ -69,6 +69,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		ReceivedDate  string // date received
 		TitleSort     string // field used by SOLR for sorting/grouping
 		Title2Key     string // field used by SOLR for sorting/grouping
+		Visibility    string // whether the work is visible
 
 		Work librametadata.ETDWork
 	}
@@ -104,6 +105,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		ReceivedDate:  extractYYMMDD(fields["create-date"]),
 		TitleSort:     titleForSort,
 		Title2Key:     title2Key,
+		Visibility:    workVisibility(fields),
 	}
 
 	// render the template
@@ -127,6 +129,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 		TitleSort      string // field used by SOLR for sorting/grouping
 		Title2Key      string // field used by SOLR for sorting/grouping
 		Title3Key      string // field used by SOLR for sorting/grouping
+		Visibility     string // whether the work is visible
 
 		Work librametadata.OAWork
 	}
@@ -160,6 +163,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 		TitleSort:      titleForSort,
 		Title2Key:      title2Key,
 		Title3Key:      title2Key, // same as above
+		Visibility:     workVisibility(fields),
 	}
 
 	// render the template
