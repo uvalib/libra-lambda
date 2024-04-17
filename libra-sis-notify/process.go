@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
+	"strings"
 	"time"
 )
 
@@ -67,22 +68,28 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// notify SIS of the activity
 	fields := obj.Fields()
-	err = notifySis(cfg, fields, token, httpClient)
-	if err != nil {
-		fmt.Printf("ERROR: notifying SIS (%s)\n", err.Error())
-		return err
+	if strings.HasPrefix(fields["source-id"], "sis:") == true {
+		// notify SIS of the activity
+		err = notifySis(cfg, fields, token, httpClient)
+		if err != nil {
+			fmt.Printf("ERROR: notifying SIS (%s)\n", err.Error())
+			return err
+		}
+
+		// update the field to note that we have notified SIS
+		fields[sisNotifiedFieldName] = time.DateTime
+		obj.SetFields(fields)
+		err = putEasystoreObject(es, obj, uvaeasystore.Fields)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err.Error())
+			return err
+		}
+	} else {
+		fmt.Printf("INFO: not a SIS work (source %s), ignoring\n", fields["source-id"])
+		return nil
 	}
 
-	// update the field to note that we have notified SIS
-	fields[sisNotifiedFieldName] = time.DateTime
-	obj.SetFields(fields)
-	err = putEasystoreObject(es, obj, uvaeasystore.Fields)
-	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
-		return err
-	}
 	return nil
 }
 
