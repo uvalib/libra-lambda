@@ -42,13 +42,18 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// render the document (very simple)
-	buf := []byte(ev.Identifier)
+	// render the document
+	buf, err := docRender(ev.Namespace, ev.Identifier)
+	if err != nil {
+		fmt.Printf("ERROR: rendering template (%s)\n", err.Error())
+		return err
+	}
 
 	// populate the key template
 	year := fmt.Sprintf("%04d", time.Now().Year())
-	bucketKey := strings.Replace(cfg.BucketKeyTemplate, "{:id}", ev.Identifier, 1)
-	bucketKey = strings.Replace(bucketKey, "{:year}", year, 1)
+	bucketKey := strings.Replace(cfg.BucketKeyTemplate, "{:year}", year, 1)
+	bucketKey = strings.Replace(bucketKey, "{:namespace}", ev.Namespace, 1)
+	bucketKey = strings.Replace(bucketKey, "{:id}", ev.Identifier, 1)
 
 	// upload to S3
 	err = putS3(s3, cfg.BucketName, bucketKey, buf)
