@@ -1,6 +1,6 @@
 <add xmlns:l="http://language.data">
    <doc>
-      <field name="id">{{ .Id }}</field>
+      <field name="id">oc_{{ .Id }}</field>
       <field name="doc_type_f_stored">libra</field>
       <field name="source_f_stored">Libra Repository</field>
       <field name="digital_collection_f_stored">Libra Open Repository</field>
