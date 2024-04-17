@@ -32,6 +32,8 @@ phases:
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-index
       - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-index-delete
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-ingest
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-mailer
@@ -57,6 +59,9 @@ phases:
       #
       # libra-index function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
+      #
+      # libra-index-delete function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index-delete/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index-delete/deployment.zip --quiet
       #
       # libra-ingest function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-ingest/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-ingest/deployment.zip --quiet

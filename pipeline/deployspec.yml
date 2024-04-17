@@ -32,6 +32,9 @@ phases:
       # libra-index function
       - aws lambda update-function-code --function-name uva-libra-index-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-index/deployment.zip
       #
+      # libra-index-delete function
+      - aws lambda update-function-code --function-name uva-libra-index-delete-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-index-delete/deployment.zip
+      #
       # libra-ingest function
       - aws lambda update-function-code --function-name uva-libra-ingest-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-ingest/deployment.zip
       #
