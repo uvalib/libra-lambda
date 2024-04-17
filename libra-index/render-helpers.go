@@ -5,9 +5,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func titleSort(title string, languages []string) string {
@@ -93,8 +95,142 @@ func listContains(key string, list []string) bool {
 	return false
 }
 
+// attempt to clean up the date for indexing (crap, I know)
+func cleanupDate(date string) string {
+
+	// remove periods, commas and a trailing 'th' on the date
+	clean := strings.Replace(date, ".", "", -1)
+	clean = strings.Replace(clean, "th,", "", -1)
+	clean = strings.Replace(clean, ",", "", -1)
+
+	// first try "YYYY"
+	format := "2006"
+	str, err := makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "YYYY-MM-DD"
+	format = "2006-01-02"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Month (short) Day, YYYY"
+	format = "Jan 2 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Month (long) Day, YYYY"
+	format = "January 2 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Month (short) YYYY"
+	format = "Jan 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Month (long) YYYY"
+	format = "January 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "MM/DD/YYYY"
+	format = "01/02/2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "YYYY/MM/DD"
+	format = "2006/01/02"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Day Month (short) YYYY"
+	format = "2 Jan 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "Day Month (long) YYYY"
+	format = "2 January 2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "YYYY-MM"
+	format = "2006-01"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "M/D/YYYY"
+	format = "1/2/2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "M/D/YY"
+	format = "1/2/06"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// next try "M-D-YYYY"
+	format = "1-2-2006"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// finally...
+	format = "2006-01-02T15:04:05+00:00"
+	str, err = makeDate(clean, format)
+	if err == nil {
+		return str
+	}
+
+	// really finally
+	str = extractYYYY(clean)
+	if len(str) != 0 {
+		return str
+	}
+
+	fmt.Printf("ERROR: unable intrpret date [%s]\n", date)
+
+	return date
+}
+
+// make a fixed format date given a date and expected format
+func makeDate(date string, format string) (string, error) {
+	tm, err := time.Parse(format, date)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",
+		tm.Year(), tm.Month(), tm.Day(), tm.Hour(), tm.Minute(), tm.Second()), nil
+}
+
 // attempt to extract a 4 digit year from the date string (crap, I know)
-func extractYYMMDD(date string) string {
+func extractYYYY(date string) string {
 	if len(date) == 0 {
 		return ""
 	}

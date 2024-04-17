@@ -64,7 +64,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		Doi           string // work DOI
 		Id            string // work identifier
 		IndexDateTime string // current date/time
-		PubDate       string // publication year
+		PubDate       string // publication date (cleaned up)
 		PubYear       string // publication year
 		ReceivedDate  string // date received
 		TitleSort     string // field used by SOLR for sorting/grouping
@@ -100,9 +100,9 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		Doi:           fields["doi"],
 		Id:            work.Id(),
 		IndexDateTime: time.Now().Format("20060102150405"),
-		PubDate:       fields["publish-date"],
-		PubYear:       extractYYMMDD(fields["publish-date"]),
-		ReceivedDate:  extractYYMMDD(fields["create-date"]),
+		PubDate:       cleanupDate(fields["publish-date"]),
+		PubYear:       extractYYYY(fields["publish-date"]),
+		ReceivedDate:  extractYYYY(fields["create-date"]),
 		TitleSort:     titleForSort,
 		Title2Key:     title2Key,
 		Visibility:    workVisibility(fields),
@@ -125,6 +125,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 		Doi            string // work DOI
 		Id             string // work identifier
 		PoolAdditional string // additional pool information
+		PubDate        string // publication date (cleaned up)
 		PubYear        string // publication year
 		TitleSort      string // field used by SOLR for sorting/grouping
 		Title2Key      string // field used by SOLR for sorting/grouping
@@ -159,7 +160,8 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 		Doi:            fields["doi"],
 		Id:             work.Id(),
 		PoolAdditional: poolAdditional(meta.ResourceType),
-		PubYear:        extractYYMMDD(meta.PublicationDate),
+		PubDate:        cleanupDate(meta.PublicationDate),
+		PubYear:        extractYYYY(meta.PublicationDate),
 		TitleSort:      titleForSort,
 		Title2Key:      title2Key,
 		Title3Key:      title2Key, // same as above

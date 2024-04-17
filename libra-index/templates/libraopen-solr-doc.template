@@ -15,7 +15,7 @@
       <field name="anon_availability_f_stored">Online</field>
       <field name="published_daterange">{{ .PubYear }}</field>
       <field name="published_display_a">{{ .PubYear }}</field>
-      <field name="published_date">{{ .Work.PublicationDate }}</field>
+      <field name="published_date">{{ .PubDate }}</field>
       <field name="published_tsearch_stored">{{ .Work.Publisher }}, {{ .PubYear }}</field>
       <field name="title_tsearch_stored">{{ .Work.Title }}</field>
       <field name="title_ssort_stored">{{ .TitleSort }}</field>
