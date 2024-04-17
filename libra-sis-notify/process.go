@@ -61,15 +61,23 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// get a new http client and get an auth token
-	httpClient := newHttpClient(1, 30)
-	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
-	if err != nil {
-		return err
+	fields := obj.Fields()
+
+	// we have already notified SIS, bail out unless this is a command event
+	if len(fields[sisNotifiedFieldName]) != 0 && ev.EventName != uvalibrabus.EventCommandSisNotify {
+		fmt.Printf("INFO: SIS already notified, ignoring\n")
+		return nil
 	}
 
-	fields := obj.Fields()
 	if strings.HasPrefix(fields["source-id"], "sis:") == true {
+
+		// get a new http client and get an auth token
+		httpClient := newHttpClient(1, 30)
+		token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
+		if err != nil {
+			return err
+		}
+
 		// notify SIS of the activity
 		err = notifySis(cfg, fields, token, httpClient)
 		if err != nil {
