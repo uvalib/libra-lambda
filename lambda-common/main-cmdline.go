@@ -42,7 +42,9 @@ func main() {
 	ev.EventName = eventName
 	ev.Namespace = namespace
 	ev.Identifier = objectId
-	ev.Detail = json.RawMessage(detail)
+	if len(detail) != 0 {
+		ev.Detail = json.RawMessage(detail)
+	}
 
 	pl, _ := ev.Serialize()
 	err := process(messageId, source, pl)
