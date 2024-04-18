@@ -42,7 +42,7 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		// add some fields
 		fields := uvaeasystore.DefaultEasyStoreFields()
 		fields["author"] = o.For
-		fields["depositor"] = fmt.Sprintf("%s@virginia.edu", o.For)
+		fields["depositor"] = o.For
 		fields["create-date"] = time.Now().Format(time.RFC3339)
 		fields["source-id"] = fmt.Sprintf("optional:%s", o.Id)
 		fields["source"] = "optional"

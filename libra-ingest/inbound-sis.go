@@ -106,7 +106,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 
 			// add some fields
 			fields["author"] = o.ComputingId
-			fields["depositor"] = fmt.Sprintf("%s@virginia.edu", o.ComputingId)
+			fields["depositor"] = o.ComputingId
 			fields["create-date"] = time.Now().Format(time.RFC3339)
 			fields["source-id"] = sourceId
 			fields["source"] = "sis"
