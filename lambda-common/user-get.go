@@ -23,6 +23,7 @@ type UserDetails struct {
 	FirstName   string `json:"first_name,omitempty"`
 	Initials    string `json:"initials,omitempty"`
 	LastName    string `json:"last_name,omitempty"`
+	Email       string `json:"email,omitempty"`
 }
 
 func getUserDetails(url string, cid string, auth string, client *http.Client) (*UserDetails, error) {
