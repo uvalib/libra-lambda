@@ -48,7 +48,7 @@
       <field name="url_label_str_stored">Access Online</field>
       <field name="url_supp_str_stored">{{ .Doi }}</field>
 {{ range $s := .Work.Sponsors }}
-      <field name="sponsoring_agency_tsearch_stored">{{ $s }}</field>
+      <field name="sponsoring_agency_tsearch_stored">{{ $s | XmlEncode }}</field>
 {{ end }}
       <field name="rights_tsearchf_stored">{{ .Work.License }}</field>
       <field name="rs_uri_a">{{ .Work.LicenseURL }}</field>
