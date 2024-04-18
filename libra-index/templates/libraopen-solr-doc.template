@@ -17,7 +17,7 @@
       <field name="published_display_a">{{ .PubYear }}</field>
       <field name="published_date">{{ .PubDate }}</field>
       <field name="published_tsearch_stored">{{ .Work.Publisher }}, {{ .PubYear }}</field>
-      <field name="title_tsearch_stored">{{ .Work.Title }}</field>
+      <field name="title_tsearch_stored">{{ .EncodedTitle }}</field>
       <field name="title_ssort_stored">{{ .TitleSort }}</field>
       <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
       <field name="work_title3_key_ssort_stored">{{ .Title3Key }}</field>

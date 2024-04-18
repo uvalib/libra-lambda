@@ -16,7 +16,7 @@
       <field name="degree_tsearch_stored">{{ .Work.Degree }}</field>
       <field name="department_tsearchf_stored">{{ .Work.Author.Department }}</field>
       <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department }}, {{ .Work.Degree }}, {{ .PubYear }}</field>
-      <field name="title_tsearch_stored">{{ .Work.Title }}</field>
+      <field name="title_tsearch_stored">{{ .EncodedTitle }}</field>
       <field name="title_sort_stored">{{ .TitleSort }}</field>
       <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
 

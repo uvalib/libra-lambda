@@ -63,6 +63,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	type Attributes struct {
 		Doi             string // work DOI
 		EncodedAbstract string // XML encoded abstract
+		EncodedTitle    string // XML encoded title
 		Id              string // work identifier
 		IndexDateTime   string // current date/time
 		PubDate         string // publication date (cleaned up)
@@ -101,6 +102,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		Work:            *meta,
 		Doi:             fields["doi"],
 		EncodedAbstract: xmlEncode(meta.Abstract),
+		EncodedTitle:    xmlEncode(meta.Title),
 		Id:              work.Id(),
 		IndexDateTime:   time.Now().Format("20060102150405"),
 		PubDate:         cleanDate,
@@ -127,6 +129,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	type Attributes struct {
 		Doi             string // work DOI
 		EncodedAbstract string // XML encoded abstract
+		EncodedTitle    string // XML encoded title
 		Id              string // work identifier
 		PoolAdditional  string // additional pool information
 		PubDate         string // publication date (cleaned up)
@@ -164,6 +167,7 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 		Work:            *meta,
 		Doi:             fields["doi"],
 		EncodedAbstract: xmlEncode(meta.Abstract),
+		EncodedTitle:    xmlEncode(meta.Title),
 		Id:              work.Id(),
 		PoolAdditional:  poolAdditional(meta.ResourceType),
 		PubDate:         cleanDate,

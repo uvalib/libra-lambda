@@ -26,6 +26,10 @@ func titleSort(title string, languages []string) string {
 	// remove leading transitional words
 	str = removeLeadingTransitional(str, languages)
 
+	// remove duplicate whitespace
+	whitespace := regexp.MustCompile(`\s+`)
+	str = whitespace.ReplaceAllString(str, " ")
+
 	// finally convert spaces to underscores
 	str = strings.Replace(str, " ", "_", -1)
 
