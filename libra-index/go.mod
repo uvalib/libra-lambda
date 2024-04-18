@@ -3,13 +3,13 @@ module github.com/uvalib/libra-index
 go 1.21.7
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
+	github.com/aws/aws-lambda-go v1.47.0
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.11
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.53.1
 	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240411133422-fa321d3d2147
 	github.com/uvalib/libra-metadata v0.0.0-20240415185307-75fea509a389
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240416170310-0936c3e9bc76
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240417152615-5f766fefdac7
 )
 
 require (
