@@ -294,7 +294,7 @@ func workVisibility(fields uvaeasystore.EasyStoreObjectFields) string {
 	return visible
 }
 
-func xmlEncode(str string) string {
+func XmlEncode(str string) string {
 	var b bytes.Buffer
 	err := xml.EscapeText(&b, []byte(str))
 	if err != nil {

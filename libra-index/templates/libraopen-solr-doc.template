@@ -16,33 +16,33 @@
 {{ if .PubYear }}
       <field name="published_daterange">{{ .PubYear }}</field>
       <field name="published_display_a">{{ .PubYear }}</field>
-      <field name="published_tsearch_stored">{{ .Work.Publisher }}, {{ .PubYear }}</field>
+      <field name="published_tsearch_stored">{{ .Work.Publisher | XmlEncode }}, {{ .PubYear }}</field>
 {{ else }}
-      <field name="published_tsearch_stored">{{ .Work.Publisher }}</field>
+      <field name="published_tsearch_stored">{{ .Work.Publisher | XmlEncode }}</field>
 {{ end }}
 {{ if .PubDate }}
       <field name="published_date">{{ .PubDate }}</field>
 {{ end }}
-      <field name="title_tsearch_stored">{{ .EncodedTitle }}</field>
+      <field name="title_tsearch_stored">{{ .Work.Title | XmlEncode }}</field>
       <field name="title_ssort_stored">{{ .TitleSort }}</field>
       <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
       <field name="work_title3_key_ssort_stored">{{ .Title3Key }}</field>
 {{ range $a := .Work.Authors }}
       <field name="author_tsearch_stored">{{ $a.FirstName }} {{ $a.LastName }}</field>
       <field name="author_facet_f_stored">{{ $a.LastName }}, {{ $a.FirstName }}</field>
-      <field name="department_tsearchf_stored">{{ $a.Department }}</field>
+      <field name="department_tsearchf_stored">{{ $a.Department | XmlEncode }}</field>
 {{ end }}
 {{ range $c := .Work.Contributors }}
       <field name="author_tsearch_stored">{{ $c.FirstName }} {{ $c.LastName }}</field>
       <field name="author_facet_f_stored">{{ $c.LastName }}, {{ $c.FirstName }}</field>
-      <field name="department_tsearchf_stored">{{ $c.Department }}</field>
+      <field name="department_tsearchf_stored">{{ $c.Department | XmlEncode }}</field>
 {{ end }}
 {{ range $l := .Work.Languages }}
       <field name="language_f_stored">{{ $l }}</field>
 {{ end }}
-      <field name="abstract_tsearch_stored">{{ .EncodedAbstract }}</field>
+      <field name="abstract_tsearch_stored">{{ .Work.Abstract | XmlEncode }}</field>
 {{ range $k := .Work.Keywords }}
-      <field name="subject_tsearchf_stored">{{ $k }}</field>
+      <field name="subject_tsearchf_stored">{{ $k | XmlEncode }}</field>
 {{ end }}
       <field name="url_str_stored">{{ .Doi }}</field>
       <field name="url_label_str_stored">Access Online</field>

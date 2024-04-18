@@ -13,16 +13,16 @@
 {{ if .PubYear }}
       <field name="published_daterange">{{ .PubYear }}</field>
       <field name="published_display_a">{{ .PubYear }}</field>
-      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department }}, {{ .Work.Degree }}, {{ .PubYear }}</field>
+      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department | XmlEncode }}, {{ .Work.Degree }}, {{ .PubYear }}</field>
 {{ else }}
-      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department }}, {{ .Work.Degree }}</field>
+      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department | XmlEncode }}, {{ .Work.Degree }}</field>
 {{ end }}
 {{ if .PubDate }}
       <field name="published_date">{{ .PubDate }}</field>
 {{ end }}
       <field name="degree_tsearch_stored">{{ .Work.Degree }}</field>
-      <field name="department_tsearchf_stored">{{ .Work.Author.Department }}</field>
-      <field name="title_tsearch_stored">{{ .EncodedTitle }}</field>
+      <field name="department_tsearchf_stored">{{ .Work.Author.Department | XmlEncode }}</field>
+      <field name="title_tsearch_stored">{{ .Work.Title | XmlEncode }}</field>
       <field name="title_sort_stored">{{ .TitleSort }}</field>
       <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
       <field name="author_tsearch_stored">{{ .Work.Author.LastName }}, {{ .Work.Author.FirstName }}</field>
@@ -33,10 +33,10 @@
       <field name="author_facet_f_stored">{{ $a.LastName }}, {{ $a.FirstName }} (advisor)</field>
 {{ end }}
       <field name="language_f_stored">{{ .Work.Language }}</field>
-      <field name="subject_summary_tsearch_stored">{{ .EncodedAbstract }}</field>
-      <field name="abstract_tsearch_stored">{{ .EncodedAbstract }}</field>
+      <field name="subject_summary_tsearch_stored">{{ .Work.Abstract | XmlEncode }}</field>
+      <field name="abstract_tsearch_stored">{{ .Work.Abstract | XmlEncode }}</field>
 {{ range $k := .Work.Keywords }}
-      <field name="subject_tsearchf_stored">{{ $k }}</field>
+      <field name="subject_tsearchf_stored">{{ $k | XmlEncode }}</field>
 {{ end }}
       <field name="date_indexed_f_stored">{{ .IndexDateTime }}</field>
       <field name="url_str_stored">{{ .Doi }}</field>
