@@ -5,6 +5,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/xml"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"regexp"
@@ -284,6 +286,16 @@ func workVisibility(fields uvaeasystore.EasyStoreObjectFields) string {
 
 	// must be visible then
 	return visible
+}
+
+func xmlEncode(str string) string {
+	var b bytes.Buffer
+	err := xml.EscapeText(&b, []byte(str))
+	if err != nil {
+		fmt.Printf("ERROR: escaping (%s)\n", err.Error())
+		return str
+	}
+	return string(b.Bytes())
 }
 
 //

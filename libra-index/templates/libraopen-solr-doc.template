@@ -34,7 +34,7 @@
 {{ range $l := .Work.Languages }}
       <field name="language_f_stored">{{ $l }}</field>
 {{ end }}
-      <field name="abstract_tsearch_stored">{{ .Work.Abstract }}</field>
+      <field name="abstract_tsearch_stored">{{ .EncodedAbstract }}</field>
 {{ range $k := .Work.Keywords }}
       <field name="subject_tsearchf_stored">{{ $k }}</field>
 {{ end }}

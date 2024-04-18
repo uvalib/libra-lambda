@@ -61,15 +61,16 @@ func docRender(cfg *Config, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 	type Attributes struct {
-		Doi           string // work DOI
-		Id            string // work identifier
-		IndexDateTime string // current date/time
-		PubDate       string // publication date (cleaned up)
-		PubYear       string // publication year
-		ReceivedDate  string // date received
-		TitleSort     string // field used by SOLR for sorting/grouping
-		Title2Key     string // field used by SOLR for sorting/grouping
-		Visibility    string // whether the work is visible
+		Doi             string // work DOI
+		EncodedAbstract string // XML encoded abstract
+		Id              string // work identifier
+		IndexDateTime   string // current date/time
+		PubDate         string // publication date (cleaned up)
+		PubYear         string // publication year
+		ReceivedDate    string // date received
+		TitleSort       string // field used by SOLR for sorting/grouping
+		Title2Key       string // field used by SOLR for sorting/grouping
+		Visibility      string // whether the work is visible
 
 		Work librametadata.ETDWork
 	}
@@ -96,16 +97,17 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	titleForSort := titleSort(meta.Title, languages)
 	title2Key := titleForSort + titleSuffix(meta.Author.FirstName, meta.Author.LastName)
 	attribs := Attributes{
-		Work:          *meta,
-		Doi:           fields["doi"],
-		Id:            work.Id(),
-		IndexDateTime: time.Now().Format("20060102150405"),
-		PubDate:       cleanupDate(fields["publish-date"]),
-		PubYear:       extractYYYY(fields["publish-date"]),
-		ReceivedDate:  extractYYYY(fields["create-date"]),
-		TitleSort:     titleForSort,
-		Title2Key:     title2Key,
-		Visibility:    workVisibility(fields),
+		Work:            *meta,
+		Doi:             fields["doi"],
+		EncodedAbstract: xmlEncode(meta.Abstract),
+		Id:              work.Id(),
+		IndexDateTime:   time.Now().Format("20060102150405"),
+		PubDate:         cleanupDate(fields["publish-date"]),
+		PubYear:         extractYYYY(fields["publish-date"]),
+		ReceivedDate:    extractYYYY(fields["create-date"]),
+		TitleSort:       titleForSort,
+		Title2Key:       title2Key,
+		Visibility:      workVisibility(fields),
 	}
 
 	// render the template
@@ -122,15 +124,16 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStoreObject) ([]byte, error) {
 
 	type Attributes struct {
-		Doi            string // work DOI
-		Id             string // work identifier
-		PoolAdditional string // additional pool information
-		PubDate        string // publication date (cleaned up)
-		PubYear        string // publication year
-		TitleSort      string // field used by SOLR for sorting/grouping
-		Title2Key      string // field used by SOLR for sorting/grouping
-		Title3Key      string // field used by SOLR for sorting/grouping
-		Visibility     string // whether the work is visible
+		Doi             string // work DOI
+		EncodedAbstract string // XML encoded abstract
+		Id              string // work identifier
+		PoolAdditional  string // additional pool information
+		PubDate         string // publication date (cleaned up)
+		PubYear         string // publication year
+		TitleSort       string // field used by SOLR for sorting/grouping
+		Title2Key       string // field used by SOLR for sorting/grouping
+		Title3Key       string // field used by SOLR for sorting/grouping
+		Visibility      string // whether the work is visible
 
 		Work librametadata.OAWork
 	}
@@ -156,16 +159,17 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	titleForSort := titleSort(meta.Title, meta.Languages)
 	title2Key := titleForSort + titleSuffix(meta.Authors[0].FirstName, meta.Authors[0].LastName)
 	attribs := Attributes{
-		Work:           *meta,
-		Doi:            fields["doi"],
-		Id:             work.Id(),
-		PoolAdditional: poolAdditional(meta.ResourceType),
-		PubDate:        cleanupDate(meta.PublicationDate),
-		PubYear:        extractYYYY(meta.PublicationDate),
-		TitleSort:      titleForSort,
-		Title2Key:      title2Key,
-		Title3Key:      title2Key, // same as above
-		Visibility:     workVisibility(fields),
+		Work:            *meta,
+		Doi:             fields["doi"],
+		EncodedAbstract: xmlEncode(meta.Abstract),
+		Id:              work.Id(),
+		PoolAdditional:  poolAdditional(meta.ResourceType),
+		PubDate:         cleanupDate(meta.PublicationDate),
+		PubYear:         extractYYYY(meta.PublicationDate),
+		TitleSort:       titleForSort,
+		Title2Key:       title2Key,
+		Title3Key:       title2Key, // same as above
+		Visibility:      workVisibility(fields),
 	}
 
 	// render the template
