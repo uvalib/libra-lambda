@@ -96,14 +96,15 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	languages := []string{meta.Language}
 	titleForSort := titleSort(meta.Title, languages)
 	title2Key := titleForSort + titleSuffix(meta.Author.FirstName, meta.Author.LastName)
+	cleanDate := cleanupDate(fields["publish-date"])
 	attribs := Attributes{
 		Work:            *meta,
 		Doi:             fields["doi"],
 		EncodedAbstract: xmlEncode(meta.Abstract),
 		Id:              work.Id(),
 		IndexDateTime:   time.Now().Format("20060102150405"),
-		PubDate:         cleanupDate(fields["publish-date"]),
-		PubYear:         extractYYYY(fields["publish-date"]),
+		PubDate:         cleanDate,
+		PubYear:         extractYYYY(cleanDate),
 		ReceivedDate:    extractYYYY(fields["create-date"]),
 		TitleSort:       titleForSort,
 		Title2Key:       title2Key,
@@ -158,14 +159,15 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	fields := work.Fields()
 	titleForSort := titleSort(meta.Title, meta.Languages)
 	title2Key := titleForSort + titleSuffix(meta.Authors[0].FirstName, meta.Authors[0].LastName)
+	cleanDate := cleanupDate(meta.PublicationDate)
 	attribs := Attributes{
 		Work:            *meta,
 		Doi:             fields["doi"],
 		EncodedAbstract: xmlEncode(meta.Abstract),
 		Id:              work.Id(),
 		PoolAdditional:  poolAdditional(meta.ResourceType),
-		PubDate:         cleanupDate(meta.PublicationDate),
-		PubYear:         extractYYYY(meta.PublicationDate),
+		PubDate:         cleanDate,
+		PubYear:         extractYYYY(cleanDate),
 		TitleSort:       titleForSort,
 		Title2Key:       title2Key,
 		Title3Key:       title2Key, // same as above

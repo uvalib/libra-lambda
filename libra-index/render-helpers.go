@@ -203,17 +203,19 @@ func cleanupDate(date string) string {
 		return str
 	}
 
-	// finally...
-	format = "2006-01-02T15:04:05+00:00"
-	str, err = makeDate(clean, format)
-	if err == nil {
-		return str
+	// next this
+	if len(clean) > 19 {
+		format = "2006-01-02T15:04:05"
+		str, err = makeDate(clean[:19], format)
+		if err == nil {
+			return str
+		}
 	}
 
 	// really finally
 	str = extractYYYY(clean)
 	if len(str) != 0 {
-		return str
+		return fmt.Sprintf("%s-01-01T00:00:00Z", str)
 	}
 
 	fmt.Printf("ERROR: unable intrpret date [%s]\n", date)
