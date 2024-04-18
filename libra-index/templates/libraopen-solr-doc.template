@@ -13,10 +13,16 @@
       <field name="shadowed_location_f_stored">{{ .Visibility }}</field>
       <field name="uva_availability_f_stored">Online</field>
       <field name="anon_availability_f_stored">Online</field>
+{{ if .PubYear }}
       <field name="published_daterange">{{ .PubYear }}</field>
       <field name="published_display_a">{{ .PubYear }}</field>
-      <field name="published_date">{{ .PubDate }}</field>
       <field name="published_tsearch_stored">{{ .Work.Publisher }}, {{ .PubYear }}</field>
+{{ else }}
+      <field name="published_tsearch_stored">{{ .Work.Publisher }}</field>
+{{ end }}
+{{ if .PubDate }}
+      <field name="published_date">{{ .PubDate }}</field>
+{{ end }}
       <field name="title_tsearch_stored">{{ .EncodedTitle }}</field>
       <field name="title_ssort_stored">{{ .TitleSort }}</field>
       <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
