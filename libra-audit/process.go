@@ -5,8 +5,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
+
+	_ "github.com/lib/pq"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
@@ -19,7 +23,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, ev.String())
+	fmt.Printf("INFO: EVENT %s from:%s -> %s\n", messageId, messageSrc, ev.String())
 
 	audit, err := uvalibrabus.MakeAuditEvent(ev.Detail)
 	if err != nil {
@@ -27,8 +31,32 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("AUDIT %s changed %s from:%s to:%s\n", audit.Who, audit.FieldName, audit.Before, audit.After)
+	fmt.Printf("INFO: Audit %v\n", audit)
 
+	db, err := sql.Open("postgres", os.Getenv("DB_CONNECTION"))
+	if err != nil {
+		panic(err)
+	}
+
+	result, err := db.Exec("INSERT INTO audits (who, oid, namespace, field_name, before, after) VALUES ($1, $2, $3, $4, $5, $6)",
+		audit.Who,
+		ev.Identifier,
+		ev.Namespace,
+		audit.FieldName,
+		audit.Before,
+		audit.After,
+	)
+
+	if err != nil {
+		panic(fmt.Errorf("ERROR: %s", err))
+	}
+
+	n, err := result.RowsAffected()
+	if err != nil {
+		panic(fmt.Errorf("ERROR: %s", err))
+	}
+
+	fmt.Printf("INFO: Inserted %d row\n", n)
 	return nil
 }
 

@@ -18,7 +18,10 @@ func main() {
 	var err error
 
 	var newMigrationName string
+	var down bool
 	flag.StringVar(&newMigrationName, "create", "", "use -create migration_name to create a new migration")
+	flag.BoolVar(&down, "down", false, "migrate down")
+
 	flag.Parse()
 
 	if newMigrationName != "" {
@@ -49,6 +52,11 @@ func main() {
 	}
 
 	m, _ := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
+	if down {
+		err = m.Down()
+		fmt.Println(err)
+		return
+	}
 	err = m.Up()
 	fmt.Println(err)
 
