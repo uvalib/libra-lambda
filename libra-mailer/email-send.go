@@ -27,7 +27,7 @@ func sendEmail(cfg *Config, subject string, recipient string, cc []string, body 
 		mail.SetHeader("Cc", cc...)
 	}
 
-	mail.SetBody("text/plain", body)
+	mail.SetBody("text/html", body)
 
 	if cfg.SendEmail == false {
 		fmt.Printf("INFO: Email is in debug mode. Logging message instead of sending\n")

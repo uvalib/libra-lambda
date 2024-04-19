@@ -1,21 +1,34 @@
 Dear {{.Recipient}},
+<p>
 
 Congratulations on successful deposit of your {{.Work.Degree}} thesis to Libra, the University of Virginia's scholarly repository.
-The work you have deposited in Libra will be available for {{.Availability}}. You have opted to grant to users of your scholarship the following re-use rights: {{.License}}.
+<p>
+
+The work you have deposited in Libra will be available for {{.Availability}}. You have opted to grant to users of your scholarship the following re-use rights: {{.Work.License}}.
+<p>
+
 {{if .IsSis}}
-	Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
-	24 hours after deposit, please verify that SIS has been updated to reflect that you have completed this requirement.
+Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
+24 hours after deposit, please verify that SIS has been updated to reflect that you have completed this requirement.
 {{else}}
 Your completion of this requirement is being reported to your department by copy of this email. If you have any questions about your degree status, please contact your department.
 {{end}}
+<p>
+
 The permanent location for your scholarship is <a href="{{.Doi}}">{{.Doi}}</a>.
+<p>
+
 Always provide this exact link when sharing your work with colleagues, collaborators, and on social media for the most accurate metrics on views and downloads.
+<p>
+
 {{if .IsSis}}
 {{else}}
 Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
 {{end}}
+<p>
 
 Best Regards,
 Scholarly Repository Services, University of Virginia Library
+<p>
 
 {{.Sender}}

@@ -119,9 +119,27 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 	}
 
+	// get a new http client and get an auth token
+	httpClient := newHttpClient(1, 30)
+	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
+	if err != nil {
+		return err
+	}
+
+	// lookup the user
+	user, err := getUserDetails(cfg.UserInfoUrl, fields["depositor"], token, httpClient)
+	if err != nil {
+		return err
+	}
+
+	// if we did not find the user...
+	if user == nil || len(user.Email) == 0 {
+		fmt.Printf("ERROR: cannot find email for [%s]\n", fields["depositor"])
+		return err
+	}
+
 	// send the mail
-	mailRecipient := fmt.Sprintf("%s@virginia.edu", fields["depositor"])
-	err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
+	err = sendEmail(cfg, mailSubject, user.Email, []string{}, mailBody)
 	if err != nil {
 		return err
 	}

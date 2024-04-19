@@ -32,12 +32,10 @@ const (
 
 // values extracted from the work used by the template rendering
 type Work struct {
-	Degree string // degree name
-	Title  string // work title
+	Degree  string // degree name
+	License string // work license
+	Title   string // work title
 }
-
-// used for time stuff
-var location, _ = time.LoadLocation("America/New_York")
 
 func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasyStoreObject) (string, string, error) {
 
@@ -90,7 +88,6 @@ func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasySt
 		EmbargoReleaseDate       string // embargo release date
 		EmbargoReleaseVisibility string // embargo release visibility
 		IsSis                    bool   // is this a SIS thesis
-		License                  string // work license
 		Recipient                string // mail recipient
 		Sender                   string // mail sender
 		Visibility               string // work visibility
@@ -171,8 +168,9 @@ func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// populate the work
 	work := Work{
-		Degree: meta.Degree,
-		Title:  meta.Title,
+		Degree:  meta.Degree,
+		License: meta.License,
+		Title:   meta.Title,
 	}
 
 	return &work, nil
@@ -198,8 +196,9 @@ func extractOpenAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 
 	// populate the work
 	work := Work{
-		Degree: "None", // no degree program for an open item
-		Title:  meta.Title,
+		Degree:  "None", // no degree program for an open item
+		License: meta.License,
+		Title:   meta.Title,
 	}
 
 	return &work, nil
@@ -212,8 +211,8 @@ func determineAvailability(fields uvaeasystore.EasyStoreObjectFields) string {
 	// if we have an embargo release date
 	if len(fields["embargo-release"]) != 0 {
 
-		format := "2006-01-02T15:04:05+00:00" // yeah, crap right
-		dt, err := time.ParseInLocation(format, fields["embargo-release"], location)
+		format := "2006-01-02T15:04:05Z"
+		dt, err := time.Parse(format, fields["embargo-release"])
 		if err != nil {
 			return ava + " (cannot decode embargo release date)"
 		}

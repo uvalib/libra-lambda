@@ -1,20 +1,31 @@
 Dear {{.Recipient}},
+<p>
 
 Congratulations on depositing your work via Libra, the University of Virginia's scholarly repository.
+<p>
 
 {{if .EmbargoReleaseDate}}
 The title and abstract for the work "{{.Work.Title}}" will be available for immediate access. After your embargo ends on {{.EmbargoReleaseDate}}, the files for "{{.Work.Title}}" will be available for {{.EmbargoReleaseVisibility}} access.
 {{else}}
 The work "{{.Work.Title}}" will be available immediately for {{.Visibility}} access.
 {{end}}
+<p>
 
-You have opted to grant to users of your work the following re-use rights: {{.License}}.
+You have opted to grant to users of your work the following re-use rights: {{.Work.License}}.
+<p>
+
 The permanent location for your work (the DOI) is <a href="{{.Doi}}">{{.Doi}}</a>.
+<p>
+
 Always provide this exact link when sharing your work with colleagues, collaborators, and on social media.
 <strong>If your work did not receive a DOI (e.g. there is no link above), please contact us immediately at</strong> {{.Sender}}.
+<p>
+
 Approximately 1 hour after depositing and opening your work, you may check that the title and abstract was successfully added to the Library's collection by searching for the work’s title or author name in VIRGO, the UVA online library catalog.
+<p>
 
 Best Regards,
 Scholarly Repository Services, University of Virginia Library
+<p>
 
 {{.Sender}}

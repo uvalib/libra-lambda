@@ -8,6 +8,11 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
+
+	// service endpoint configuration
+	MintAuthUrl string // mint auth token endpoint
+	UserInfoUrl string // the user information service
+
 	// configuration needed for mail content
 	EtdBaseUrl  string // etd application base URL
 	OpenBaseUrl string // open application base URL
@@ -107,6 +112,15 @@ func loadConfiguration() (*Config, error) {
 	var cfg Config
 
 	var err error
+	cfg.MintAuthUrl, err = ensureSetAndNonEmpty("MINT_AUTH_URL")
+	if err != nil {
+		return nil, err
+	}
+	cfg.UserInfoUrl, err = ensureSetAndNonEmpty("USER_INFO_URL")
+	if err != nil {
+		return nil, err
+	}
+
 	cfg.EtdBaseUrl, err = ensureSetAndNonEmpty("ETD_BASE_URL")
 	if err != nil {
 		return nil, err
@@ -161,6 +175,12 @@ func loadConfiguration() (*Config, error) {
 
 	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
 	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+
+	fmt.Printf("[conf] MintAuthUrl    = [%s]\n", cfg.MintAuthUrl)
+	fmt.Printf("[conf] UserInfoUrl    = [%s]\n", cfg.UserInfoUrl)
+
+	fmt.Printf("[conf] EtdBaseUrl     = [%s]\n", cfg.EtdBaseUrl)
+	fmt.Printf("[conf] OpenBaseUrl    = [%s]\n", cfg.OpenBaseUrl)
 
 	fmt.Printf("[conf] SMTPHost       = [%s]\n", cfg.SMTPHost)
 	fmt.Printf("[conf] SMTPPort       = [%d]\n", cfg.SMTPPort)

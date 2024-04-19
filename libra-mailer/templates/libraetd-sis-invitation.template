@@ -1,4 +1,5 @@
 Dear {{.Recipient}},
+<p>
 
 Congratulations on the successful defense of your thesis or dissertation. You now have access to <a href="{{.BaseUrl}}">upload your approved thesis or dissertation to LIBRA</a>.
 After you log in to LIBRA, check the title displayed for your draft thesis or dissertation. The title in LIBRA must match the title as approved by your committee or advisor. If it does not, please report the discrepancy to your departmental administrator to make the corrections in SIS. You will receive a new email message from LIBRA when it has been corrected and you can proceed with your deposit.
@@ -8,8 +9,10 @@ Text documents deposited in LIBRA must be in PDF format. Supplemental files are 
 You will receive email confirmation of your deposit, including the permanent URL for your scholarship.
 Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
 24 hours after deposit, please verify that SIS has been updated to reflect that you have completed this requirement.
+<p>
 
 Best Regards,
 Scholarly Repository Services, University of Virginia Library
+<p>
 
 {{.Sender}}
