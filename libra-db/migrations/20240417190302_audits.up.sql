@@ -9,6 +9,7 @@ CREATE TABLE audits (
    id         serial PRIMARY KEY,
    who        VARCHAR( 32 ) NOT NULL DEFAULT '' ,
    oid        VARCHAR( 64 ) NOT NULL DEFAULT '',
+   namespace  VARCHAR( 32 ) NOT NULL DEFAULT '' ,
    field_name VARCHAR( 32 ) NOT NULL DEFAULT '',
    before     TEXT NOT NULL DEFAULT '',
    after      TEXT NOT NULL DEFAULT '',
