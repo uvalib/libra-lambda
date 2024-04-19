@@ -65,7 +65,7 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 		Doi           string // work DOI
 		Id            string // work identifier
 		IndexDateTime string // current date/time
-		PubDate       string // publication date (cleaned up)
+		PubDate       string // publication date
 		PubYear       string // publication year
 		ReceivedDate  string // date received
 		TitleSort     string // field used by SOLR for sorting/grouping
@@ -96,14 +96,13 @@ func renderEtd(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStore
 	languages := []string{meta.Language}
 	titleForSort := titleSort(meta.Title, languages)
 	title2Key := titleForSort + titleSuffix(meta.Author.FirstName, meta.Author.LastName)
-	cleanDate := cleanupDate(fields["publish-date"])
 	attribs := Attributes{
 		Work:          *meta,
 		Doi:           fields["doi"],
 		Id:            work.Id(),
 		IndexDateTime: time.Now().Format("20060102150405"),
-		PubDate:       cleanDate,
-		PubYear:       extractYYYY(cleanDate),
+		PubDate:       fields["publish-date"],
+		PubYear:       extractYYYY(fields["publish-date"]),
 		ReceivedDate:  extractYYYY(fields["create-date"]),
 		TitleSort:     titleForSort,
 		Title2Key:     title2Key,
@@ -157,14 +156,13 @@ func renderOpen(cfg *Config, tmpl *template.Template, work uvaeasystore.EasyStor
 	fields := work.Fields()
 	titleForSort := titleSort(meta.Title, meta.Languages)
 	title2Key := titleForSort + titleSuffix(meta.Authors[0].FirstName, meta.Authors[0].LastName)
-	cleanDate := cleanupDate(meta.PublicationDate)
 	attribs := Attributes{
 		Work:           *meta,
 		Doi:            fields["doi"],
 		Id:             work.Id(),
 		PoolAdditional: poolAdditional(meta.ResourceType),
-		PubDate:        cleanDate,
-		PubYear:        extractYYYY(cleanDate),
+		PubDate:        meta.PublicationDate,
+		PubYear:        extractYYYY(meta.PublicationDate),
 		TitleSort:      titleForSort,
 		Title2Key:      title2Key,
 		Title3Key:      title2Key, // same as above
