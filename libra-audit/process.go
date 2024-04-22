@@ -8,7 +8,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"os"
 
 	_ "github.com/lib/pq"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
@@ -33,7 +32,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fmt.Printf("INFO: Audit %v\n", audit)
 
-	db, err := sql.Open("postgres", os.Getenv("DB_CONNECTION"))
+	config := getConfig()
+
+	db, err := sql.Open("postgres", config.connectionStr)
 	if err != nil {
 		panic(err)
 	}

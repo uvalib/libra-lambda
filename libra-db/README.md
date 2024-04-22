@@ -3,6 +3,7 @@
 libra-db uses golang style migrations to manage the db for libra.
 
 ## Usage
+
 Required Environment:
 
 - export DB_HOST=
