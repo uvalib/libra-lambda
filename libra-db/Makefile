@@ -1,45 +1,32 @@
-GOCMD = go
-GOBUILD = $(GOCMD) build
-GOCLEAN = $(GOCMD) clean
-GOTEST = $(GOCMD) test
-GOGET = $(GOCMD) get
-GOMOD = $(GOCMD) mod
-GOFMT = $(GOCMD) fmt
-GOVET = $(GOCMD) vet
-BINNAME = cmd
-COMMON = ../lambda-common
-DEPLOYNAME = bootstrap
+MIGRATION_DIR ='../migrations'
+MIGRATE_CMD=cd bin && migrate -path $(MIGRATION_DIR) \
+	-database 'postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)'
 
-build: common cmdline
+build: migrate-up
 
-linux: common deployable
+migrate-%: setup
+	$(MIGRATE_CMD) $*
 
-all: common cmdline deployable
+new: setup
+	cd bin && migrate create -ext sql -dir $(MIGRATION_DIR) $(NAME)
 
-cmdline:
-	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 $(GOBUILD) -tags cmdline -o bin/$(BINNAME)
-
-deployable:
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -tags lambda.norpc,lambda -o bin/$(DEPLOYNAME)
-	cd bin; zip -r deployment.zip $(DEPLOYNAME) data
-
-common: download
-
-download:
-	cd bin && test -f migrate || curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz && chmod +x migrate
-
+setup: check_env
+	mkdir -p bin
+	cd bin && test -f migrate || curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
+	chmod +x ./bin/migrate
 
 clean:
-	$(GOCLEAN)
 	rm -rf bin
 
-dep:
-	$(GOGET) -u
-	$(GOMOD) tidy
-	$(GOMOD) verify
-
-fmt:
-	$(GOFMT)
-
-vet:
-	$(GOVET)
+check_env:
+ifeq ($(DB_USER),)
+$(error missing required environment DB_USER)
+else ifeq ($(DB_PASSWORD),)
+$(error missing required environment DB_PASSWORD)
+else ifeq ($(DB_HOST),)
+$(error missing required environment DB_HOST)
+else ifeq ($(DB_PORT),)
+$(error missing required environment DB_PORT)
+else ifeq ($(DB_NAME),)
+$(error missing required environment DB_NAME)
+endif
