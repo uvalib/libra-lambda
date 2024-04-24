@@ -3,9 +3,9 @@ module github.com/uvalib/libra-sis-notify
 go 1.21.7
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240411133422-fa321d3d2147
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240417152615-5f766fefdac7
+	github.com/aws/aws-lambda-go v1.47.0
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240424182848-30c5d1dfc9ce
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240424181938-23a2768958e8
 )
 
 require (

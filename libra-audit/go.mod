@@ -3,8 +3,9 @@ module github.com/uvalib/libra-field-audit
 go 1.21.7
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240416170310-0936c3e9bc76
+	github.com/aws/aws-lambda-go v1.47.0
+	github.com/lib/pq v1.10.9
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240424181938-23a2768958e8
 )
 
 require (
@@ -22,5 +23,4 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.6 // indirect
 	github.com/aws/smithy-go v1.20.2 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 )

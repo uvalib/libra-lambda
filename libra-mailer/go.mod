@@ -3,10 +3,10 @@ module github.com/uvalib/libra-mailer
 go 1.21.7
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240411133422-fa321d3d2147
-	github.com/uvalib/libra-metadata v0.0.0-20240415155233-27ae068e41db
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240325152856-57ba633b6d1b
+	github.com/aws/aws-lambda-go v1.47.0
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20240424182848-30c5d1dfc9ce
+	github.com/uvalib/libra-metadata v0.0.0-20240415185307-75fea509a389
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240424181938-23a2768958e8
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
@@ -35,6 +35,6 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/rs/xid v1.5.0 // indirect
-	golang.org/x/exp v0.0.0-20240409090435-93d18d7e34b8 // indirect
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )

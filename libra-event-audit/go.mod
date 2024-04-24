@@ -3,8 +3,8 @@ module github.com/uvalib/libra-event-audit
 go 1.21.7
 
 require (
-	github.com/aws/aws-lambda-go v1.46.0
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240325152856-57ba633b6d1b
+	github.com/aws/aws-lambda-go v1.47.0
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20240424181938-23a2768958e8
 )
 
 require (
