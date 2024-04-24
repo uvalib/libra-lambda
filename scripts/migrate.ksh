@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Manage lambda migrations
 #
@@ -5,9 +6,7 @@
 #set -x
 
 # helper definitions
-FULL_NAME=$(realpath ${0})
-SCRIPT_DIR=$(dirname ${FULL_NAME})
-MIGRATE_TOOL=tmp/migrate
+MIGRATE_TOOL=bin/migrate
 
 function error_and_exit {
 
