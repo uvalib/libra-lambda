@@ -6,7 +6,7 @@ version: 0.2
 
 env:
   variables:
-    results_bucket: libra-lambda-deployable
+    deploy_bucket: libra-lambda-deployable
 
 phases:
   install:
@@ -48,44 +48,48 @@ phases:
       # copy to the results bucket
       #
       #
-      # libra-audit function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-audit/deployment.zip --quiet
+      # libra-audit function plus migrations
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/migrations s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit/migrations --recursive --include *.sql --quiet
       #
       # libra-doi function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
       #
       # libra-event-audit function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-event-audit/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-event-audit/deployment.zip --quiet
       #
       # libra-index function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-index/deployment.zip --quiet
       #
       # libra-index-delete function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index-delete/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-index-delete/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-index-delete/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-index-delete/deployment.zip --quiet
       #
       # libra-ingest function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-ingest/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-ingest/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-ingest/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-ingest/deployment.zip --quiet
       #
       # libra-mailer function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-mailer/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-mailer/deployment.zip --quiet
       #
       # libra-orcid function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-orcid/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-orcid/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-orcid/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-orcid/deployment.zip --quiet
       #
       # libra-schedule function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet
       #
       # libra-sis-notify function
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-sis-notify/bin/deployment.zip s3://${results_bucket}/${BUILD_VERSION}/libra-sis-notify/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-sis-notify/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-sis-notify/deployment.zip --quiet
+      #
+      # scripts
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/scripts s3://${deploy_bucket}/${BUILD_VERSION}/scripts --recursive --include *.ksh --quiet
       #
       # create the git commit tag file
       #
       - touch ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git
-      - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${results_bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/${COMMIT_TAG}.git s3://${deploy_bucket}/${BUILD_VERSION}/${COMMIT_TAG}.git --quiet
       #
       # make the latest folder
       #
-      - aws s3 sync s3://${results_bucket}/${BUILD_VERSION} s3://${results_bucket}/latest --delete --quiet
+      - aws s3 sync s3://${deploy_bucket}/${BUILD_VERSION} s3://${deploy_bucket}/latest --delete --quiet
 
 #  post_build:
 #    commands:
