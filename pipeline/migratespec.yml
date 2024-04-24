@@ -23,7 +23,7 @@ phases:
 
   build:
     commands:
-      - cd ${CODEBUILD_SRC_DIR/}
+      - cd ${CODEBUILD_SRC_DIR}
       # libra-audit migrations
       - mkdir -p libra-audit/migrations && aws s3 cp s3://${deploy_bucket}/latest/libra-audit/migrations libra-audit/migrations --recursive --include *.sql --quiet
       - ./migrate.ksh libra-audit/migrations lambda_audit_migrations up
