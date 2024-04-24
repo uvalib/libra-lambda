@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
@@ -39,13 +40,20 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		panic(err)
 	}
 
-	result, err := db.Exec("INSERT INTO audits (who, oid, namespace, field_name, before, after) VALUES ($1, $2, $3, $4, $5, $6)",
+	parsedEventTime, err := time.Parse(time.RFC3339, ev.EventTime)
+	if err != nil {
+		fmt.Printf("ERROR: unable to parse event time %s\n", err.Error())
+		return err
+	}
+
+	result, err := db.Exec("INSERT INTO audits (who, oid, namespace, field_name, before, after, event_time) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		audit.Who,
 		ev.Identifier,
 		ev.Namespace,
 		audit.FieldName,
 		audit.Before,
 		audit.After,
+		parsedEventTime,
 	)
 
 	if err != nil {
