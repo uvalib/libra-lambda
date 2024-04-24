@@ -4,9 +4,9 @@
 
 version: 0.2
 
-env:
-  variables:
-    migrate_script: scripts/migrate.ksh
+#env:
+#  variables:
+#    name: value.ksh
 
 phases:
   install:
@@ -17,12 +17,12 @@ phases:
   pre_build:
     commands:
       # install the binary
-      - mkdir bin && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xvz && chmod +x bin/migrate
+      - mkdir bin && cd bin && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.1/migrate.linux-amd64.tar.gz | tar xvz && chmod +x migrate
 
   build:
     commands:
       # libra-audit migrations
-      - ${migrate_script} libra-audit/migrations lambda_audit_migrations up
+      - scripts/migrate.ksh libra-audit/migrations lambda_audit_migrations up
 
 #  post_build:
 #    commands:
