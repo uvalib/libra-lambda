@@ -33,11 +33,16 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fmt.Printf("INFO: Audit %v\n", audit)
 
-	config := getConfig()
-
-	db, err := sql.Open("postgres", config.connectionStr)
+	dbConf, err := getDBConf()
 	if err != nil {
-		panic(err)
+		fmt.Printf("ERROR: unable to get config %s\n", err.Error())
+		return err
+	}
+
+	db, err := sql.Open("postgres", dbConf.connectionStr)
+	if err != nil {
+		fmt.Printf("ERROR: unable to open database %s\n", err.Error())
+		return err
 	}
 
 	parsedEventTime, err := time.Parse(time.RFC3339, ev.EventTime)
@@ -57,12 +62,13 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	)
 
 	if err != nil {
-		panic(fmt.Errorf("ERROR: %s", err))
+		fmt.Printf("ERROR: db insert %s", err)
 	}
 
 	n, err := result.RowsAffected()
 	if err != nil {
-		panic(fmt.Errorf("ERROR: %s", err))
+		fmt.Printf("ERROR: rows affected %s", err)
+		return err
 	}
 
 	fmt.Printf("INFO: Inserted %d row\n", n)

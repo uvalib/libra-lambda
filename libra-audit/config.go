@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -16,32 +17,37 @@ type DBConf struct {
 	connectionStr string
 }
 
-func getConfig() DBConf {
+func getDBConf() (*DBConf, error) {
 
 	db := DBConf{}
 	var exist bool
+	var err error
 
 	if db.host, exist = os.LookupEnv("DB_HOST"); !exist {
-		panic("DB_HOST required")
+		return nil, errors.New("DB_HOST required")
 	}
 	if portStr, exist := os.LookupEnv("DB_PORT"); !exist {
-		panic("DB_PORT required")
+		return nil, errors.New("DB_PORT required")
+
 	} else {
-		db.port, _ = strconv.Atoi(portStr)
+		db.port, err = strconv.Atoi(portStr)
+		if err != nil {
+			return nil, fmt.Errorf("DB_PORT must be a number %s", err)
+		}
 	}
 	if db.user, exist = os.LookupEnv("DB_USER"); !exist {
-		panic("DB_USER required")
+		return nil, errors.New("DB_USER required")
 	}
 	if db.password, exist = os.LookupEnv("DB_PASSWORD"); !exist {
-		panic("DB_PASSWORD required")
+		return nil, errors.New("DB_PASSWORD required")
 	}
 	if db.name, exist = os.LookupEnv("DB_NAME"); !exist {
-		panic("DB_NAME required")
+		return nil, errors.New("DB_NAME required")
 	}
 
 	db.connectionStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
 		db.host, db.port, db.user, db.password, db.name)
 
-	return db
+	return &db, nil
 
 }
