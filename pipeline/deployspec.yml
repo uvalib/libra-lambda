@@ -23,6 +23,9 @@ phases:
       # libra-audit function
       - aws lambda update-function-code --function-name uva-libra-audit-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-audit/deployment.zip
       #
+      # libra-audit-query function
+      - aws lambda update-function-code --function-name uva-libra-audit-query-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-audit-query/deployment.zip
+      #
       # libra-doi function
       - aws lambda update-function-code --function-name uva-libra-doi-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-doi/deployment.zip
       #

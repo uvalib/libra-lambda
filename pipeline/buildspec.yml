@@ -26,6 +26,8 @@ phases:
       #
       - cd ${CODEBUILD_SRC_DIR}/libra-audit
       - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-audit-query
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-doi
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-event-audit
@@ -51,6 +53,9 @@ phases:
       # libra-audit function plus migrations
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit/deployment.zip --quiet
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/migrations s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit/migrations --recursive --include *.sql --quiet
+      #
+      # libra-audit-query function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit-query/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit-query/deployment.zip --quiet
       #
       # libra-doi function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-doi/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-doi/deployment.zip --quiet
