@@ -15,7 +15,7 @@ import (
 
 func HandleRequest(ctx context.Context, event events.EventBridgeEvent) error {
 
-	// process the message, in the event of an error, it is re-queued
+	// process the message
 	return process(event.ID, event.Source, event.Detail)
 }
 
