@@ -44,6 +44,8 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		fmt.Printf("ERROR: unable to open database %s\n", err.Error())
 		return err
 	}
+	// cleanup
+	defer db.Close()
 
 	parsedEventTime, err := time.Parse(time.RFC3339, ev.EventTime)
 	if err != nil {
