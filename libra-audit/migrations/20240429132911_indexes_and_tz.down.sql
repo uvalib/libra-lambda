@@ -7,6 +7,6 @@ ALTER COLUMN created_at
 TYPE TIMESTAMP;
 
 
-DROP INDEX audits_who_idx;
+DROP INDEX IF EXISTS audits_who_idx;
 
 COMMIT;

@@ -13,7 +13,7 @@ DROP INDEX IF EXISTS audits_key_idx;
 CREATE INDEX audits_key_idx ON audits(namespace, oid);
 
 -- add who index
-CREATE INDEX audits_who_idx on audits who;
+CREATE INDEX audits_who_idx on audits(who);
 
 
 COMMIT;
