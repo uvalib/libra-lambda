@@ -30,24 +30,24 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	query_params := make([]string, 0, len(request.QueryStringParameters))
 	// log inbound query parameters
 	for key, value := range request.QueryStringParameters {
+		fmt.Printf("DEBUG: query param [%s] = [%s]\n", key, value)
 		if key == "objid" {
 			temp_key := "oid"
 			query_params = append(query_params, temp_key, value)
 		} else {
 			query_params = append(query_params, key, value)
 		}
-		fmt.Printf("Query Param %s: %s\n", key, value)
 	}
 
 	// log inbound headers
 	for key, value := range request.Headers {
-		fmt.Printf("Header %s: %s\n", key, value)
+		fmt.Printf("DEBUG: header [%s] = [%s]\n", key, value)
 	}
 
 	// load configuration
 	cfg, err := loadConfiguration()
 	if err != nil {
-		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 500}, err
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 
 	connectionStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
@@ -55,8 +55,8 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	db, err := sql.Open("postgres", connectionStr)
 	if err != nil {
-		fmt.Printf("ERROR: unable to open database %s\n", err.Error())
-		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 500}, err
+		fmt.Printf("ERROR: unable to open database (%s)\n", err.Error())
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 
 	// cleanup
@@ -75,8 +75,8 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where who = $1 ORDER BY event_time desc",
 			query_params[1])
 		if err != nil {
-			fmt.Printf("ERROR: Query failed %s\n", err.Error())
-			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 404}, err
+			fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 		}
 		defer rows.Close()
 
@@ -85,25 +85,30 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 			var currentAudit QueriedAudit
 			if err := rows.Scan(&currentAudit.Who, &currentAudit.Oid, &currentAudit.Namespace, &currentAudit.FieldName,
 				&currentAudit.Before, &currentAudit.After, &currentAudit.EventTime); err != nil {
-				fmt.Printf("ERROR: rows.Scan() failed %s\n", err.Error())
-				return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 404}, err
+				fmt.Printf("ERROR: rows.Scan() failed (%s)\n", err.Error())
+				return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 			}
 			audits = append(audits, currentAudit)
 		}
 		b_response, err := json.Marshal(audits)
 		if err != nil {
-			fmt.Printf("ERROR: json.Marshal() failed %s\n", err.Error())
+			fmt.Printf("ERROR: json.Marshal() failed (%s)\n", err.Error())
+			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 		}
-		s_response := string(b_response)
-		return events.APIGatewayProxyResponse{Body: s_response, StatusCode: 200}, nil
+		status := http.StatusOK
+		if len(audits) == 0 {
+			status = http.StatusNotFound
+		}
+		fmt.Printf("INFO: returning %d row(s)\n", len(audits))
+		return events.APIGatewayProxyResponse{Body: string(b_response), StatusCode: status}, nil
 	}
 
 	if query_params[0] == "namespace" && query_params[2] == "oid" {
 		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where namespace = $1 and oid = $2 ORDER BY event_time desc",
 			query_params[1], query_params[3])
 		if err != nil {
-			fmt.Printf("ERROR: Query failed %s\n", err.Error())
-			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 404}, err
+			fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 		}
 		defer rows.Close()
 
@@ -112,20 +117,25 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 			var currentAudit QueriedAudit
 			if err := rows.Scan(&currentAudit.Who, &currentAudit.Oid, &currentAudit.Namespace, &currentAudit.FieldName,
 				&currentAudit.Before, &currentAudit.After, &currentAudit.EventTime); err != nil {
-				fmt.Printf("ERROR: rows.Scan() failed %s\n", err.Error())
-				return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: 404}, err
+				fmt.Printf("ERROR: rows.Scan() failed (%s)\n", err.Error())
+				return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 			}
 			audits = append(audits, currentAudit)
 		}
 		b_response, err := json.Marshal(audits)
 		if err != nil {
-			fmt.Printf("ERROR: json.Marshal() failed %s\n", err.Error())
+			fmt.Printf("ERROR: json.Marshal() failed (%s)\n", err.Error())
+			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 		}
-		s_response := string(b_response)
-		return events.APIGatewayProxyResponse{Body: s_response, StatusCode: 200}, nil
+		status := http.StatusOK
+		if len(audits) == 0 {
+			status = http.StatusNotFound
+		}
+		fmt.Printf("INFO: returning %d row(s)\n", len(audits))
+		return events.APIGatewayProxyResponse{Body: string(b_response), StatusCode: status}, nil
 	}
 
-	return events.APIGatewayProxyResponse{Body: http.StatusText(400), StatusCode: 400}, nil
+	return events.APIGatewayProxyResponse{Body: http.StatusText(http.StatusBadRequest), StatusCode: http.StatusBadRequest}, nil
 }
 
 //

@@ -47,6 +47,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	fmt.Printf("INFO: response: %s\n", resp.Body)
 	fmt.Printf("INFO: terminating with HTTP %d\n", resp.StatusCode)
 }
 
