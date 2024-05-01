@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -71,7 +72,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	}
 
 	if query_params[0] == "who" {
-		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where who = $1",
+		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where who = $1 ORDER BY event_time desc",
 			query_params[1])
 		if err != nil {
 			fmt.Printf("ERROR: Query failed %s\n", err.Error())
@@ -98,7 +99,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	}
 
 	if query_params[0] == "namespace" && query_params[2] == "oid" {
-		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where namespace = $1 and oid = $2",
+		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where namespace = $1 and oid = $2 ORDER BY event_time desc",
 			query_params[1], query_params[3])
 		if err != nil {
 			fmt.Printf("ERROR: Query failed %s\n", err.Error())
@@ -124,7 +125,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 		return events.APIGatewayProxyResponse{Body: s_response, StatusCode: 200}, nil
 	}
 
-	return events.APIGatewayProxyResponse{Body: request.Body, StatusCode: 400}, nil
+	return events.APIGatewayProxyResponse{Body: http.StatusText(400), StatusCode: 400}, nil
 }
 
 //
