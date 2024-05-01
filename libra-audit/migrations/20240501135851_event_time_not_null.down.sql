@@ -1,0 +1,7 @@
+
+BEGIN;
+
+ALTER TABLE audits
+  ALTER COLUMN event_time DROP NOT NULL;
+
+COMMIT;
