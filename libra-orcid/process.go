@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
@@ -89,8 +90,13 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	newCode, err := updateAuthorOrcidActivity(cfg, eso, authorId, updateCode, token, httpClient)
 	if err != nil {
-		fmt.Printf("ERROR: updating %s ORCID activity ns/oid [%s/%s] (%s)\n", authorId, ev.Namespace, ev.Identifier, err.Error())
-		return err
+		if errors.Is(err, ErrIncompleteData) == true {
+			fmt.Printf("WARNING: incomplete data for ORCID activity ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
+			return nil
+		} else {
+			fmt.Printf("ERROR: updating %s ORCID activity ns/oid [%s/%s] (%s)\n", authorId, ev.Namespace, ev.Identifier, err.Error())
+			return err
+		}
 	}
 
 	// do we have a new update code

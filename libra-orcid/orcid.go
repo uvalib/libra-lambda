@@ -40,12 +40,19 @@ type Person struct {
 	LastName  string `json:"last_name,omitempty"`
 }
 
+var ErrIncompleteData = fmt.Errorf("incomplete data")
+
 func updateAuthorOrcidActivity(config *Config, eso uvaeasystore.EasyStoreObject, authorId string, updateCode string, auth string, client *http.Client) (string, error) {
 
 	// create the update schema
 	schema, err := createUpdateSchema(eso)
 	if err != nil {
 		return "", err
+	}
+
+	// ensure we have enough to do the activity update, otherwise it will be rejected
+	if len(schema.Title) == 0 || len(schema.ResourceType) == 0 || len(schema.URL) == 0 {
+		return "", ErrIncompleteData
 	}
 
 	// substitute values into url
