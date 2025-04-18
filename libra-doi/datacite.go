@@ -97,15 +97,6 @@ func UVAAffiliation() AffiliationData {
 	}
 }
 
-func getGeneralResourceType(resourceTypeStr string) string {
-	for _, rt := range Cfg().ResourceTypes {
-		if rt.Value == resourceTypeStr {
-			return rt.Category
-		}
-	}
-	return ""
-}
-
 func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
 	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
@@ -133,39 +124,6 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 		},
 		Publisher: "University of Virginia",
 	}
-	addDates(&payload, fields["publish-date"])
-	return payload
-}
-func createOAPayload(work *librametadata.OAWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
-	var payload = DataciteData{}
-	payload.Data.TypeName = "dois"
-
-	// remove http://doi... prefix
-	lastPath := regexp.MustCompile("[^/]+$")
-	bareDOI := lastPath.FindString(fields["doi"])
-
-	payload.Data.Attributes = AttributesData{
-		DOI:    bareDOI,
-		Prefix: Cfg().IDService.Shoulder,
-		Titles: []TitleData{{Title: work.Title}},
-		Descriptions: []DescriptionData{{
-			Description:     work.Abstract,
-			DescriptionType: "Abstract",
-		}},
-		Creators:          parseContributors(work.Authors, ""),
-		Contributors:      parseContributors(work.Contributors, "Other"),
-		Subjects:          parseKeywords(work.Keywords),
-		RightsList:        []RightsData{{Rights: work.License}},
-		FundingReferences: parseSponsors(work.Sponsors),
-
-		Affiliation: UVAAffiliation(),
-		Types: TypeData{
-			ResourceTypeGeneral: getGeneralResourceType(work.ResourceType),
-			ResourceType:        work.ResourceType,
-		},
-		Publisher: work.Publisher,
-	}
-
 	addDates(&payload, fields["publish-date"])
 	return payload
 }
@@ -281,5 +239,8 @@ func parseContributor(contributor librametadata.ContributorData, contribType str
 		}}
 	}
 	return person
-
 }
+
+//
+// end of file
+//

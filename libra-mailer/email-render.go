@@ -27,7 +27,6 @@ const (
 	ETD_SIS_INVITATION
 	ETD_SUBMITTED_AUTHOR
 	ETD_SUBMITTED_ADVISOR
-	OPEN_SUBMITTED_AUTHOR
 )
 
 // values extracted from the work used by the template rendering
@@ -57,10 +56,6 @@ func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasySt
 	case ETD_SUBMITTED_ADVISOR:
 		templateFile = "templates/libraetd-submitted-advisor.template"
 		subject = "Successful deposit of your student's thesis"
-
-	case OPEN_SUBMITTED_AUTHOR:
-		templateFile = "templates/libraopen-submitted-author.template"
-		subject = "Work successfully deposited to Libra"
 
 	default:
 		return "", "", fmt.Errorf("unsupported email type")
@@ -104,11 +99,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasySt
 	// determine the availability string
 	availability := determineAvailability(fields)
 
-	// determine the base URL
 	baseUrl := cfg.EtdBaseUrl
-	if obj.Namespace() == libraOpenNamespace {
-		baseUrl = cfg.OpenBaseUrl
-	}
 
 	//	populate the attributes
 	attribs := Attributes{
@@ -137,15 +128,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasySt
 }
 
 func extractAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
-
-	switch obj.Namespace() {
-	case libraEtdNamespace:
-		return extractEtdAtributes(obj)
-	case libraOpenNamespace:
-		return extractOpenAtributes(obj)
-	default:
-		return nil, fmt.Errorf("unsupported namespace")
-	}
+	return extractEtdAtributes(obj)
 }
 
 func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
@@ -169,34 +152,6 @@ func extractEtdAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
 	// populate the work
 	work := Work{
 		Degree:  meta.Degree,
-		License: meta.License,
-		Title:   meta.Title,
-	}
-
-	return &work, nil
-}
-
-func extractOpenAtributes(obj uvaeasystore.EasyStoreObject) (*Work, error) {
-
-	// extract the metadata
-	if obj.Metadata() == nil {
-		fmt.Printf("ERROR: unable to get metadata payload for ns/oid [%s/%s]\n", obj.Namespace(), obj.Id())
-		return nil, ErrNoMetadata
-	}
-
-	md := obj.Metadata()
-	pl, err := md.Payload()
-	if err != nil {
-		return nil, err
-	}
-	meta, err := librametadata.OAWorkFromBytes(pl)
-	if err != nil {
-		return nil, err
-	}
-
-	// populate the work
-	work := Work{
-		Degree:  "None", // no degree program for an open item
 		License: meta.License,
 		Title:   meta.Title,
 	}

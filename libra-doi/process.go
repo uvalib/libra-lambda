@@ -27,7 +27,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 	fmt.Printf("EVENT %s from:%s -> %s\n", messageID, messageSrc, ev.String())
 
 	// initial namespace validation
-	if ev.Namespace != libraEtdNamespace && ev.Namespace != libraOpenNamespace {
+	if ev.Namespace != libraEtdNamespace {
 		fmt.Printf("WARNING: unsupported namespace (%s), ignoring\n", ev.Namespace)
 		return nil
 	}
@@ -101,27 +101,15 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		payload.Data.Attributes.Event = "hide"
 	} // A draft is created when event is blank
 
-	if ev.Namespace == cfg.ETDNamespace.Name {
-		work, err := librametadata.ETDWorkFromBytes(mdBytes)
-		if err != nil {
-			fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
-			return err
-		}
-		//spew.Dump(work)
-		payload = createETDPayload(work, fields)
-
-	} else if ev.Namespace == cfg.OpenNamespace.Name {
-		work, err := librametadata.OAWorkFromBytes(mdBytes)
-		if err != nil {
-			fmt.Printf("ERROR: unable to process OA Work  %s\n", err.Error())
-			return err
-		}
-		//spew.Dump(work)
-		payload = createOAPayload(work, fields)
+	work, err := librametadata.ETDWorkFromBytes(mdBytes)
+	if err != nil {
+		fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
+		return err
 	}
 
+	payload = createETDPayload(work, fields)
 	payload.Data.Attributes.URL =
-		fmt.Sprintf("%s/public/%s/%s", cfg.PublicURLBase, cfg.OAPublicShoulder, ev.Identifier)
+		fmt.Sprintf("%s/public/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
 
 	spew.Dump(payload)
 

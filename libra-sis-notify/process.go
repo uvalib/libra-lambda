@@ -28,14 +28,8 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, ev.String())
 
 	// initial namespace validation
-	if ev.Namespace != libraEtdNamespace && ev.Namespace != libraOpenNamespace {
-		fmt.Printf("WARNING: unsupported namespace (%s), ignoring\n", ev.Namespace)
-		return nil
-	}
-
-	// make sure this is an object we are interested in
 	if ev.Namespace != libraEtdNamespace {
-		fmt.Printf("INFO: uninteresting event, ignoring\n")
+		fmt.Printf("WARNING: unsupported namespace (%s), ignoring\n", ev.Namespace)
 		return nil
 	}
 

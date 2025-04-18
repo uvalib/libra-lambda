@@ -113,14 +113,14 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			eso.SetFields(fields)
 
 			meta := librametadata.ETDWork{}
-			meta.Department = o.Department
+			//meta.Department = o.Department
 			meta.Degree = o.Degree
 			meta.Title = o.Title
 			meta.Author = librametadata.ContributorData{
 				ComputeID:   o.ComputingId,
 				FirstName:   o.FirstName,
 				LastName:    o.LastName,
-				Program:     o.Department,
+				Department:  o.Department,
 				Institution: "University of Virginia",
 			}
 			eso.SetMetadata(meta)

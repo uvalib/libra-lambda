@@ -24,7 +24,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, ev.String())
 
 	// initial namespace validation
-	if ev.Namespace != libraEtdNamespace && ev.Namespace != libraOpenNamespace {
+	if ev.Namespace != libraEtdNamespace {
 		fmt.Printf("WARNING: unsupported namespace (%s), ignoring\n", ev.Namespace)
 		return nil
 	}
@@ -64,41 +64,18 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// check the event type
 	switch ev.EventName {
 	case uvalibrabus.EventObjectCreate, uvalibrabus.EventCommandMailInvite:
-		// we send notifications for libraetd events only
-		switch obj.Namespace() {
-		case libraEtdNamespace:
-			mail := ETD_OPTIONAL_INVITATION
-			if fields["source"] == "sis" {
-				mail = ETD_SIS_INVITATION
-			}
-			emailSentFieldName = "invitation-sent"
-			mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
-
-		case libraOpenNamespace:
-			fmt.Printf("INFO: uninteresting namespace for event, ignoring\n")
-			return nil
-
-		default:
-			err = fmt.Errorf("unsupported namespace")
+		mail := ETD_OPTIONAL_INVITATION
+		if fields["source"] == "sis" {
+			mail = ETD_SIS_INVITATION
 		}
+		emailSentFieldName = "invitation-sent"
+		mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
 
 	case uvalibrabus.EventWorkPublish, uvalibrabus.EventCommandMailSuccess:
-		switch obj.Namespace() {
-		case libraEtdNamespace:
-			// FIXME: support advisor email too
+		// FIXME: support advisor email too
 
-			emailSentFieldName = "submitted-sent"
-			mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_AUTHOR, obj)
-
-		case libraOpenNamespace:
-
-			emailSentFieldName = "submitted-sent"
-			mailSubject, mailBody, err = emailSubjectAndBody(cfg, OPEN_SUBMITTED_AUTHOR, obj)
-
-		default:
-
-			err = fmt.Errorf("unsupported namespace for work publish event")
-		}
+		emailSentFieldName = "submitted-sent"
+		mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_AUTHOR, obj)
 
 	default:
 		fmt.Printf("INFO: uninteresting event, ignoring\n")
@@ -145,7 +122,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// a special case, we also need to email the registrar
-	if ev.EventName == uvalibrabus.EventWorkPublish && obj.Namespace() == libraEtdNamespace {
+	if ev.EventName == uvalibrabus.EventWorkPublish {
 		mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_ADVISOR, obj)
 		//mailRecipient = //FIXME
 		//err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)

@@ -15,11 +15,9 @@ type Config struct {
 	DOIBaseURL string // base url for DOIs
 
 	PublicURLBase     string // Base URL for public pages
-	OAPublicShoulder  string
 	ETDPublicShoulder string
 
-	ETDNamespace  Namespace
-	OpenNamespace Namespace
+	ETDNamespace Namespace
 
 	ResourceTypes []ResourceType
 
@@ -38,10 +36,9 @@ type Config struct {
 	MintAuthURL        string
 
 	httpClient *http.Client // shared http client
-
 }
 
-// Namespace such as libraopen or libraetd
+// Namespace such as libraetd
 type Namespace struct {
 	Name string
 	Path string
@@ -115,20 +112,6 @@ func envToInt(env string) (int, error) {
 	return n, nil
 }
 
-func envToBool(env string) (bool, error) {
-
-	str, err := ensureSetAndNonEmpty(env)
-	if err != nil {
-		return false, err
-	}
-
-	b, err := strconv.ParseBool(str)
-	if err != nil {
-		return false, err
-	}
-	return b, nil
-}
-
 var cfg Config
 
 // Cfg returns the global configuration
@@ -167,12 +150,8 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
-	cfg.OpenNamespace = Namespace{
-		Name: "libraopen",
-		Path: "oa",
-	}
 	cfg.ETDNamespace = Namespace{
-		Name: "libraetd",
+		Name: libraEtdNamespace,
 		Path: "etd",
 	}
 
@@ -212,10 +191,6 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.OAPublicShoulder, err = ensureSet("OA_PUBLIC_SHOULDER")
-	if err != nil {
-		return nil, err
-	}
 	cfg.ETDPublicShoulder, err = ensureSet("ETD_PUBLIC_SHOULDER")
 	if err != nil {
 		return nil, err
@@ -250,7 +225,6 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] ORCIDGetDetailsURL        = [%s]\n", cfg.OrcidGetDetailsURL)
 	fmt.Printf("[conf] MintAuthURL        = [%s]\n", cfg.MintAuthURL)
 
-	fmt.Printf("[conf] Public Libra OA URL format  = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.OAPublicShoulder)
 	fmt.Printf("[conf] Public Libra ETD URL format = [%s/public/%s/id]\n", cfg.PublicURLBase, cfg.ETDPublicShoulder)
 
 	return &cfg, nil

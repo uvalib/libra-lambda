@@ -109,34 +109,19 @@ func createUpdateSchema(eso uvaeasystore.EasyStoreObject) (*WorkSchema, error) {
 	fields := eso.Fields()
 	schema.URL = fields["doi"]
 
-	if eso.Namespace() == libraEtdNamespace {
-		meta, err := librametadata.ETDWorkFromBytes(pl)
-		if err != nil {
-			return nil, err
-		}
-
-		schema.Authors = getEtdPersons(meta)
-		schema.Abstract = meta.Abstract
-		schema.PublicationDate = extractYYMMDD(fields["publish-date"])
-		schema.Title = meta.Title
-
-		schema.ResourceType = "supervised-student-publication"
-		if strings.Contains(meta.Degree, "Doctor") == true {
-			schema.ResourceType = "dissertation-thesis"
-		}
+	meta, err := librametadata.ETDWorkFromBytes(pl)
+	if err != nil {
+		return nil, err
 	}
 
-	if eso.Namespace() == libraOpenNamespace {
-		meta, err := librametadata.OAWorkFromBytes(pl)
-		if err != nil {
-			return nil, err
-		}
+	schema.Authors = getEtdPersons(meta)
+	schema.Abstract = meta.Abstract
+	schema.PublicationDate = extractYYMMDD(fields["publish-date"])
+	schema.Title = meta.Title
 
-		schema.Authors = getOpenPersons(meta)
-		schema.Abstract = meta.Abstract
-		schema.PublicationDate = extractYYMMDD(fields["publish-date"])
-		schema.ResourceType = mapResourceType(meta.ResourceType)
-		schema.Title = meta.Title
+	schema.ResourceType = "supervised-student-publication"
+	if strings.Contains(meta.Degree, "Doctor") == true {
+		schema.ResourceType = "dissertation-thesis"
 	}
 
 	return &schema, nil
@@ -154,26 +139,12 @@ func getWorkAuthor(eso uvaeasystore.EasyStoreObject) (string, error) {
 		return "", err
 	}
 
-	if eso.Namespace() == libraEtdNamespace {
-		meta, err := librametadata.ETDWorkFromBytes(pl)
-		if err != nil {
-			return "", err
-		}
-		if len(meta.Author.ComputeID) != 0 {
-			return meta.Author.ComputeID, nil
-		}
+	meta, err := librametadata.ETDWorkFromBytes(pl)
+	if err != nil {
+		return "", err
 	}
-
-	if eso.Namespace() == libraOpenNamespace {
-		meta, err := librametadata.OAWorkFromBytes(pl)
-		if err != nil {
-			return "", err
-		}
-		if len(meta.Authors) != 0 {
-			if len(meta.Authors[0].ComputeID) != 0 {
-				return meta.Authors[0].ComputeID, nil
-			}
-		}
+	if len(meta.Author.ComputeID) != 0 {
+		return meta.Author.ComputeID, nil
 	}
 
 	// no error and no author
@@ -183,36 +154,6 @@ func getWorkAuthor(eso uvaeasystore.EasyStoreObject) (string, error) {
 func getEtdPersons(meta *librametadata.ETDWork) []Person {
 	person := Person{Index: 0, FirstName: meta.Author.FirstName, LastName: meta.Author.LastName}
 	return []Person{person}
-}
-
-func getOpenPersons(meta *librametadata.OAWork) []Person {
-	persons := make([]Person, 0)
-	for ix, p := range meta.Authors {
-		person := Person{Index: ix, FirstName: p.FirstName, LastName: p.LastName}
-		persons = append(persons, person)
-	}
-	return persons
-}
-
-func mapResourceType(rt string) string {
-	switch rt {
-	case "Article":
-		return "journal-article"
-	case "Book":
-		return "book"
-	case "Conference Paper":
-		return "conference-paper"
-	case "Part of Book":
-		return "book-chapter"
-	case "Report":
-		return "report"
-	case "Journal":
-		return "journal-issue"
-	case "Poster":
-		return "conference-poster"
-	default:
-		return "other"
-	}
 }
 
 // attempt to extract a 4 digit year from the date string (crap, I know)

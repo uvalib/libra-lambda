@@ -40,7 +40,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// publish ETD namespace event
 	ev.Namespace = libraEtdNamespace
-	err = bus.PublishEvent(ev)
+	err = bus.PublishEvent(&ev)
 	if err != nil {
 		fmt.Printf("ERROR: publishing event (%s)\n", err.Error())
 		return err

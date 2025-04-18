@@ -18,13 +18,7 @@ var templates embed.FS
 
 func docRender(namespace string, oid string) ([]byte, error) {
 
-	var templateFile string
-	switch namespace {
-	case libraEtdNamespace, libraOpenNamespace:
-		templateFile = fmt.Sprintf("templates/%s-del-doc.template", namespace)
-	default:
-		return nil, fmt.Errorf("unsupported namespace (%s)", namespace)
-	}
+	var templateFile = fmt.Sprintf("templates/%s-del-doc.template", namespace)
 
 	// read the template
 	templateStr, err := templates.ReadFile(templateFile)
