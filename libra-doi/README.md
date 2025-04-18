@@ -15,7 +15,7 @@ cd bin
 ./cmd -messageid=123 \
   -source=librabus \
   -eventname=metadata/edit \
-  -namespace=libraopen \
+  -namespace=libraetd \
   -objid=oid:co3e8h0ki3ukr53r60ng
 ```
 
