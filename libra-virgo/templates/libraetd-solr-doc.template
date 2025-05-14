@@ -1,0 +1,53 @@
+<add xmlns:l="http://language.data">
+   <doc>
+      <field name="id">{{ .Id }}</field>
+      <field name="source_f_stored">Libra Repository</field>
+      <field name="digital_collection_f_stored">Libra ETD Repository</field>
+      <field name="data_source_f_stored">libraetd</field>
+      <field name="pool_f_stored">thesis</field>
+      <field name="doc_type_f_stored">libra</field>
+      <field name="location_f_stored">Internet Materials</field>
+      <field name="shadowed_location_f_stored">{{ .Visibility }}</field>
+      <field name="uva_availability_f_stored">Online</field>
+      <field name="anon_availability_f_stored">Online</field>
+{{ if .PubYear }}
+      <field name="published_daterange">{{ .PubYear }}</field>
+      <field name="published_display_a">{{ .PubYear }}</field>
+      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department | XmlEncode }}, {{ .Work.Degree }}, {{ .PubYear }}</field>
+{{ else }}
+      <field name="published_tsearch_stored">University of Virginia, {{ .Work.Author.Department | XmlEncode }}, {{ .Work.Degree }}</field>
+{{ end }}
+{{ if .PubDate }}
+      <field name="published_date">{{ .PubDate }}</field>
+{{ end }}
+      <field name="degree_tsearch_stored">{{ .Work.Degree }}</field>
+      <field name="department_tsearchf_stored">{{ .Work.Author.Department | XmlEncode }}</field>
+      <field name="title_tsearch_stored">{{ .Work.Title | XmlEncode }}</field>
+      <field name="title_sort_stored">{{ .TitleSort }}</field>
+      <field name="work_title2_key_ssort_stored">{{ .Title2Key }}</field>
+      <field name="author_tsearch_stored">{{ .Work.Author.LastName }}, {{ .Work.Author.FirstName }}</field>
+      <field name="author_facet_f_stored">{{ .Work.Author.LastName }}, {{ .Work.Author.FirstName }}</field>
+      <field name="author_sort_stored">{{ .Work.Author.LastName | ToLower }} {{ .Work.Author.FirstName | ToLower }}</field>
+{{ range $a := .Work.Advisors }}
+      <field name="author_added_entry_tsearch_stored">{{ $a.LastName }} {{ $a.FirstName }}</field>
+      <field name="author_facet_f_stored">{{ $a.LastName }}, {{ $a.FirstName }} (advisor)</field>
+{{ end }}
+      <field name="language_f_stored">{{ .Work.Language }}</field>
+      <field name="subject_summary_tsearch_stored">{{ .Work.Abstract | XmlEncode }}</field>
+      <field name="abstract_tsearch_stored">{{ .Work.Abstract | XmlEncode }}</field>
+{{ range $k := .Work.Keywords }}
+      <field name="subject_tsearchf_stored">{{ $k | XmlEncode }}</field>
+{{ end }}
+      <field name="date_indexed_f_stored">{{ .IndexDateTime }}</field>
+      <field name="url_str_stored">{{ .Doi }}</field>
+      <field name="url_label_str_stored">Access Online</field>
+{{ range $s := .Work.Sponsors }}
+      <field name="sponsoring_agency_tsearch_stored">{{ $s | XmlEncode }}</field>
+{{ end }}
+      <field name="rights_tsearchf_stored">{{ .Work.License }}</field>
+      <field name="rs_uri_a">{{ .Work.LicenseURL }}</field>
+      <field name="format_f_stored">Thesis/Dissertation</field>
+      <field name="format_f_stored">Online</field>
+      <field name="date_received_f_stored">{{ .ReceivedDate }}</field>
+   </doc>
+</add>

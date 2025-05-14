@@ -46,6 +46,10 @@ phases:
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
       - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-virgo
+      - make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-virgo-delete
+      - make linux
       #
       # copy to the results bucket
       #
@@ -83,6 +87,12 @@ phases:
       #
       # libra-sis-notify function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-sis-notify/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-sis-notify/deployment.zip --quiet
+      #
+      # libra-virgo function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-virgo/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-virgo/deployment.zip --quiet
+      #
+      # libra-virgo-delete function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-virgo-delete/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-virgo-delete/deployment.zip --quiet
       #
       # scripts
       - aws s3 cp ${CODEBUILD_SRC_DIR}/scripts s3://${deploy_bucket}/${BUILD_VERSION}/scripts --recursive --include *.ksh --quiet
