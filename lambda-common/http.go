@@ -33,6 +33,17 @@ func httpGet(client *http.Client, url string) ([]byte, error) {
 	return httpSend(client, req)
 }
 
+func httpDelete(client *http.Client, url string) ([]byte, error) {
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Printf("ERROR: DELETE %s failed with error (%s)\n", url, err)
+		return nil, err
+	}
+
+	return httpSend(client, req)
+}
+
 func httpPost(client *http.Client, url string, payload []byte, contentType string) ([]byte, error) {
 
 	reader := bytes.NewReader(payload)
