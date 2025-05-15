@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
-	"strings"
-	"time"
+	//"strings"
+	//"time"
 )
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
@@ -36,13 +36,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// init the S3 client
-	s3, err := newS3Client()
-	if err != nil {
-		fmt.Printf("ERROR: creating S3 client (%s)\n", err.Error())
-		return err
-	}
-
 	// easystore access
 	es, err := newEasystore(cfg)
 	if err != nil {
@@ -53,30 +46,13 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// important, cleanup properly
 	defer es.Close()
 
-	obj, err := getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Fields+uvaeasystore.Metadata)
+	_, err = getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Fields+uvaeasystore.Metadata)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
-	// render the document
-	buf, err := docRender(cfg, obj)
-	if err != nil {
-		return err
-	}
-
-	// populate the key template
-	year := fmt.Sprintf("%04d", time.Now().Year())
-	bucketKey := strings.Replace(cfg.BucketKeyTemplate, "{:year}", year, 1)
-	bucketKey = strings.Replace(bucketKey, "{:namespace}", ev.Namespace, 1)
-	bucketKey = strings.Replace(bucketKey, "{:id}", ev.Identifier, 1)
-
-	// upload to S3
-	err = putS3(s3, cfg.BucketName, bucketKey, buf)
-	if err != nil {
-		fmt.Printf("ERROR: uploading (%s)\n", err.Error())
-		return err
-	}
+	// do stuff
 
 	return nil
 }
