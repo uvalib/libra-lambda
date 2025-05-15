@@ -9,8 +9,7 @@ import (
 // Config defines all of the service configuration parameters
 type Config struct {
 	// upload configuration
-	BucketName        string // the bucket name
-	BucketKeyTemplate string // the bucket key template
+	IndexUpdateUrl string // the index update URL
 
 	// easystore configuration
 	EsDbHost     string // database host
@@ -82,11 +81,7 @@ func loadConfiguration() (*Config, error) {
 	var cfg Config
 
 	var err error
-	cfg.BucketName, err = ensureSetAndNonEmpty("BUCKET_NAME")
-	if err != nil {
-		return nil, err
-	}
-	cfg.BucketKeyTemplate, err = ensureSetAndNonEmpty("BUCKET_KEY_TEMPLATE")
+	cfg.IndexUpdateUrl, err = ensureSetAndNonEmpty("INDEX_UPDATE_URL")
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +110,7 @@ func loadConfiguration() (*Config, error) {
 	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
 	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
-	fmt.Printf("[conf] BucketName        = [%s]\n", cfg.BucketName)
-	fmt.Printf("[conf] BucketKeyTemplate = [%s]\n", cfg.BucketKeyTemplate)
+	fmt.Printf("[conf] IndexUpdateUrl    = [%s]\n", cfg.IndexUpdateUrl)
 
 	fmt.Printf("[conf] EsDbHost          = [%s]\n", cfg.EsDbHost)
 	fmt.Printf("[conf] EsDbPort          = [%d]\n", cfg.EsDbPort)

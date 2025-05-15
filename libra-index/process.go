@@ -46,15 +46,23 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// important, cleanup properly
 	defer es.Close()
 
-	_, err = getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Fields+uvaeasystore.Metadata)
+	obj, err := getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.AllComponents)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
-	// do stuff
+	// get a new http client
+	httpClient := newHttpClient(1, 30)
 
-	return nil
+	// and update the index
+	err = updateIndex(cfg, obj, httpClient)
+	if err == nil {
+		// log the happy news
+		fmt.Printf("INFO: successful index update for [%s/%s]\n", ev.Namespace, ev.Identifier)
+	}
+
+	return err
 }
 
 //

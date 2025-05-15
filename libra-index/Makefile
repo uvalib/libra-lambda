@@ -26,6 +26,7 @@ deployable:
 common:
 	-ln -s $(COMMON)/definitions.go . 2> /dev/null || true
 	-ln -s $(COMMON)/easystore.go . 2> /dev/null || true
+	-ln -s $(COMMON)/http.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-cmdline.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-lambda-sqs.go . 2> /dev/null || true
 
