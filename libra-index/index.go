@@ -61,7 +61,7 @@ func updateIndex(config *Config, eso uvaeasystore.EasyStoreObject, client *http.
 		return err
 	}
 
-	//fmt.Printf("INFO: payload [%s]\n", string(pl))
+	fmt.Printf("INFO: payload [%s]\n", string(pl))
 
 	buf, err := httpPost(client, config.IndexUpdateUrl, pl, "application/json")
 	if err != nil {
@@ -71,6 +71,8 @@ func updateIndex(config *Config, eso uvaeasystore.EasyStoreObject, client *http.
 		}
 		return err
 	}
+
+	fmt.Printf("INFO: response [%s]\n", string(buf))
 
 	// all good
 	return nil
