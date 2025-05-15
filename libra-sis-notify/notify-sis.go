@@ -21,7 +21,7 @@ func notifySis(config *Config, fields uvaeasystore.EasyStoreObjectFields, auth s
 	url = strings.Replace(url, "{:auth}", auth, 1)
 	url = strings.Replace(url, "{:doi}", doi, 1)
 
-	buf, err := httpPut(client, url, nil)
+	buf, err := httpPut(client, url, nil, "")
 	if err != nil {
 		if buf != nil {
 			fmt.Printf("ERROR: failed response [%s]\n", string(buf))

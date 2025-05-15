@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
@@ -31,59 +30,27 @@ func httpGet(client *http.Client, url string) ([]byte, error) {
 		return nil, err
 	}
 
-	var response *http.Response
-	count := 0
-	for {
-		start := time.Now()
-		response, err = client.Do(req)
-		duration := time.Since(start)
-		fmt.Printf("INFO: GET %s (elapsed %d ms)\n", url, duration.Milliseconds())
-
-		count++
-		if err != nil {
-			if canRetry(err) == false {
-				fmt.Printf("ERROR: GET %s failed with error (%s)\n", url, err)
-				return nil, err
-			}
-
-			// break when tried too many times
-			if count >= maxHttpRetries {
-				return nil, err
-			}
-
-			fmt.Printf("ERROR: GET %s failed with error, retrying (%s)\n", url, err)
-
-			// sleep for a bit before retrying
-			time.Sleep(retrySleepTime)
-		} else {
-
-			defer response.Body.Close()
-
-			if response.StatusCode != http.StatusOK {
-				logLevel := "ERROR"
-				// log not found as informational instead of as an error
-				if response.StatusCode == http.StatusNotFound {
-					logLevel = "INFO"
-				}
-				fmt.Printf("%s: GET %s failed with status %d\n", logLevel, url, response.StatusCode)
-
-				body, _ := ioutil.ReadAll(response.Body)
-
-				return body, fmt.Errorf("request returns HTTP %d", response.StatusCode)
-			} else {
-				body, err := ioutil.ReadAll(response.Body)
-				if err != nil {
-					return nil, err
-				}
-
-				//fmt.Printf( body )
-				return body, nil
-			}
-		}
-	}
+	return httpSend(client, req)
 }
 
-func httpPut(client *http.Client, url string, payload []byte) ([]byte, error) {
+func httpPost(client *http.Client, url string, payload []byte, contentType string) ([]byte, error) {
+
+	reader := bytes.NewReader(payload)
+	req, err := http.NewRequest("POST", url, reader)
+	if err != nil {
+		fmt.Printf("ERROR: POST %s failed with error (%s)\n", url, err)
+		return nil, err
+	}
+
+	// if we specify the content type, add the content type header
+	if len(contentType) != 0 {
+		req.Header.Add("content-type", contentType)
+	}
+
+	return httpSend(client, req)
+}
+
+func httpPut(client *http.Client, url string, payload []byte, contentType string) ([]byte, error) {
 
 	reader := bytes.NewReader(payload)
 	req, err := http.NewRequest("PUT", url, reader)
@@ -92,56 +59,12 @@ func httpPut(client *http.Client, url string, payload []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	var response *http.Response
-	count := 0
-	for {
-		start := time.Now()
-		response, err = client.Do(req)
-		duration := time.Since(start)
-		fmt.Printf("INFO: PUT %s (elapsed %d ms)\n", url, duration.Milliseconds())
-
-		count++
-		if err != nil {
-			if canRetry(err) == false {
-				fmt.Printf("ERROR: PUT %s failed with error (%s)\n", url, err)
-				return nil, err
-			}
-
-			// break when tried too many times
-			if count >= maxHttpRetries {
-				return nil, err
-			}
-
-			fmt.Printf("ERROR: PUT %s failed with error, retrying (%s)\n", url, err)
-
-			// sleep for a bit before retrying
-			time.Sleep(retrySleepTime)
-		} else {
-
-			defer response.Body.Close()
-
-			if response.StatusCode != http.StatusOK {
-				logLevel := "ERROR"
-				// log not found as informational instead of as an error
-				if response.StatusCode == http.StatusNotFound {
-					logLevel = "INFO"
-				}
-				fmt.Printf("%s: PUT %s failed with status %d\n", logLevel, url, response.StatusCode)
-
-				body, _ := ioutil.ReadAll(response.Body)
-
-				return body, fmt.Errorf("request returns HTTP %d", response.StatusCode)
-			} else {
-				body, err := ioutil.ReadAll(response.Body)
-				if err != nil {
-					return nil, err
-				}
-
-				//fmt.Printf( body )
-				return body, nil
-			}
-		}
+	// if we specify the content type, add the content type header
+	if len(contentType) != 0 {
+		req.Header.Add("content-type", contentType)
 	}
+
+	return httpSend(client, req)
 }
 
 func httpSend(client *http.Client, req *http.Request) ([]byte, error) {
@@ -178,7 +101,7 @@ func httpSend(client *http.Client, req *http.Request) ([]byte, error) {
 
 			if response.StatusCode >= 300 {
 				logLevel := "ERROR"
-				// log not found as informational instead of as an error
+				// log StatusNotFound as informational instead of as an error
 				if response.StatusCode == http.StatusNotFound {
 					logLevel = "INFO"
 				}
