@@ -3,16 +3,17 @@ module github.com/uvalib/libra-virgo
 go 1.24.3
 
 require (
+	github.com/aws/aws-lambda-go v1.48.0
+	github.com/aws/aws-sdk-go-v2 v1.36.3
+	github.com/aws/aws-sdk-go-v2/config v1.29.14
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/uvalib/easystore/uvaeasystore v0.0.0-20250513144758-d0fd8f4ca690
 	github.com/uvalib/libra-metadata v0.0.0-20250513131340-aa4ee04ad7d1
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250417145647-b8007dc1f770
 )
 
 require (
-	github.com/aws/aws-lambda-go v1.48.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.29.14 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.67 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.30 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.75 // indirect
@@ -25,7 +26,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.18.15 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.25.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.19 // indirect
