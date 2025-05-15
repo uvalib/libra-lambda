@@ -54,10 +54,10 @@ phases:
       - aws lambda update-function-code --function-name uva-libra-sis-notify-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-sis-notify/deployment.zip
       #
       # libra-virgo function
-      #- aws lambda update-function-code --function-name uva-libra-virgo-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-virgo/deployment.zip
+      - aws lambda update-function-code --function-name uva-libra-virgo-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-virgo/deployment.zip
       #
       # libra-virgo-delete function
-      #- aws lambda update-function-code --function-name uva-libra-virgo-delete-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-virgo-delete/deployment.zip
+      - aws lambda update-function-code --function-name uva-libra-virgo-delete-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-virgo-delete/deployment.zip
 
 #  post_build:
 #    commands:
