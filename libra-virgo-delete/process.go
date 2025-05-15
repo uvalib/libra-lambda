@@ -62,6 +62,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
+	// log the happy news
+	fmt.Printf("INFO: successful virgo delete for [%s/%s]\n", ev.Namespace, ev.Identifier)
+
 	return nil
 }
 
