@@ -8,9 +8,8 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
-	// upload configuration
-	BucketName        string // the bucket name
-	BucketKeyTemplate string // the bucket key template
+	// index endpoint configuration
+	IndexDeleteUrl string // the index update URL
 }
 
 func envWithDefault(env string, defaultValue string) string {
@@ -71,17 +70,12 @@ func loadConfiguration() (*Config, error) {
 	var cfg Config
 
 	var err error
-	cfg.BucketName, err = ensureSetAndNonEmpty("BUCKET_NAME")
-	if err != nil {
-		return nil, err
-	}
-	cfg.BucketKeyTemplate, err = ensureSetAndNonEmpty("BUCKET_KEY_TEMPLATE")
+	cfg.IndexDeleteUrl, err = ensureSetAndNonEmpty("INDEX_DELETE_URL")
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("[conf] BucketName        = [%s]\n", cfg.BucketName)
-	fmt.Printf("[conf] BucketKeyTemplate = [%s]\n", cfg.BucketKeyTemplate)
+	fmt.Printf("[conf] IndexDeleteUrl = [%s]\n", cfg.IndexDeleteUrl)
 
 	return &cfg, nil
 }

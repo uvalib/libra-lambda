@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
+	"strings"
 )
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
@@ -28,14 +29,23 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// load configuration
-	_, err = loadConfiguration()
+	cfg, err := loadConfiguration()
 	if err != nil {
 		return err
 	}
 
-	// do stuff
+	// get a new http client
+	httpClient := newHttpClient(1, 30)
 
-	return nil
+	url := strings.Replace(cfg.IndexDeleteUrl, "{:id}", ev.Identifier, 1)
+
+	_, err = httpDelete(httpClient, url)
+	if err == nil {
+		// log the happy news
+		fmt.Printf("INFO: successful index delete for [%s/%s]\n", ev.Namespace, ev.Identifier)
+	}
+
+	return err
 }
 
 //
