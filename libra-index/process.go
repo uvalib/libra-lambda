@@ -46,7 +46,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// important, cleanup properly
 	defer es.Close()
 
-	obj, err := getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.AllComponents)
+	obj, err := getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Metadata+uvaeasystore.Fields)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
