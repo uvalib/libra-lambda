@@ -8,7 +8,7 @@ import (
 
 // Config defines all of the service configuration parameters
 type Config struct {
-	// upload configuration
+	// index endpoint configuration
 	IndexUpdateUrl string // the index update URL
 
 	// easystore configuration
