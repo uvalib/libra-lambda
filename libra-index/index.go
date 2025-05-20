@@ -9,10 +9,13 @@ import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"net/http"
+	"time"
 )
 
 type IndexWork struct {
-	Id       string          `json:"id,omitempty"`
+	Id       string          `json:"id"`
+	Created  time.Time       `json:"created"`
+	Modified time.Time       `json:"modified"`
 	Metadata json.RawMessage `json:"metadata,omitempty"`
 	Fields   json.RawMessage `json:"fields,omitempty"`
 	Files    json.RawMessage `json:"files,omitempty"`
@@ -21,8 +24,11 @@ type IndexWork struct {
 func updateIndex(config *Config, eso uvaeasystore.EasyStoreObject, client *http.Client) error {
 
 	// create the request payload
-	req := IndexWork{}
-	req.Id = eso.Id()
+	req := IndexWork{
+		Id:       eso.Id(),
+		Created:  eso.Created(),
+		Modified: eso.Modified(),
+	}
 
 	// include metadata if it exists
 	if eso.Metadata() != nil {
