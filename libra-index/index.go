@@ -13,21 +13,25 @@ import (
 )
 
 type IndexWork struct {
-	Id       string          `json:"id"`
-	Created  time.Time       `json:"created"`
-	Modified time.Time       `json:"modified"`
-	Metadata json.RawMessage `json:"metadata,omitempty"`
-	Fields   json.RawMessage `json:"fields,omitempty"`
-	Files    json.RawMessage `json:"files,omitempty"`
+	Id           string          `json:"id"`
+	Created      time.Time       `json:"created"`
+	Modified     time.Time       `json:"modified"`
+	CreatedUnix  int64           `json:"createdUnix"`
+	ModifiedUnix int64           `json:"modifiedUnix"`
+	Metadata     json.RawMessage `json:"metadata,omitempty"`
+	Fields       json.RawMessage `json:"fields,omitempty"`
+	Files        json.RawMessage `json:"files,omitempty"`
 }
 
 func updateIndex(config *Config, eso uvaeasystore.EasyStoreObject, client *http.Client) error {
 
 	// create the request payload
 	req := IndexWork{
-		Id:       eso.Id(),
-		Created:  eso.Created(),
-		Modified: eso.Modified(),
+		Id:           eso.Id(),
+		Created:      eso.Created(),
+		Modified:     eso.Modified(),
+		CreatedUnix:  eso.Created().Unix(),
+		ModifiedUnix: eso.Modified().Unix(),
 	}
 
 	// include metadata if it exists
