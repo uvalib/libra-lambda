@@ -40,9 +40,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// easystore access
-	es, err := newEasystore(cfg)
+	es, err := newEasystoreProxy(cfg)
 	if err != nil {
-		fmt.Printf("ERROR: creating easystore (%s)\n", err.Error())
+		fmt.Printf("ERROR: creating easystore proxy (%s)\n", err.Error())
 		return err
 	}
 
@@ -88,7 +88,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			return err
 		}
 	} else {
-		fmt.Printf("INFO: not a SIS work (source %s), ignoring\n", fields["source-id"])
+		src := "<empty>"
+		if len(fields["source-id"]) != 0 {
+			src = fields["source-id"]
+		}
+		fmt.Printf("INFO: not a SIS work (source %s), ignoring\n", src)
 		return nil
 	}
 

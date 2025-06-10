@@ -7,26 +7,25 @@ package main
 import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
+	"log"
 )
 
-func newEasystore(cfg *Config) (uvaeasystore.EasyStore, error) {
+func newEasystoreProxy(cfg *Config) (uvaeasystore.EasyStore, error) {
 
-	// make better later
-	config := uvaeasystore.DatastorePostgresConfig{
-		DbHost:     cfg.EsDbHost,
-		DbPort:     cfg.EsDbPort,
-		DbName:     cfg.EsDbName,
-		DbUser:     cfg.EsDbUser,
-		DbPassword: cfg.EsDbPassword,
-		DbTimeout:  30, // probably fix me later
-
-		BusName:    cfg.BusName,
-		SourceName: cfg.SourceName,
-
-		//Log:        logger,
+	config := uvaeasystore.ProxyConfigImpl{
+		ServiceEndpoint: cfg.EsProxyUrl,
+		Log:             log.Default(),
 	}
+	return uvaeasystore.NewEasyStoreProxy(config)
+}
 
-	return uvaeasystore.NewEasyStore(config)
+func newEasystoreReadonlyProxy(cfg *Config) (uvaeasystore.EasyStoreReadonly, error) {
+
+	config := uvaeasystore.ProxyConfigImpl{
+		ServiceEndpoint: cfg.EsProxyUrl,
+		Log:             log.Default(),
+	}
+	return uvaeasystore.NewEasyStoreProxyReadonly(config)
 }
 
 func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject) error {
@@ -38,11 +37,11 @@ func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStore
 	return err
 }
 
-func getEasystoreObjectByKey(es uvaeasystore.EasyStore, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
+func getEasystoreObjectByKey(es uvaeasystore.EasyStoreReadonly, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
 	return es.GetByKey(namespace, identifier, what)
 }
 
-func getEasystoreObjectsByFields(es uvaeasystore.EasyStore, namespace string, fields uvaeasystore.EasyStoreObjectFields, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObjectSet, error) {
+func getEasystoreObjectsByFields(es uvaeasystore.EasyStoreReadonly, namespace string, fields uvaeasystore.EasyStoreObjectFields, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObjectSet, error) {
 	return es.GetByFields(namespace, fields, what)
 }
 

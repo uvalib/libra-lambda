@@ -37,16 +37,16 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// easystore access
-	es, err := newEasystore(cfg)
+	esro, err := newEasystoreReadonlyProxy(cfg)
 	if err != nil {
-		fmt.Printf("ERROR: creating easystore (%s)\n", err.Error())
+		fmt.Printf("ERROR: creating easystore proxy (%s)\n", err.Error())
 		return err
 	}
 
 	// important, cleanup properly
-	defer es.Close()
+	defer esro.Close()
 
-	obj, err := getEasystoreObjectByKey(es, ev.Namespace, ev.Identifier, uvaeasystore.Metadata+uvaeasystore.Fields)
+	obj, err := getEasystoreObjectByKey(esro, ev.Namespace, ev.Identifier, uvaeasystore.Metadata+uvaeasystore.Fields)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err

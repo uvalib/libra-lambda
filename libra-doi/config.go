@@ -21,15 +21,16 @@ type Config struct {
 
 	ResourceTypes []ResourceType
 
-	// easystore configuration
-	EsDbHost     string // database host
-	EsDbPort     int    // database port
-	EsDbName     string // database name
-	EsDbUser     string // database user
-	EsDbPassword string // database password
+	// easystore proxy configuration
+	EsProxyUrl string // the easystore proxy endpoint
+	//EsDbHost     string // database host
+	//EsDbPort     int    // database port
+	//EsDbName     string // database name
+	//EsDbUser     string // database user
+	//EsDbPassword string // database password
 
-	BusName    string // name of the bus
-	SourceName string // name of the source
+	//BusName    string // name of the bus
+	//SourceName string // name of the source
 
 	OrcidGetDetailsURL string // URL for orcid-ws
 	AuthToken          string
@@ -167,26 +168,32 @@ func loadConfiguration() (*Config, error) {
 		}
 	}
 
-	cfg.EsDbHost, err = ensureSet("ES_DBHOST")
+	cfg.EsProxyUrl, err = ensureSetAndNonEmpty("ES_PROXY_URL")
 	if err != nil {
 		return nil, err
 	}
-	cfg.EsDbPort, err = envToInt("ES_DBPORT")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbName, err = ensureSet("ES_DBNAME")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbUser, err = ensureSet("ES_DBUSER")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbPassword, err = ensureSet("ES_DBPASSWORD")
-	if err != nil {
-		return nil, err
-	}
+
+	//cfg.EsDbHost, err = ensureSet("ES_DBHOST")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//cfg.EsDbPort, err = envToInt("ES_DBPORT")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//cfg.EsDbName, err = ensureSet("ES_DBNAME")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//cfg.EsDbUser, err = ensureSet("ES_DBUSER")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//cfg.EsDbPassword, err = ensureSet("ES_DBPASSWORD")
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	cfg.PublicURLBase, err = ensureSet("PUBLIC_URL_BASE")
 	if err != nil {
 		return nil, err
@@ -205,17 +212,18 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
-	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
-	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+	//cfg.BusName = envWithDefault("MESSAGE_BUS", "")
+	//cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
-	fmt.Printf("[conf] EsDbHost       = [%s]\n", cfg.EsDbHost)
-	fmt.Printf("[conf] EsDbPort       = [%d]\n", cfg.EsDbPort)
-	fmt.Printf("[conf] EsDbName       = [%s]\n", cfg.EsDbName)
-	fmt.Printf("[conf] EsDbUser       = [%s]\n", cfg.EsDbUser)
-	fmt.Printf("[conf] EsDbPassword   = [REDACTED]\n")
-	fmt.Printf("[conf] BusName        = [%s]\n", cfg.BusName)
-	fmt.Printf("[conf] SourceName     = [%s]\n", cfg.SourceName)
+	//fmt.Printf("[conf] EsDbHost       = [%s]\n", cfg.EsDbHost)
+	//fmt.Printf("[conf] EsDbPort       = [%d]\n", cfg.EsDbPort)
+	//fmt.Printf("[conf] EsDbName       = [%s]\n", cfg.EsDbName)
+	//fmt.Printf("[conf] EsDbUser       = [%s]\n", cfg.EsDbUser)
+	//fmt.Printf("[conf] EsDbPassword   = [REDACTED]\n")
+	//fmt.Printf("[conf] BusName        = [%s]\n", cfg.BusName)
+	//fmt.Printf("[conf] SourceName     = [%s]\n", cfg.SourceName)
 
+	fmt.Printf("[conf] EsProxyUrl        = [%s]\n", cfg.EsProxyUrl)
 	fmt.Printf("[conf] DOIBaseURL        = [%s]\n", cfg.DOIBaseURL)
 	fmt.Printf("[conf] IDServiceBase     = [%s]\n", cfg.IDService.BaseURL)
 	fmt.Printf("[conf] IDServiceShoulder = [%s]\n", cfg.IDService.Shoulder)

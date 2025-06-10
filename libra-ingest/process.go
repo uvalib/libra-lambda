@@ -79,9 +79,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// easystore access
-	es, err := newEasystore(cfg)
+	es, err := newEasystoreProxy(cfg)
 	if err != nil {
-		fmt.Printf("ERROR: creating easystore (%s)\n", err.Error())
+		fmt.Printf("ERROR: creating easystore proxy (%s)\n", err.Error())
 		return err
 	}
 

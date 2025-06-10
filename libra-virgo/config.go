@@ -12,16 +12,17 @@ type Config struct {
 	BucketName        string // the bucket name
 	BucketKeyTemplate string // the bucket key template
 
-	// easystore configuration
-	EsDbHost     string // database host
-	EsDbPort     int    // database port
-	EsDbName     string // database name
-	EsDbUser     string // database user
-	EsDbPassword string // database password
+	// easystore proxy configuration
+	EsProxyUrl string // the easystore proxy endpoint
+	//	EsDbHost     string // database host
+	//	EsDbPort     int    // database port
+	//	EsDbName     string // database name
+	//	EsDbUser     string // database user
+	//	EsDbPassword string // database password
 
 	// message bus configuration
-	BusName    string // the message bus name
-	SourceName string // the event source name
+	//	BusName    string // the message bus name
+	//	SourceName string // the event source name
 }
 
 func envWithDefault(env string, defaultValue string) string {
@@ -91,41 +92,47 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
-	cfg.EsDbHost, err = ensureSetAndNonEmpty("ES_DBHOST")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbPort, err = envToInt("ES_DBPORT")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbName, err = ensureSetAndNonEmpty("ES_DBNAME")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbUser, err = ensureSetAndNonEmpty("ES_DBUSER")
-	if err != nil {
-		return nil, err
-	}
-	cfg.EsDbPassword, err = ensureSetAndNonEmpty("ES_DBPASSWORD")
+	cfg.EsProxyUrl, err = ensureSetAndNonEmpty("ES_PROXY_URL")
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
-	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+	//	cfg.EsDbHost, err = ensureSetAndNonEmpty("ES_DBHOST")
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	cfg.EsDbPort, err = envToInt("ES_DBPORT")
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	cfg.EsDbName, err = ensureSetAndNonEmpty("ES_DBNAME")
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	cfg.EsDbUser, err = ensureSetAndNonEmpty("ES_DBUSER")
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	cfg.EsDbPassword, err = ensureSetAndNonEmpty("ES_DBPASSWORD")
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
+	//	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
 
 	fmt.Printf("[conf] BucketName        = [%s]\n", cfg.BucketName)
 	fmt.Printf("[conf] BucketKeyTemplate = [%s]\n", cfg.BucketKeyTemplate)
 
-	fmt.Printf("[conf] EsDbHost          = [%s]\n", cfg.EsDbHost)
-	fmt.Printf("[conf] EsDbPort          = [%d]\n", cfg.EsDbPort)
-	fmt.Printf("[conf] EsDbName          = [%s]\n", cfg.EsDbName)
-	fmt.Printf("[conf] EsDbUser          = [%s]\n", cfg.EsDbUser)
-	fmt.Printf("[conf] EsDbPassword      = [REDACTED]\n")
-
-	fmt.Printf("[conf] BusName           = [%s]\n", cfg.BusName)
-	fmt.Printf("[conf] SourceName        = [%s]\n", cfg.SourceName)
+	fmt.Printf("[conf] EsProxyUrl        = [%s]\n", cfg.EsProxyUrl)
+	//	fmt.Printf("[conf] EsDbHost          = [%s]\n", cfg.EsDbHost)
+	//	fmt.Printf("[conf] EsDbPort          = [%d]\n", cfg.EsDbPort)
+	//	fmt.Printf("[conf] EsDbName          = [%s]\n", cfg.EsDbName)
+	//	fmt.Printf("[conf] EsDbUser          = [%s]\n", cfg.EsDbUser)
+	//	fmt.Printf("[conf] EsDbPassword      = [REDACTED]\n")
+	//
+	//	fmt.Printf("[conf] BusName           = [%s]\n", cfg.BusName)
+	//	fmt.Printf("[conf] SourceName        = [%s]\n", cfg.SourceName)
 
 	return &cfg, nil
 }
