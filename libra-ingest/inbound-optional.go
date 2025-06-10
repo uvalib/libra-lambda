@@ -46,6 +46,7 @@ func processOptional(cfg *Config, objs []InboundOptionalItem, es uvaeasystore.Ea
 		fields["create-date"] = time.Now().Format(time.RFC3339)
 		fields["source-id"] = fmt.Sprintf("optional:%s", o.Id)
 		fields["source"] = "optional"
+		fields["draft"] = "true"
 		eso.SetFields(fields)
 
 		user, err := getUserDetails(cfg.UserInfoUrl, o.For, auth, client)

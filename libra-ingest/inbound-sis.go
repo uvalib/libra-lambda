@@ -110,6 +110,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			fields["create-date"] = time.Now().Format(time.RFC3339)
 			fields["source-id"] = sourceId
 			fields["source"] = "sis"
+			fields["draft"] = "true"
 			eso.SetFields(fields)
 
 			meta := librametadata.ETDWork{}
