@@ -114,7 +114,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			eso.SetFields(fields)
 
 			meta := librametadata.ETDWork{}
-			//meta.Department = o.Department
+			meta.Program = o.Department
 			meta.Degree = o.Degree
 			meta.Title = o.Title
 			meta.Author = librametadata.ContributorData{
