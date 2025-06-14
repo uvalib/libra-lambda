@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -124,10 +125,20 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 				Department:  o.Department,
 				Institution: "University of Virginia",
 			}
-			eso.SetMetadata(meta)
+
+			// An ETDWork does not serialize the same way as an EasyStoreMetadata object
+			// does when being managed by json.Marshal/json.Unmarshal so we wrap it in an object that
+			// behaves appropriately
+			pl, err := meta.Payload()
+			if err != nil {
+				log.Printf("ERROR: serializing ETDWork: %s, continuing", err.Error())
+				returnErr = err
+				continue
+			}
+			eso.SetMetadata(uvaeasystore.NewEasyStoreMetadata(meta.MimeType(), pl))
 
 			// create the new object
-			err := createEasystoreObject(es, eso)
+			err = createEasystoreObject(es, eso)
 			if err != nil {
 				fmt.Printf("ERROR: creating easystore object, continuing (%s)\n", err.Error())
 				returnErr = err

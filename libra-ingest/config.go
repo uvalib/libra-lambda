@@ -10,12 +10,11 @@ import (
 type Config struct {
 
 	// service endpoint configuration
-	MintAuthUrl             string // mint auth token endpoint
-	UserInfoUrl             string // the user information service
-	SisIngestUrl            string // the sis ingest service
-	OptionalIngestUrl       string // the optional ingest service
-	SisIngestStateName      string // the sis ingest ssm state name
-	OptionalIngestStateName string // the optional ingest ssm state name
+	MintAuthUrl        string // mint auth token endpoint
+	UserInfoUrl        string // the user information service
+	SisIngestUrl       string // the sis ingest service
+	OptionalIngestUrl  string // the optional ingest service
+	SisIngestStateName string // the sis ingest ssm state name
 
 	// easystore proxy configuration
 	EsProxyUrl string // the easystore proxy endpoint
@@ -108,10 +107,6 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.OptionalIngestStateName, err = ensureSetAndNonEmpty("OPTIONAL_INGEST_STATE_NAME")
-	if err != nil {
-		return nil, err
-	}
 
 	cfg.EsProxyUrl, err = ensureSetAndNonEmpty("ES_PROXY_URL")
 	if err != nil {
@@ -148,7 +143,6 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] SisIngestUrl            = [%s]\n", cfg.SisIngestUrl)
 	fmt.Printf("[conf] OptionalIngestUrl       = [%s]\n", cfg.OptionalIngestUrl)
 	fmt.Printf("[conf] SisIngestStateName      = [%s]\n", cfg.SisIngestStateName)
-	fmt.Printf("[conf] OptionalIngestStateName = [%s]\n", cfg.OptionalIngestStateName)
 
 	//fmt.Printf("[conf] SourceName              = [%s]\n", cfg.SourceName)
 	//fmt.Printf("[conf] EsDbHost                = [%s]\n", cfg.EsDbHost)

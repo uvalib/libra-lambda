@@ -41,7 +41,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// get our state information
-	optionalLastProcessed, err := getParameter(ssm, cfg.OptionalIngestStateName)
 	if err != nil {
 		return err
 	}
@@ -49,19 +48,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("INFO: last OPT = [%s]\n", optionalLastProcessed)
 	fmt.Printf("INFO: last SIS = [%s]\n", sisLastProcessed)
 
 	// get a new http client and get an auth token
 	httpClient := newHttpClient(1, 30)
 	token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
-	if err != nil {
-		return err
-	}
-
-	// get inbound optional items
-	optionalList, err := inboundOptional(cfg, optionalLastProcessed, token, httpClient)
 	if err != nil {
 		return err
 	}
@@ -73,7 +64,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// bail out if nothing to do
-	if len(sisList) == 0 && len(optionalList) == 0 {
+	if len(sisList) == 0 {
 		fmt.Printf("INFO: nothing to do, terminating early\n")
 		return nil
 	}
@@ -87,25 +78,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// important, cleanup properly
 	defer es.Close()
-
-	// process inbound optional items
-	err = processOptional(cfg, optionalList, es, token, httpClient)
-	if err != nil {
-		return err
-	}
-
-	// get the last one processed and update the state if necessary
-	if len(optionalList) != 0 {
-		optionalLast := lastOptionalId(optionalList)
-		if optionalLastProcessed != optionalLast {
-			fmt.Printf("INFO: last OPT = [%s]\n", optionalLast)
-			err = setParameter(ssm, cfg.OptionalIngestStateName, optionalLast)
-			if err != nil {
-				fmt.Printf("ERROR: setting parameter (%s)\n", err.Error())
-				return err
-			}
-		}
-	}
 
 	// process inbound SIS items
 	err = processSis(cfg, sisList, es)
