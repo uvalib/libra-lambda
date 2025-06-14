@@ -13,7 +13,6 @@ type Config struct {
 	MintAuthUrl        string // mint auth token endpoint
 	UserInfoUrl        string // the user information service
 	SisIngestUrl       string // the sis ingest service
-	OptionalIngestUrl  string // the optional ingest service
 	SisIngestStateName string // the sis ingest ssm state name
 
 	// easystore proxy configuration
@@ -99,10 +98,6 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.OptionalIngestUrl, err = ensureSetAndNonEmpty("OPTIONAL_INGEST_URL")
-	if err != nil {
-		return nil, err
-	}
 	cfg.SisIngestStateName, err = ensureSetAndNonEmpty("SIS_INGEST_STATE_NAME")
 	if err != nil {
 		return nil, err
@@ -141,7 +136,6 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] UserInfoUrl             = [%s]\n", cfg.UserInfoUrl)
 
 	fmt.Printf("[conf] SisIngestUrl            = [%s]\n", cfg.SisIngestUrl)
-	fmt.Printf("[conf] OptionalIngestUrl       = [%s]\n", cfg.OptionalIngestUrl)
 	fmt.Printf("[conf] SisIngestStateName      = [%s]\n", cfg.SisIngestStateName)
 
 	//fmt.Printf("[conf] SourceName              = [%s]\n", cfg.SourceName)
