@@ -36,7 +36,7 @@ type Work struct {
 	Title   string // work title
 }
 
-func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasyStoreObject) (string, string, error) {
+func renderEmailSubjectAndBody(cfg *Config, theType emailType, recipient *UserDetails, obj uvaeasystore.EasyStoreObject) (string, string, error) {
 
 	var templateFile string
 	var subject string
@@ -112,7 +112,7 @@ func emailSubjectAndBody(cfg *Config, theType emailType, obj uvaeasystore.EasySt
 		EmbargoReleaseDate:       fields["embargo-release"],
 		EmbargoReleaseVisibility: fields["embargo-release-visibility"],
 		IsSis:                    fields["source"] == "sis",
-		Recipient:                fields["depositor"],
+		Recipient:                recipient.DisplayName,
 		Sender:                   cfg.EmailSender,
 		Visibility:               fields["visibility"],
 	}

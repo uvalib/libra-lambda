@@ -54,41 +54,37 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// object fields contain useful state information
 	fields := obj.Fields()
 
+	// ensure we have the depositor field else we have no-one to email
+	v, f := fields["depositor"]
+	if f == false || len(v) == 0 {
+		fmt.Printf("ERROR: missing depositor field for object ns/oid [%s/%s]\n", ev.Namespace, ev.Identifier)
+		return uvaeasystore.ErrBadParameter
+	}
+
 	// field we add to ensure we do not mail more than once
 	emailSentFieldName := "unknown"
 
-	// mail attributes
-	var mailSubject string
-	var mailBody string
+	var mailType emailType
 
 	// check the event type
 	switch ev.EventName {
 	case uvalibrabus.EventObjectCreate, uvalibrabus.EventCommandMailInvite:
-		mail := ETD_OPTIONAL_INVITATION
+		mailType = ETD_OPTIONAL_INVITATION
 		if fields["source"] == "sis" {
-			mail = ETD_SIS_INVITATION
+			mailType = ETD_SIS_INVITATION
 		}
 		emailSentFieldName = "invitation-sent"
-		mailSubject, mailBody, err = emailSubjectAndBody(cfg, mail, obj)
 
 	case uvalibrabus.EventWorkPublish, uvalibrabus.EventCommandMailSuccess:
-		// FIXME: support advisor email too
-
+		mailType = ETD_SUBMITTED_AUTHOR
 		emailSentFieldName = "submitted-sent"
-		mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_AUTHOR, obj)
 
 	default:
 		fmt.Printf("INFO: uninteresting event, ignoring\n")
 		return nil
 	}
 
-	// bail out in the event of an error
-	if err != nil {
-		fmt.Printf("ERROR: %s\n", err.Error())
-		return err
-	}
-
-	// final check to make sure we do not resend an email unless commanded to do so
+	// check to make sure we do not resend an email unless commanded to do so
 	if ev.EventName == uvalibrabus.EventObjectCreate || ev.EventName == uvalibrabus.EventWorkPublish {
 		if len(fields[emailSentFieldName]) != 0 {
 			fmt.Printf("INFO: email already sent, ignoring\n")
@@ -104,26 +100,39 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// lookup the user
-	user, err := getUserDetails(cfg.UserInfoUrl, fields["depositor"], token, httpClient)
+	depositor, err := getUserDetails(cfg.UserInfoUrl, fields["depositor"], token, httpClient)
 	if err != nil {
 		return err
 	}
 
 	// if we did not find the user...
-	if user == nil || len(user.Email) == 0 {
+	if depositor == nil {
+		fmt.Printf("ERROR: cannot find user details for [%s]\n", fields["depositor"])
+		return err
+	}
+
+	// if the user does not have an email
+	if len(depositor.Email) == 0 {
 		fmt.Printf("ERROR: cannot find email for [%s]\n", fields["depositor"])
 		return err
 	}
 
+	// render the email body and bail out in the event of an error
+	mailSubject, mailBody, err := renderEmailSubjectAndBody(cfg, mailType, depositor, obj)
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err.Error())
+		return err
+	}
+
 	// send the mail
-	err = sendEmail(cfg, mailSubject, user.Email, []string{}, mailBody)
+	err = sendEmail(cfg, mailSubject, depositor.Email, []string{}, mailBody)
 	if err != nil {
 		return err
 	}
 
 	// a special case, we also need to email the registrar
 	if ev.EventName == uvalibrabus.EventWorkPublish {
-		mailSubject, mailBody, err = emailSubjectAndBody(cfg, ETD_SUBMITTED_ADVISOR, obj)
+		//mailSubject, mailBody, err = renderEmailSubjectAndBody(cfg, ETD_SUBMITTED_ADVISOR, obj)
 		//mailRecipient = //FIXME
 		//err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
 		//if err != nil {
