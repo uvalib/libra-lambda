@@ -11,8 +11,8 @@ Approximately 1 hour after deposit, you may check that your scholarship was succ
 You will receive email confirmation of your deposit, including the permanent URL for your scholarship.
 <p>
 
-Best Regards,
-Scholarly Repository Services, University of Virginia Library
+Best Regards,<br>
+Scholarly Repository Services, University of Virginia Library<br>
 <p>
 
 {{.Sender}}

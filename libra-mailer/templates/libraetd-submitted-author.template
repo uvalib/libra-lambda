@@ -27,8 +27,8 @@ Approximately 1 hour after deposit, you may check that your scholarship was succ
 {{end}}
 <p>
 
-Best Regards,
-Scholarly Repository Services, University of Virginia Library
+Best Regards,<br>
+Scholarly Repository Services, University of Virginia Library<br>
 <p>
 
 {{.Sender}}
