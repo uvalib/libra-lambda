@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/uvalib/easystore/uvaeasystore"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
+	"net/http"
 	"time"
 )
 
@@ -61,7 +62,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return uvaeasystore.ErrBadParameter
 	}
 
-	// field we add to ensure we do not mail more than once
+	// the field we add to ensure we do not mail more than once
 	emailSentFieldName := "unknown"
 
 	var mailType emailType
@@ -99,21 +100,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// lookup the user
-	depositor, err := getUserDetails(cfg.UserInfoUrl, fields["depositor"], token, httpClient)
+	// lookup the depositor
+	depositor, err := getUser(fields["depositor"], cfg.UserInfoUrl, token, httpClient)
 	if err != nil {
-		return err
-	}
-
-	// if we did not find the user...
-	if depositor == nil {
-		fmt.Printf("ERROR: cannot find user details for [%s]\n", fields["depositor"])
-		return err
-	}
-
-	// if the user does not have an email
-	if len(depositor.Email) == 0 {
-		fmt.Printf("ERROR: cannot find email for [%s]\n", fields["depositor"])
 		return err
 	}
 
@@ -131,13 +120,29 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// a special case, we also need to email the registrar
-	if ev.EventName == uvalibrabus.EventWorkPublish {
-		//mailSubject, mailBody, err = renderEmailSubjectAndBody(cfg, ETD_SUBMITTED_ADVISOR, obj)
-		//mailRecipient = //FIXME
-		//err = sendEmail(cfg, mailSubject, mailRecipient, []string{}, mailBody)
-		//if err != nil {
-		//	return err
-		//}
+	switch ev.EventName {
+	case uvalibrabus.EventWorkPublish, uvalibrabus.EventCommandMailSuccess:
+		if len(fields["registrar"]) != 0 {
+
+			// lookup the registrar
+			registrar, err := getUser(fields["registrar"], cfg.UserInfoUrl, token, httpClient)
+			if err != nil {
+				return err
+			}
+
+			// specify the mail type and render the body
+			mailType = ETD_SUBMITTED_ADVISOR
+
+			mailSubject, mailBody, err = renderEmailSubjectAndBody(cfg, mailType, registrar, obj)
+			if err != nil {
+				fmt.Printf("ERROR: %s\n", err.Error())
+				return err
+			}
+			err = sendEmail(cfg, mailSubject, registrar.Email, []string{}, mailBody)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	// update the field to note that we have sent the email(s)
@@ -149,6 +154,29 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 	return nil
+}
+
+func getUser(userId string, serviceUrl string, authToken string, client *http.Client) (*UserDetails, error) {
+
+	// lookup the user
+	user, err := getUserDetails(serviceUrl, userId, authToken, client)
+	if err != nil {
+		return nil, err
+	}
+
+	// if we did not find the user...
+	if user == nil {
+		fmt.Printf("ERROR: cannot find user details for [%s]\n", userId)
+		return nil, ErrUserNotFound
+	}
+
+	// if the user does not have an email
+	if len(user.Email) == 0 {
+		fmt.Printf("ERROR: cannot find email for [%s]\n", userId)
+		return nil, ErrEmailNotFound
+	}
+	// all good
+	return user, nil
 }
 
 //
