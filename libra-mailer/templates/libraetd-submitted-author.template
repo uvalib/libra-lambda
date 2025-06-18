@@ -23,7 +23,7 @@ Always provide this exact link when sharing your work with colleagues, collabora
 
 {{if .IsSis}}
 {{else}}
-Approximately 1 hour after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
+Shortly after deposit, you may check that your scholarship was successfully added to the Library's collection by searching for your thesis or dissertation in VIRGO, the UVA online library catalog.
 {{end}}
 <p>
 
