@@ -12,7 +12,8 @@ You will receive email confirmation of your deposit, including the permanent URL
 <p>
 
 Best Regards,<br>
-Scholarly Repository Services, University of Virginia Library<br>
+Scholarly Repository Services,<br>
+University of Virginia Library<br>
 <p>
 
 {{.Sender}}
