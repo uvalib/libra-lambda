@@ -169,12 +169,13 @@ func determineAvailability(fields uvaeasystore.EasyStoreObjectFields) string {
 		format := "2006-01-02T15:04:05Z"
 		dt, err := time.Parse(format, fields["embargo-release"])
 		if err != nil {
+			fmt.Printf("ERROR: cannot decode embargo release date (%s)\n", fields["embargo-release"])
 			return ava + " (cannot decode embargo release date)"
 		}
 
 		// are we still under embargo
 		if dt.After(time.Now()) {
-			ava = fmt.Sprintf("public access on %s", dt.Format("%B %-d, %Y"))
+			ava = fmt.Sprintf("public access on %s", dt.Format("January 02, 2006"))
 		}
 	}
 
