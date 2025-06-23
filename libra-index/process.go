@@ -54,6 +54,8 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	// get a new http client
 	httpClient := newHttpClient(1, 30)
+	// important, cleanup properly
+	defer httpClient.CloseIdleConnections()
 
 	// and update the index
 	err = updateIndex(cfg, obj, httpClient)

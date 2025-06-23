@@ -39,6 +39,9 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	cfg.httpClient = newHttpClient(1, 30)
+	// important, cleanup properly
+	defer cfg.httpClient.CloseIdleConnections()
+
 	cfg.AuthToken, err = getAuthToken(cfg.httpClient, cfg.MintAuthURL)
 	if err != nil {
 		return err

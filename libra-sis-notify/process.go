@@ -67,6 +67,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 		// get a new http client and get an auth token
 		httpClient := newHttpClient(1, 30)
+		// important, cleanup properly
+		defer httpClient.CloseIdleConnections()
+
 		token, err := getAuthToken(httpClient, cfg.MintAuthUrl)
 		if err != nil {
 			return err

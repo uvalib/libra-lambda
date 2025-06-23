@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -14,11 +15,19 @@ var retrySleepTime = 100 * time.Millisecond
 
 func newHttpClient(maxConnections int, timeout int) *http.Client {
 
+	defaultTransport := &http.Transport{
+		Dial: (&net.Dialer{
+			Timeout:   2 * time.Second,
+			KeepAlive: 15 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 2 * time.Second,
+		MaxIdleConns:        maxConnections,
+		MaxIdleConnsPerHost: maxConnections,
+	}
+
 	return &http.Client{
-		Transport: &http.Transport{
-			MaxIdleConnsPerHost: maxConnections,
-		},
-		Timeout: time.Duration(timeout) * time.Second,
+		Transport: defaultTransport,
+		Timeout:   time.Duration(timeout) * time.Second,
 	}
 }
 
