@@ -74,6 +74,17 @@ func updateAuthorOrcidActivity(config *Config, eso uvaeasystore.EasyStoreObject,
 	if err != nil {
 		fmt.Printf("ERROR: failed payload [%s]\n", string(pl))
 		if buf != nil {
+			// let's try and unmarshal the response anyway
+			resp := OrcidActivityUpdateResponse{}
+			err = json.Unmarshal(buf, &resp)
+			if err == nil {
+				// this is a special case
+				if resp.Status == http.StatusConflict {
+					fmt.Printf("INFO: reports update already applied [%s]\n", resp.Message)
+					// assume all is well and we can ignore this
+					return resp.UpdateCode, nil
+				}
+			}
 			fmt.Printf("ERROR: failed response [%s]\n", string(buf))
 		}
 		return "", err
