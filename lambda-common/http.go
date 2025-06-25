@@ -17,10 +17,10 @@ func newHttpClient(maxConnections int, timeout int) *http.Client {
 
 	defaultTransport := &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout:   2 * time.Second,
+			Timeout:   5 * time.Second,
 			KeepAlive: 15 * time.Second,
 		}).Dial,
-		TLSHandshakeTimeout: 2 * time.Second,
+		TLSHandshakeTimeout: 5 * time.Second,
 		MaxIdleConns:        maxConnections,
 		MaxIdleConnsPerHost: maxConnections,
 	}
