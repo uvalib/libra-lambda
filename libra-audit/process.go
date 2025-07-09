@@ -65,6 +65,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	if err != nil {
 		fmt.Printf("ERROR: db insert %s", err)
+		return err
 	}
 
 	n, err := result.RowsAffected()
