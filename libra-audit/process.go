@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aquilax/truncate"
 	_ "github.com/lib/pq"
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
@@ -57,14 +56,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// cos some 'field names' are larger than they should be
-	fn := truncate.Truncate(audit.FieldName, maxFieldNameSize, "...", truncate.PositionEnd)
-
 	result, err := db.Exec("INSERT INTO audits (who, oid, namespace, field_name, before, after, event_time) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 		audit.Who,
 		ev.Identifier,
 		ev.Namespace,
-		fn,
+		audit.FieldName,
 		audit.Before,
 		audit.After,
 		parsedEventTime,
