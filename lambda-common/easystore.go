@@ -30,7 +30,7 @@ func newEasystoreReadonlyProxy(cfg *Config) (uvaeasystore.EasyStoreReadonly, err
 
 func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject) error {
 
-	obj, err := es.Create(obj)
+	obj, err := es.ObjectCreate(obj)
 	if err == nil {
 		fmt.Printf("INFO: created new easystore object [%s/%s]\n", obj.Namespace(), obj.Id())
 	}
@@ -38,15 +38,15 @@ func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStore
 }
 
 func getEasystoreObjectByKey(es uvaeasystore.EasyStoreReadonly, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
-	return es.GetByKey(namespace, identifier, what)
+	return es.ObjectGetByKey(namespace, identifier, what)
 }
 
 func getEasystoreObjectsByFields(es uvaeasystore.EasyStoreReadonly, namespace string, fields uvaeasystore.EasyStoreObjectFields, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObjectSet, error) {
-	return es.GetByFields(namespace, fields, what)
+	return es.ObjectGetByFields(namespace, fields, what)
 }
 
 func putEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject, what uvaeasystore.EasyStoreComponents) error {
-	obj, err := es.Update(obj, what)
+	obj, err := es.ObjectUpdate(obj, what)
 	if err == nil {
 		fmt.Printf("INFO: updated easystore object [%s/%s]\n", obj.Namespace(), obj.Id())
 	}
