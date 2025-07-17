@@ -24,7 +24,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from:%s -> %s\n", messageID, messageSrc, ev.String())
+	fmt.Printf("EVENT %s from: %s -> %s\n", messageID, messageSrc, ev.String())
 
 	// initial namespace validation
 	if ev.Namespace != libraEtdNamespace {

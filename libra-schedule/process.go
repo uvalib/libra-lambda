@@ -12,7 +12,7 @@ import (
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
-	fmt.Printf("EVENT %s from:%s -> %s\n", messageId, messageSrc, string(rawMsg))
+	fmt.Printf("EVENT %s from: %s -> %s\n", messageId, messageSrc, string(rawMsg))
 
 	// load configuration
 	cfg, err := loadConfiguration()
