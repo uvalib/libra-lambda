@@ -15,15 +15,9 @@ type Config struct {
 
 	// easystore proxy configuration
 	EsProxyUrl string // the easystore proxy endpoint
-	//	EsDbHost     string // database host
-	//	EsDbPort     int    // database port
-	//	EsDbName     string // database name
-	//	EsDbUser     string // database user
-	//	EsDbPassword string // database password
 
 	// message bus configuration
-	//	BusName    string // the message bus name
-	//	SourceName string // the event source name
+	BusName string // the message bus name
 }
 
 func envWithDefault(env string, defaultValue string) string {
@@ -98,42 +92,12 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
-	//	cfg.EsDbHost, err = ensureSetAndNonEmpty("ES_DBHOST")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	cfg.EsDbPort, err = envToInt("ES_DBPORT")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	cfg.EsDbName, err = ensureSetAndNonEmpty("ES_DBNAME")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	cfg.EsDbUser, err = ensureSetAndNonEmpty("ES_DBUSER")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	cfg.EsDbPassword, err = ensureSetAndNonEmpty("ES_DBPASSWORD")
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//
-	//	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
-	//	cfg.SourceName = envWithDefault("MESSAGE_SOURCE", "")
+	cfg.BusName = envWithDefault("MESSAGE_BUS", "")
 
 	fmt.Printf("[conf] MintAuthUrl  = [%s]\n", cfg.MintAuthUrl)
 	fmt.Printf("[conf] SisNotifyUrl = [%s]\n", cfg.SisNotifyUrl)
-
 	fmt.Printf("[conf] EsProxyUrl   = [%s]\n", cfg.EsProxyUrl)
-	//	fmt.Printf("[conf] EsDbHost     = [%s]\n", cfg.EsDbHost)
-	//	fmt.Printf("[conf] EsDbPort     = [%d]\n", cfg.EsDbPort)
-	//	fmt.Printf("[conf] EsDbName     = [%s]\n", cfg.EsDbName)
-	//	fmt.Printf("[conf] EsDbUser     = [%s]\n", cfg.EsDbUser)
-	//	fmt.Printf("[conf] EsDbPassword = [REDACTED]\n")
-	//
-	//	fmt.Printf("[conf] BusName      = [%s]\n", cfg.BusName)
-	//	fmt.Printf("[conf] SourceName   = [%s]\n", cfg.SourceName)
+	fmt.Printf("[conf] BusName      = [%s]\n", cfg.BusName)
 
 	return &cfg, nil
 }

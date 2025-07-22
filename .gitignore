@@ -11,6 +11,7 @@ env.*
 auth.go
 definitions.go
 easystore.go
+events.go
 http.go
 main-cmdline.go
 main-lambda-apigw.go

@@ -145,7 +145,10 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			return err
 		}
 
-		// audit
+		// audit this change
+		who := "libra-doi"
+		bus, _ := NewEventBus(cfg.BusName, who)
+		_ = pubAuditEvent(bus, eso, who, "doi", "", fields["doi"])
 	}
 
 	// log the happy news

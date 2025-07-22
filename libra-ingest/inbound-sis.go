@@ -37,6 +37,10 @@ type InboundSisItem struct {
 func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) error {
 	fmt.Printf("INFO: processing %d SIS item(s)\n", len(objs))
 
+	// audit infrastructure
+	auditWho := "libra-ingest"
+	messageBus, _ := NewEventBus(cfg.BusName, auditWho)
+
 	var returnErr error
 	for _, o := range objs {
 		fmt.Printf("INFO: processing SIS # %s for %s\n", o.InboundId, o.ComputingId)
@@ -85,6 +89,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 					// is this a title update
 					if md.Title != o.Title {
 						fmt.Printf("INFO: title update for unpublished work [%s/%s]\n", eso.Namespace(), eso.Id())
+						previous := md.Title
 						md.Title = o.Title
 
 						eso.SetMetadata(md)
@@ -94,6 +99,8 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 							returnErr = err
 							continue
 						}
+						// audit this change
+						_ = pubAuditEvent(messageBus, eso, auditWho, "title", previous, o.Title)
 					}
 				} else {
 					fmt.Printf("ERROR: sis update but work has missing metadata [%s/%s], ignoring\n", eso.Namespace(), eso.Id())
@@ -144,6 +151,17 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 				returnErr = err
 				continue
 			}
+
+			// audit this set of changes
+			_ = pubAuditEvent(messageBus, eso, auditWho, "create-date", "", fields["create-date"])
+			_ = pubAuditEvent(messageBus, eso, auditWho, "program", "", meta.Program)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "degree", "", meta.Degree)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "title", "", meta.Title)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "author.cid", "", meta.Author.ComputeID)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "author.firstname", "", meta.Author.FirstName)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "author.lastname", "", meta.Author.LastName)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "author.department", "", meta.Author.Department)
+			_ = pubAuditEvent(messageBus, eso, auditWho, "author.institution", "", meta.Author.Institution)
 		}
 	}
 

@@ -99,6 +99,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return nil
 	}
 
+	// audit this change
+	who := "libra-sis-notify"
+	bus, _ := NewEventBus(cfg.BusName, who)
+	_ = pubAuditEvent(bus, obj, who, sisNotifiedFieldName, "", fields[sisNotifiedFieldName])
+
 	// log the happy news
 	fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)
 	return nil
