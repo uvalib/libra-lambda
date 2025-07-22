@@ -6,7 +6,7 @@ toolchain go1.24.3
 
 require (
 	github.com/aws/aws-lambda-go v1.49.0
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250520140939-0b78bc8b863f
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250722185634-5799610d7eb7
 )
 
 require (

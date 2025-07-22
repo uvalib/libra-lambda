@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.60.0
 	github.com/uvalib/easystore/uvaeasystore v0.0.0-20250717150932-d438f30cb70b
 	github.com/uvalib/libra-metadata v0.0.0-20250513131340-aa4ee04ad7d1
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250520140939-0b78bc8b863f
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250722185634-5799610d7eb7
 )
 
 // for local development
