@@ -15,7 +15,7 @@ import (
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
-func process(messageID string, messageSrc string, rawMsg json.RawMessage) error {
+func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event
 	ev, err := uvalibrabus.MakeBusEvent(rawMsg)
@@ -24,7 +24,7 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from: %s -> %s\n", messageID, messageSrc, ev.String())
+	fmt.Printf("INFO: EVENT %s from %s -> %s\n", messageId, messageSrc, ev.String())
 
 	// initial namespace validation
 	if ev.Namespace != libraEtdNamespace {
@@ -144,12 +144,12 @@ func process(messageID string, messageSrc string, rawMsg json.RawMessage) error 
 			fmt.Printf("ERROR: DOI created but not saved for [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, doi)
 			return err
 		}
-		return nil
+
+		// audit
 	}
 
-	// DOI update complete
-	fmt.Printf("INFO: Successfully updated\n")
-
+	// log the happy news
+	fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)
 	return nil
 }
 

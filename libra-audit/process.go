@@ -26,7 +26,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("INFO: EVENT %s from: %s -> %s\n", messageId, messageSrc, ev.String())
+	fmt.Printf("INFO: EVENT %s from %s -> %s\n", messageId, messageSrc, ev.String())
 
 	audit, err := uvalibrabus.MakeAuditEvent(ev.Detail)
 	if err != nil {
@@ -78,6 +78,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	fmt.Printf("INFO: Inserted %d row\n", n)
+
+	// log the happy news
+	fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)
 	return nil
 }
 

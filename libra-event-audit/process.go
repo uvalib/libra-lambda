@@ -19,7 +19,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from: %s -> %s\n", messageId, messageSrc, ev.String())
+	fmt.Printf("INFO: EVENT %s from %s -> %s\n", messageId, messageSrc, ev.String())
 	return nil
 }
 

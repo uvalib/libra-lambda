@@ -21,7 +21,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	fmt.Printf("EVENT %s from: %s -> %s\n", messageId, messageSrc, ev.String())
+	fmt.Printf("INFO: EVENT %s from %s -> %s\n", messageId, messageSrc, ev.String())
 
 	// initial namespace validation
 	if ev.Namespace != libraEtdNamespace {
@@ -63,8 +63,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// log the happy news
-	fmt.Printf("INFO: successful virgo delete for [%s/%s]\n", ev.Namespace, ev.Identifier)
-
+	fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)
 	return nil
 }
 
