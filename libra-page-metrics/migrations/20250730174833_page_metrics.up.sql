@@ -4,10 +4,13 @@
 
 BEGIN;
 
+-- create the enumeration
+CREATE TYPE mtype AS ENUM ('download', 'view');
+
 -- create page_metrics table
 CREATE TABLE page_metrics (
    id          serial PRIMARY KEY,
-   metric_type ENUM('download', 'view'),
+   metric_type mtype,
    namespace   VARCHAR( 32 ) NOT NULL DEFAULT '' ,
    oid         VARCHAR( 64 ) NOT NULL DEFAULT '',
    file_id     VARCHAR( 64 ) NOT NULL DEFAULT '',
