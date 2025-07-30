@@ -24,9 +24,16 @@ phases:
   build:
     commands:
       - cd ${CODEBUILD_SRC_DIR}
+      #
       # libra-audit migrations
+      #
       - mkdir -p libra-audit/migrations && aws s3 cp s3://${deploy_bucket}/latest/libra-audit/migrations libra-audit/migrations --recursive --include *.sql --quiet
       - ${CODEBUILD_SRC_DIR}/migrate.ksh libra-audit/migrations libra_audit_migrations up
+      #
+      # libra-page-metrics migrations
+      #
+      - mkdir -p libra-page-metrics/migrations && aws s3 cp s3://${deploy_bucket}/latest/libra-page-metrics/migrations libra-page-metrics/migrations --recursive --include *.sql --quiet
+      - ${CODEBUILD_SRC_DIR}/migrate.ksh libra-page-metrics/migrations libra_page_metrics_migrations up
 
 #  post_build:
 #    commands:
