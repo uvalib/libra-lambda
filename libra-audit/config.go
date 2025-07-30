@@ -1,53 +1,99 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 )
 
-// DBConf holds the database cconnection info
-type DBConf struct {
-	host          string
-	port          int
-	user          string
-	password      string
-	name          string
-	connectionStr string
+// DBConf holds the database connection info
+// Config defines all of the service configuration parameters
+type Config struct {
+	// database configuration
+	DbHost     string // database host
+	DbPort     int    // database port
+	DbName     string // database name
+	DbUser     string // database user
+	DbPassword string // database password
 }
 
-func getDBConf() (*DBConf, error) {
+func ensureSet(env string) (string, error) {
+	val, set := os.LookupEnv(env)
 
-	db := DBConf{}
-	var exist bool
+	if set == false {
+		err := fmt.Errorf("environment variable not set: [%s]", env)
+		fmt.Printf("ERROR: %s\n", err.Error())
+		return "", err
+	}
+
+	return val, nil
+}
+
+func ensureSetAndNonEmpty(env string) (string, error) {
+	val, err := ensureSet(env)
+	if err != nil {
+		return "", err
+	}
+
+	if val == "" {
+		err := fmt.Errorf("environment variable is empty: [%s]", env)
+		return "", err
+	}
+
+	return val, nil
+}
+
+func envToInt(env string) (int, error) {
+
+	number, err := ensureSetAndNonEmpty(env)
+	if err != nil {
+		return -1, err
+	}
+
+	n, err := strconv.Atoi(number)
+	if err != nil {
+		return -1, err
+	}
+	return n, nil
+}
+
+// loadConfiguration will load the service configuration from env/cmdline
+// and return a pointer to it. Any failures are fatal.
+func loadConfiguration() (*Config, error) {
+
+	var cfg Config
+
 	var err error
-
-	if db.host, exist = os.LookupEnv("DB_HOST"); !exist {
-		return nil, errors.New("DB_HOST required")
+	cfg.DbHost, err = ensureSetAndNonEmpty("DB_HOST")
+	if err != nil {
+		return nil, err
 	}
-	if portStr, exist := os.LookupEnv("DB_PORT"); !exist {
-		return nil, errors.New("DB_PORT required")
-
-	} else {
-		db.port, err = strconv.Atoi(portStr)
-		if err != nil {
-			return nil, fmt.Errorf("DB_PORT must be a number %s", err)
-		}
+	cfg.DbPort, err = envToInt("DB_PORT")
+	if err != nil {
+		return nil, err
 	}
-	if db.user, exist = os.LookupEnv("DB_USER"); !exist {
-		return nil, errors.New("DB_USER required")
+	cfg.DbName, err = ensureSetAndNonEmpty("DB_NAME")
+	if err != nil {
+		return nil, err
 	}
-	if db.password, exist = os.LookupEnv("DB_PASSWORD"); !exist {
-		return nil, errors.New("DB_PASSWORD required")
+	cfg.DbUser, err = ensureSetAndNonEmpty("DB_USER")
+	if err != nil {
+		return nil, err
 	}
-	if db.name, exist = os.LookupEnv("DB_NAME"); !exist {
-		return nil, errors.New("DB_NAME required")
+	cfg.DbPassword, err = ensureSetAndNonEmpty("DB_PASSWORD")
+	if err != nil {
+		return nil, err
 	}
 
-	db.connectionStr = fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
-		db.host, db.port, db.user, db.password, db.name)
+	fmt.Printf("[conf] DbHost          = [%s]\n", cfg.DbHost)
+	fmt.Printf("[conf] DbPort          = [%d]\n", cfg.DbPort)
+	fmt.Printf("[conf] DbName          = [%s]\n", cfg.DbName)
+	fmt.Printf("[conf] DbUser          = [%s]\n", cfg.DbUser)
+	fmt.Printf("[conf] DbPassword      = [REDACTED]\n")
 
-	return &db, nil
-
+	return &cfg, nil
 }
+
+//
+// end of file
+//

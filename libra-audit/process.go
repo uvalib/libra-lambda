@@ -36,13 +36,16 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	fmt.Printf("INFO: Audit %v\n", audit)
 
-	dbConf, err := getDBConf()
+	// load configuration
+	cfg, err := loadConfiguration()
 	if err != nil {
-		fmt.Printf("ERROR: unable to get config %s\n", err.Error())
 		return err
 	}
 
-	db, err := sql.Open("postgres", dbConf.connectionStr)
+	connectionStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s",
+		cfg.DbHost, cfg.DbPort, cfg.DbUser, cfg.DbPassword, cfg.DbName)
+
+	db, err := sql.Open("postgres", connectionStr)
 	if err != nil {
 		fmt.Printf("ERROR: unable to open database %s\n", err.Error())
 		return err
