@@ -59,3 +59,7 @@ func loadConfiguration() (*Config, error) {
 
 	return &cfg, nil
 }
+
+//
+// end of file
+//
