@@ -19,7 +19,7 @@ import (
 // keep the following in-sync with the schema defined in the migrations
 var maxSourceIpSize = 32
 var maxReferrerSize = 255
-var maxUserAgentSize = 32
+var maxUserAgentSize = 255
 var maxAcceptLanguageSize = 32
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
