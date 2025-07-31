@@ -8,11 +8,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
-
 	"github.com/aws/aws-lambda-go/events"
 	_ "github.com/lib/pq"
+	"net/http"
 )
 
 type ObjectMetrics struct {
@@ -25,17 +23,6 @@ type ObjectMetrics struct {
 type BlobMetrics struct {
 	FileId        string `json:"file_id"`
 	DownloadCount int    `json:"downloads"`
-}
-
-type DbQueryResponse struct {
-	MetricType string
-	Oid        string
-	Namespace  string
-	FileId     string
-	SourceIp   string
-	UserAgent  string
-	AcceptLang string
-	EventTime  time.Time
 }
 
 func process(messageId string, messageSrc string, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -83,41 +70,45 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	// cleanup
 	defer db.Close()
 
-	// select count(*) from page_metrics where namespace = ns, oid = oid, mtype = 'views'
+	// get a count of view events for this object
+	var viewCount int
+	// select count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'view'
+	err = db.QueryRow("SELECT COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'view'", namespace, oid).Scan(&viewCount)
+	if err != nil {
+		fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
+	}
 
-	// select select file_id, count(*) from page_metrics where namespace = ns, oid = oid, mtype = 'downloads' group by 1
+	// get a list of filenames and the corresponding count of their download events
+	var blobMetrics []BlobMetrics
+	// select select file_id, count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
+	rows, err := db.Query("SELECT file_id, COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
+	if err != nil {
+		fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
+	}
+	defer rows.Close()
 
-	//var metrics []DbQueryResponse
-	//		rows, err := db.Query("SELECT who, oid, namespace, field_name, before, after, event_time FROM audits where namespace = $1 and oid = $2 ORDER BY event_time desc",
-	//			query_params[1], query_params[3])
-	//		if err != nil {
-	//			fmt.Printf("ERROR: query failed (%s)\n", err.Error())
-	//			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
-	//		}
-	//		defer rows.Close()
-	//
-	//		var audits []QueriedAudit
-	//		for rows.Next() {
-	//			var currentAudit QueriedAudit
-	//			if err := rows.Scan(&currentAudit.Who, &currentAudit.Oid, &currentAudit.Namespace, &currentAudit.FieldName,
-	//				&currentAudit.Before, &currentAudit.After, &currentAudit.EventTime); err != nil {
-	//				fmt.Printf("ERROR: rows.Scan() failed (%s)\n", err.Error())
-	//				return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
-	//			}
-	//			audits = append(audits, currentAudit)
-	//		}
+	for rows.Next() {
+		var fileMetrics BlobMetrics
+		if err := rows.Scan(&fileMetrics.FileId, &fileMetrics.DownloadCount); err != nil {
+			fmt.Printf("ERROR: rows.Scan() failed (%s)\n", err.Error())
+			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
+		}
+		blobMetrics = append(blobMetrics, fileMetrics)
+	}
 
 	// check to see if we have results
-	//if len(metrics) == 0 {
-	//	return events.APIGatewayProxyResponse{StatusCode: http.StatusNotFound}, nil
-	//}
+	if viewCount == 0 && len(blobMetrics) == 0 {
+		return events.APIGatewayProxyResponse{StatusCode: http.StatusNotFound}, nil
+	}
 
+	// construct the response
 	response := ObjectMetrics{}
 	response.Namespace = namespace
 	response.Oid = oid
-	response.ViewCount = 99
-	bm := BlobMetrics{FileId: "this", DownloadCount: 5}
-	response.Files = []BlobMetrics{bm}
+	response.ViewCount = viewCount
+	response.Files = blobMetrics
 
 	buf, err := json.Marshal(response)
 	if err != nil {
