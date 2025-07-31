@@ -1,4 +1,4 @@
-module github.com/uvalib/libra-index
+module github.com/uvalib/libra-orcid
 
 go 1.23.0
 

@@ -1,4 +1,4 @@
-module github.com/uvalib/libra-field-audit
+module github.com/uvalib/libra-audit
 
 go 1.22
 
