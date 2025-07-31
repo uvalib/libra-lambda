@@ -14,9 +14,6 @@ import (
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
-// some of the 'field names' from the legacy libra-etd audit import are too big
-var maxFieldNameSize = 127
-
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
 
 	// convert to librabus event
