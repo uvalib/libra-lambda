@@ -51,7 +51,7 @@ phases:
       #- aws lambda update-function-code --function-name uva-libra-page-metrics-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-page-metrics/deployment.zip
       #
       # libra-page-metrics-query function
-      #- aws lambda update-function-code --function-name uva-libra-page-metrics-query-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-page-metrics-query/deployment.zip
+      - aws lambda update-function-code --function-name uva-libra-page-metrics-query-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-page-metrics-query/deployment.zip
       #
       # libra-schedule function
       - aws lambda update-function-code --function-name uva-libra-schedule-staging --s3-bucket ${deploy_bucket} --s3-key latest/libra-schedule/deployment.zip

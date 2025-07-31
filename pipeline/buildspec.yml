@@ -44,8 +44,8 @@ phases:
       - make linux
       #- cd ${CODEBUILD_SRC_DIR}/libra-page-metrics
       #- make linux
-      #- cd ${CODEBUILD_SRC_DIR}/libra-page-metrics-query
-      #- make linux
+      - cd ${CODEBUILD_SRC_DIR}/libra-page-metrics-query
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-schedule
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-sis-notify
@@ -91,7 +91,7 @@ phases:
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-page-metrics/migrations s3://${deploy_bucket}/${BUILD_VERSION}/libra-page-metrics/migrations --recursive --include *.sql --quiet
       #
       # libra-page-metrics-query function
-      #- aws s3 cp ${CODEBUILD_SRC_DIR}/libra-page-metrics-query/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-page-metrics-query/deployment.zip --quiet
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-page-metrics-query/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-page-metrics-query/deployment.zip --quiet
       #
       # libra-schedule function
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-schedule/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-schedule/deployment.zip --quiet
