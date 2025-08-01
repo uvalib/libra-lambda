@@ -115,6 +115,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 		fmt.Printf("ERROR: json.Marshal() failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
+	fmt.Printf("DEBUG: response [%s]\n", string(buf))
 	return events.APIGatewayProxyResponse{Body: string(buf), StatusCode: http.StatusOK}, nil
 }
 
