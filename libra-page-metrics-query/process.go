@@ -17,7 +17,7 @@ type ObjectMetrics struct {
 	Oid       string        `json:"oid"`
 	Namespace string        `json:"namespace"`
 	ViewCount int           `json:"views"`
-	Files     []BlobMetrics `json:"files,omitempty "`
+	Files     []BlobMetrics `json:"files,omitempty"`
 }
 
 type BlobMetrics struct {
