@@ -48,7 +48,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	// ensure we have the parameters we need
 	if len(namespace) == 0 || len(oid) == 0 {
-		err := fmt.Errorf("Missing required query params: [namespace, oid]")
+		err := fmt.Errorf("missing required query params: [namespace, oid]")
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusBadRequest}, err
 	}
 
@@ -75,7 +75,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	// select count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'view'
 	err = db.QueryRow("SELECT COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'view'", namespace, oid).Scan(&viewCount)
 	if err != nil {
-		fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+		fmt.Printf("ERROR: view query failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 
@@ -84,7 +84,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 	// select select target_id, count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
 	rows, err := db.Query("SELECT target_id, COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
 	if err != nil {
-		fmt.Printf("ERROR: query failed (%s)\n", err.Error())
+		fmt.Printf("ERROR: doqwnload query failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 	defer rows.Close()
@@ -100,6 +100,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	// check to see if we have results
 	if viewCount == 0 && len(blobMetrics) == 0 {
+		fmt.Printf("INFO: no metrics for [%s/%s]\n", namespace, oid)
 		return events.APIGatewayProxyResponse{StatusCode: http.StatusNotFound}, nil
 	}
 
