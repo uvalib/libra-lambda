@@ -21,7 +21,7 @@ type ObjectMetrics struct {
 }
 
 type BlobMetrics struct {
-	FileId        string `json:"file_id"`
+	TargetId      string `json:"target_id"`
 	DownloadCount int    `json:"downloads"`
 }
 
@@ -81,8 +81,8 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	// get a list of filenames and the corresponding count of their download events
 	var blobMetrics []BlobMetrics
-	// select select file_id, count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
-	rows, err := db.Query("SELECT file_id, COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
+	// select select target_id, count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
+	rows, err := db.Query("SELECT target_id, COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
 	if err != nil {
 		fmt.Printf("ERROR: query failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
@@ -91,7 +91,7 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	for rows.Next() {
 		var fileMetrics BlobMetrics
-		if err := rows.Scan(&fileMetrics.FileId, &fileMetrics.DownloadCount); err != nil {
+		if err := rows.Scan(&fileMetrics.TargetId, &fileMetrics.DownloadCount); err != nil {
 			fmt.Printf("ERROR: rows.Scan() failed (%s)\n", err.Error())
 			return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 		}

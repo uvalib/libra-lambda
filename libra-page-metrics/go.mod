@@ -8,7 +8,7 @@ require (
 	github.com/aquilax/truncate v1.0.1
 	github.com/aws/aws-lambda-go v1.49.0
 	github.com/lib/pq v1.10.9
-	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250729171533-58f2a52d4a53
+	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250801130056-157231a1fcac
 )
 
 require (

@@ -17,6 +17,7 @@ import (
 )
 
 // keep the following in-sync with the schema defined in the migrations
+var maxTargetIdSize = 64
 var maxSourceIpSize = 32
 var maxReferrerSize = 255
 var maxUserAgentSize = 255
@@ -65,15 +66,12 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	var metricType string
-	var fileId string
 	switch ev.EventName {
 	case uvalibrabus.EventContentView:
 		metricType = "view"
-		fileId = ""
 
 	case uvalibrabus.EventContentDownload:
 		metricType = "download"
-		fileId = "blablabla"
 
 	default:
 		fmt.Printf("INFO: uninteresting event, ignoring\n")
@@ -81,17 +79,18 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// endure we do not exceed any character limits
+	content.TargetId = truncate.Truncate(content.TargetId, maxTargetIdSize, "...", truncate.PositionEnd)
 	content.SourceIp = truncate.Truncate(content.SourceIp, maxSourceIpSize, "...", truncate.PositionEnd)
 	content.Referrer = truncate.Truncate(content.Referrer, maxReferrerSize, "...", truncate.PositionEnd)
 	content.UserAgent = truncate.Truncate(content.UserAgent, maxUserAgentSize, "...", truncate.PositionEnd)
 	content.AcceptLanguage = truncate.Truncate(content.AcceptLanguage, maxAcceptLanguageSize, "...", truncate.PositionEnd)
 
 	// insert into the database
-	result, err := db.Exec("INSERT INTO page_metrics (metric_type, namespace, oid, file_id, source_ip, referrer, user_agent, accept_lang, event_time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+	result, err := db.Exec("INSERT INTO page_metrics (metric_type, namespace, oid, target_id, source_ip, referrer, user_agent, accept_lang, event_time) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 		metricType,
 		ev.Namespace,
 		ev.Identifier,
-		fileId,
+		content.TargetId,
 		content.SourceIp,
 		content.Referrer,
 		content.UserAgent,

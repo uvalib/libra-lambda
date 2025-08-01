@@ -38,7 +38,7 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/testify v1.7.2 h1:4jaiDzPyXQvSd7D0EjG45355tLlV3VOECpq10pLC+8s=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
-github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250729171533-58f2a52d4a53 h1:3nrGMSeeyy34VCK1Crgm7TqdilIkLP7uJv6bqDeKnKU=
-github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250729171533-58f2a52d4a53/go.mod h1:cITJrlIM3D+iX5y0dnyFWg45MfnmYKFvyHU1Ghj8Tjk=
+github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250801130056-157231a1fcac h1:8WAZ9xsOK4U4gtDlx7csTNRMLzxXqIo2WipuokkGyco=
+github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250801130056-157231a1fcac/go.mod h1:cITJrlIM3D+iX5y0dnyFWg45MfnmYKFvyHU1Ghj8Tjk=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
