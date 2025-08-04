@@ -72,19 +72,19 @@ func process(messageId string, messageSrc string, request events.APIGatewayProxy
 
 	// get a count of view events for this object
 	var viewCount int
-	// select count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'view'
-	err = db.QueryRow("SELECT COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'view'", namespace, oid).Scan(&viewCount)
+	// select sum(rollup_count) from page_metrics where namespace = ns and oid = oid and metric_type = 'view'
+	err = db.QueryRow("SELECT COALESCE(SUM(rollup_count), 0) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'view'", namespace, oid).Scan(&viewCount)
 	if err != nil {
-		fmt.Printf("ERROR: view query failed (%s)\n", err.Error())
+		fmt.Printf("ERROR: view metrics query failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 
 	// get a list of filenames and the corresponding count of their download events
 	var blobMetrics []BlobMetrics
-	// select select target_id, count(*) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
-	rows, err := db.Query("SELECT target_id, COUNT(*) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
+	// select target_id, sum(rollup_count) from page_metrics where namespace = ns and oid = oid and metric_type = 'download' group by 1
+	rows, err := db.Query("SELECT target_id, COALESCE(SUM(rollup_count), 0) FROM page_metrics WHERE namespace = $1 and oid = $2 and metric_type = 'download' GROUP BY 1", namespace, oid)
 	if err != nil {
-		fmt.Printf("ERROR: doqwnload query failed (%s)\n", err.Error())
+		fmt.Printf("ERROR: download metrics query failed (%s)\n", err.Error())
 		return events.APIGatewayProxyResponse{Body: err.Error(), StatusCode: http.StatusInternalServerError}, err
 	}
 	defer rows.Close()
