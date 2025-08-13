@@ -120,10 +120,6 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cfg.OpenBaseUrl, err = ensureSetAndNonEmpty("OPEN_BASE_URL")
-	if err != nil {
-		return nil, err
-	}
 
 	cfg.SMTPHost, err = ensureSetAndNonEmpty("SMTP_HOST")
 	if err != nil {
@@ -158,7 +154,6 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] UserInfoUrl    = [%s]\n", cfg.UserInfoUrl)
 
 	fmt.Printf("[conf] EtdBaseUrl     = [%s]\n", cfg.EtdBaseUrl)
-	fmt.Printf("[conf] OpenBaseUrl    = [%s]\n", cfg.OpenBaseUrl)
 
 	fmt.Printf("[conf] SMTPHost       = [%s]\n", cfg.SMTPHost)
 	fmt.Printf("[conf] SMTPPort       = [%d]\n", cfg.SMTPPort)
