@@ -97,8 +97,7 @@ func UVAAffiliation() AffiliationData {
 	}
 }
 
-func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
-	var payload = DataciteData{}
+func createETDPayload(payload *DataciteData, work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) {
 	payload.Data.TypeName = "dois"
 	// remove http://doi... prefix
 	lastPath := regexp.MustCompile("[^/]+$")
@@ -124,8 +123,7 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 		},
 		Publisher: "University of Virginia",
 	}
-	addDates(&payload, fields["publish-date"])
-	return payload
+	addDates(payload, fields["publish-date"])
 }
 
 func addDates(payload *DataciteData, publishDate string) {

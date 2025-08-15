@@ -115,7 +115,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 
 	case uvalibrabus.EventMetadataUpdate, uvalibrabus.EventCommandDoiSync :
-		// No Event change for these
+		// No Event change
 		if len(fields["doi"]) > 0 {
 			fmt.Printf("INFO: Update Event for [%s/%s] with DOI %s\n", ev.Namespace, ev.Identifier, fields["doi"])
 		} else {
@@ -129,7 +129,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	payload = createETDPayload(work, fields)
+	createETDPayload(&payload, work, fields)
 	payload.Data.Attributes.URL =
 		fmt.Sprintf("%s/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
 
