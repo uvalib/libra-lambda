@@ -187,6 +187,7 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 
 	response, err = httpSend(Cfg().httpClient, req)
 	if err != nil {
+		spew.Dump(req)
 		spew.Dump(response)
 		return "", err
 	}

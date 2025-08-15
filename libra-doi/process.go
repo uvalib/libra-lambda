@@ -87,22 +87,41 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	var payload DataciteData
 
-	// If there is no DOI and the work is published, set the event to publish
-	if len(fields["doi"]) == 0 &&
-		fields["draft"] == "false" {
-		// No DOI and the work is published
-		payload.Data.Attributes.Event = "publish"
+	switch ev.EventName {
+	case uvalibrabus.EventWorkPublish:
+		if fields["draft"] == "false"  {
+			// Publish Event for published work
+			fmt.Printf("INFO: Publish Event for [%s/%s]\n", ev.Namespace, ev.Identifier)
+			if len(fields["doi"]) > 0 {
+				fmt.Printf("INFO: Publishing DOI %s \n", fields["doi"])
+			} else {
+				fmt.Printf("INFO: Publishing new DOI\n")
+			}
+			payload.Data.Attributes.Event = "publish"
 
-	} else if len(fields["doi"]) == 0 && fields["draft"] == "true" &&
-		ev.Namespace != cfg.ETDNamespace.Name {
-		// Quit if draft with no DOI and not an ETD
-		fmt.Printf("INFO: Skipping draft work %s \n", ev.Identifier)
-		return nil
+		} else{
+			fmt.Printf("WARN: Exiting. Can't publish a draft %s \n", ev.Identifier)
+			return nil
+		}
 
-	} else if len(fields["doi"]) > 0 && fields["draft"] == "true" {
-		// If the work has a DOI but is a draft, set the event to hide
-		payload.Data.Attributes.Event = "hide"
-	} // A draft is created when event is blank
+	case uvalibrabus.EventWorkUnpublish:
+		fmt.Printf("INFO: Unpublish Event for [%s/%s]\n", ev.Namespace, ev.Identifier)
+		payload.Data.Attributes.Event = "register"
+
+	case uvalibrabus.EventObjectCreate:
+	  if len(fields["doi"]) == 0 && fields["draft"] == "true" {
+			fmt.Printf("INFO: Create Event for Draft Work [%s/%s]. DOI will be registered.\n", ev.Namespace, ev.Identifier)
+			payload.Data.Attributes.Event = "register"
+		}
+
+	case uvalibrabus.EventMetadataUpdate, uvalibrabus.EventCommandDoiSync :
+		// No Event change for these
+		if len(fields["doi"]) > 0 {
+			fmt.Printf("INFO: Update Event for [%s/%s] with DOI %s\n", ev.Namespace, ev.Identifier, fields["doi"])
+		} else {
+			fmt.Printf("INFO: Update Event for [%s/%s] without DOI. One will be created.\n", ev.Namespace, ev.Identifier)
+		}
+	}
 
 	work, err := librametadata.ETDWorkFromBytes(mdBytes)
 	if err != nil {
