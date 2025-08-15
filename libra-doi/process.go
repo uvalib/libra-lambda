@@ -112,7 +112,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	payload = createETDPayload(work, fields)
 	payload.Data.Attributes.URL =
-		fmt.Sprintf("%s/public/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
+		fmt.Sprintf("%s/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
 
 	spew.Dump(payload)
 

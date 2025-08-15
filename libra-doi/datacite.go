@@ -178,7 +178,7 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 
 	jsonPayload, _ := json.Marshal(payload)
 
-	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL+path, bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL + path, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
