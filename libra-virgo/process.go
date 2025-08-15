@@ -7,10 +7,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/uvalib/easystore/uvaeasystore"
-	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"strings"
 	"time"
+
+	"github.com/uvalib/easystore/uvaeasystore"
+	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
@@ -62,6 +63,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// render the document
 	buf, err := docRender(cfg, obj)
 	if err != nil {
+		fmt.Printf("ERROR: rendering template (%s)\n", err.Error())
 		return err
 	}
 

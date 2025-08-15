@@ -6,6 +6,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ssm"
@@ -27,6 +29,7 @@ func getParameter(client *ssm.Client, name string) (string, error) {
 		})
 
 	if err != nil {
+		fmt.Printf("ERROR: getting parameter (%s)\n", err.Error())
 		return "", err
 	}
 
@@ -42,6 +45,7 @@ func setParameter(client *ssm.Client, name string, value string) error {
 		})
 
 	if err != nil {
+		fmt.Printf("ERROR: setting parameter (%s)\n", err.Error())
 		return err
 	}
 

@@ -51,6 +51,7 @@ func ensureSetAndNonEmpty(env string) (string, error) {
 
 	if val == "" {
 		err := fmt.Errorf("environment variable is empty: [%s]", env)
+		fmt.Printf("ERROR: %s\n", err.Error())
 		return "", err
 	}
 

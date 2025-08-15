@@ -134,6 +134,7 @@ func httpSend(client *http.Client, req *http.Request) ([]byte, error) {
 
 			body, err := io.ReadAll(response.Body)
 			if err != nil {
+				fmt.Printf("ERROR: %s %s failed with error (%s)\n", req.Method, url, err)
 				return nil, err
 			}
 			//fmt.Printf( body )

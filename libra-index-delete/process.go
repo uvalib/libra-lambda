@@ -7,8 +7,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"strings"
+
+	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
 func process(messageId string, messageSrc string, rawMsg json.RawMessage) error {
@@ -45,6 +46,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	if err == nil {
 		// log the happy news
 		fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)
+	} else {
+		// log the sad news
+		fmt.Printf("ERROR: EVENT %s from %s FAILED (%s)\n", messageId, messageSrc, err.Error())
 	}
 
 	return err

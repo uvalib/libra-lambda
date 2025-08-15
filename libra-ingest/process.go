@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
@@ -41,9 +42,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// get our state information
-	if err != nil {
-		return err
-	}
 	sisLastProcessed, err := getParameter(ssm, cfg.SisIngestStateName)
 	if err != nil {
 		return err
@@ -95,7 +93,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			fmt.Printf("INFO: last SIS = [%s]\n", sisLast)
 			err = setParameter(ssm, cfg.SisIngestStateName, sisLast)
 			if err != nil {
-				fmt.Printf("ERROR: setting parameter (%s)\n", err.Error())
 				return err
 			}
 		}
