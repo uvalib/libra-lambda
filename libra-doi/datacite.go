@@ -82,7 +82,6 @@ type AttributesData struct {
 
 type DataciteData struct {
 	Data struct {
-		ID         string         `json:"id,omitempty"`
 		TypeName   string         `json:"type"`
 		Attributes AttributesData `json:"attributes"`
 	} `json:"data"`
@@ -97,7 +96,8 @@ func UVAAffiliation() AffiliationData {
 	}
 }
 
-func createETDPayload(payload *DataciteData, work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) {
+func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStoreObjectFields) DataciteData {
+	var payload = DataciteData{}
 	payload.Data.TypeName = "dois"
 	// remove http://doi... prefix
 	lastPath := regexp.MustCompile("[^/]+$")
@@ -123,7 +123,8 @@ func createETDPayload(payload *DataciteData, work *librametadata.ETDWork, fields
 		},
 		Publisher: "University of Virginia",
 	}
-	addDates(payload, fields["publish-date"])
+	addDates(&payload, fields["publish-date"])
+	return payload
 }
 
 func addDates(payload *DataciteData, publishDate string) {

@@ -85,9 +85,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 
 	spew.Dump(fields)
 
-	var payload DataciteData
-
+	var eventType string
 	switch ev.EventName {
+	// https://support.datacite.org/docs/doi-states
 	case uvalibrabus.EventWorkPublish:
 		if fields["draft"] == "false"  {
 			// Publish Event for published work
@@ -97,25 +97,26 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			} else {
 				fmt.Printf("INFO: Publishing new DOI\n")
 			}
-			payload.Data.Attributes.Event = "publish"
+			eventType = "publish"
 
 		} else{
-			fmt.Printf("WARN: Exiting. Can't publish a draft %s \n", ev.Identifier)
+			fmt.Printf("ERROR: Can't publish a draft %s \n", ev.Identifier)
 			return nil
 		}
 
 	case uvalibrabus.EventWorkUnpublish:
 		fmt.Printf("INFO: Unpublish Event for [%s/%s]\n", ev.Namespace, ev.Identifier)
-		payload.Data.Attributes.Event = "register"
+		// "registered" is a reserved DOI but not findable
+		eventType = "register"
 
 	case uvalibrabus.EventObjectCreate:
 	  if len(fields["doi"]) == 0 && fields["draft"] == "true" {
-			fmt.Printf("INFO: Create Event for Draft Work [%s/%s]. DOI will be registered.\n", ev.Namespace, ev.Identifier)
-			payload.Data.Attributes.Event = "register"
+			fmt.Printf("INFO: Registering new DOI for draft work [%s/%s].\n", ev.Namespace, ev.Identifier)
+			eventType = "register"
 		}
 
 	case uvalibrabus.EventMetadataUpdate, uvalibrabus.EventCommandDoiSync :
-		// No Event change
+		// No Event change for edits or resyncs
 		if len(fields["doi"]) > 0 {
 			fmt.Printf("INFO: Update Event for [%s/%s] with DOI %s\n", ev.Namespace, ev.Identifier, fields["doi"])
 		} else {
@@ -123,13 +124,15 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 	}
 
+
 	work, err := librametadata.ETDWorkFromBytes(mdBytes)
 	if err != nil {
 		fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
 		return err
 	}
 
-	createETDPayload(&payload, work, fields)
+	payload := createETDPayload(work, fields)
+	payload.Data.Attributes.Event = eventType
 	payload.Data.Attributes.URL =
 		fmt.Sprintf("%s/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
 
