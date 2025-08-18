@@ -89,7 +89,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	switch ev.EventName {
 	// https://support.datacite.org/docs/doi-states
 	case uvalibrabus.EventWorkPublish:
-		if fields["draft"] == "false"  {
+		if fields["draft"] == "false" {
 			// Publish Event for published work
 			fmt.Printf("INFO: Publish Event for [%s/%s]\n", ev.Namespace, ev.Identifier)
 			if len(fields["doi"]) > 0 {
@@ -99,7 +99,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			}
 			eventType = "publish"
 
-		} else{
+		} else {
 			fmt.Printf("ERROR: Can't publish a draft %s \n", ev.Identifier)
 			return nil
 		}
@@ -107,15 +107,15 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	case uvalibrabus.EventWorkUnpublish:
 		fmt.Printf("INFO: Unpublish Event for [%s/%s]\n", ev.Namespace, ev.Identifier)
 		// "registered" is a reserved DOI but not findable
-		eventType = "register"
+		eventType = "hide"
 
 	case uvalibrabus.EventObjectCreate:
-	  if len(fields["doi"]) == 0 && fields["draft"] == "true" {
+		if len(fields["doi"]) == 0 && fields["draft"] == "true" {
 			fmt.Printf("INFO: Registering new DOI for draft work [%s/%s].\n", ev.Namespace, ev.Identifier)
 			eventType = "register"
 		}
 
-	case uvalibrabus.EventMetadataUpdate, uvalibrabus.EventCommandDoiSync :
+	case uvalibrabus.EventMetadataUpdate, uvalibrabus.EventCommandDoiSync:
 		// No Event change for edits or resyncs
 		if len(fields["doi"]) > 0 {
 			fmt.Printf("INFO: Update Event for [%s/%s] with DOI %s\n", ev.Namespace, ev.Identifier, fields["doi"])
@@ -123,7 +123,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 			fmt.Printf("INFO: Update Event for [%s/%s] without DOI. One will be created.\n", ev.Namespace, ev.Identifier)
 		}
 	}
-
 
 	work, err := librametadata.ETDWorkFromBytes(mdBytes)
 	if err != nil {
