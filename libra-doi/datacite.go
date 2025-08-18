@@ -101,9 +101,13 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 	payload.Data.TypeName = "dois"
 	// remove http://doi... prefix
 	lastPath := regexp.MustCompile("[^/]+$")
-	bareDOI := lastPath.FindString(fields["doi"])
+	suffix := lastPath.FindString(fields["doi"])
+	doi := ""
+	if len(suffix) > 0 {
+		doi = Cfg().IDService.Shoulder + "/" + suffix
+	}
 	payload.Data.Attributes = AttributesData{
-		DOI:    bareDOI,
+		DOI:    doi,
 		Prefix: Cfg().IDService.Shoulder,
 		Titles: []TitleData{{Title: work.Title}},
 		Descriptions: []DescriptionData{{
@@ -175,7 +179,8 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 	} else {
 		// update existing
 		httpMethod = "PUT"
-		path = fmt.Sprintf("/dois/%s/%s", payload.Data.Attributes.Prefix, payload.Data.Attributes.DOI)
+		// payload.Data.Attributes.DOI format should be: 10.18130/xxxx
+		path = fmt.Sprintf("/dois/%s", payload.Data.Attributes.DOI)
 	}
 
 	jsonPayload, err := json.Marshal(payload)
@@ -184,7 +189,7 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 	}
 	fmt.Printf("INFO: JSON Payload to Datacite:\n%s\n", jsonPayload)
 
-	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL + path, bytes.NewBuffer(jsonPayload))
+	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL+path, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
