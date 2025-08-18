@@ -128,6 +128,9 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 }
 
 func addDates(payload *DataciteData, publishDate string) {
+	if len(publishDate) == 0 {
+		return
+	}
 
 	parsedDate, err := time.Parse(time.RFC3339, publishDate)
 	if err != nil {
@@ -175,13 +178,18 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 		path = fmt.Sprintf("/dois/%s/%s", payload.Data.Attributes.Prefix, payload.Data.Attributes.DOI)
 	}
 
-	jsonPayload, _ := json.Marshal(payload)
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	fmt.Printf("INFO: JSON Payload to Datacite:\n%s\n", jsonPayload)
 
 	req, err := http.NewRequest(httpMethod, Cfg().IDService.BaseURL + path, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/json")
 	req.SetBasicAuth(Cfg().IDService.User, Cfg().IDService.Password)
 
 	response, err = httpSend(Cfg().httpClient, req)
@@ -226,17 +234,20 @@ func parseContributor(contributor librametadata.ContributorData, contribType str
 	}
 
 	// Check for ORCID Account
-	orcid, err := getOrcidDetails(Cfg().OrcidGetDetailsURL, contributor.ComputeID, Cfg().AuthToken, Cfg().httpClient)
-	if err != nil {
-		fmt.Printf("WARNING: unable to get ORCID details for %s\n", contributor.ComputeID)
-	}
+	if contributor.ComputeID != "" {
+		orcid, err := getOrcidDetails(Cfg().OrcidGetDetailsURL, contributor.ComputeID, Cfg().AuthToken, Cfg().httpClient)
+		if err != nil {
+			fmt.Printf("WARNING: unable to get ORCID details for %s\n", contributor.ComputeID)
+		}
 
-	if len(orcid) > 0 {
-		person.NameIdentifiers = []NameIdentifierData{{
-			NameIdentifier:       orcid,
-			SchemeURI:            "https://orcid.org",
-			NameIdentifierScheme: "ORCID",
-		}}
+		if len(orcid) > 0 {
+			person.NameIdentifiers = []NameIdentifierData{{
+				NameIdentifier:       orcid,
+				SchemeURI:            "https://orcid.org",
+				NameIdentifierScheme: "ORCID",
+			}}
+		}
+
 	}
 	return person
 }

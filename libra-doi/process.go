@@ -136,8 +136,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	payload.Data.Attributes.URL =
 		fmt.Sprintf("%s/%s/%s", cfg.PublicURLBase, cfg.ETDPublicShoulder, ev.Identifier)
 
-	spew.Dump(payload)
-
 	// send to Datacite
 	doi, err := sendToDatacite(&payload)
 	if err != nil {
