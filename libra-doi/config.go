@@ -173,6 +173,7 @@ func loadConfiguration() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Ensure this is quoted in the env file. Otherwise trailing zeros are lost.
 	cfg.ETDPublicShoulder, err = ensureSet("ETD_PUBLIC_SHOULDER")
 	if err != nil {
 		return nil, err
