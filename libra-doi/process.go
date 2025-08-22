@@ -129,9 +129,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		fmt.Printf("ERROR: unable to process ETD Work %s\n", err.Error())
 		return err
 	}
-	if work.Title == "" {
+	if len(work.Title) == 0 {
 		fmt.Printf("WARN: Title is blank. Exiting.\n")
-		return
+		return nil
 	}
 
 	payload := createETDPayload(work, fields)
