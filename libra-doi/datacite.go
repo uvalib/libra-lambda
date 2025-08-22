@@ -231,7 +231,9 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 func getPersonList(contributors []librametadata.ContributorData, typeName string) []PersonData {
 	var personList []PersonData
 	for _, person := range contributors {
-		personList = append(personList, getPerson(person, typeName))
+		if len(person.FirstName) > 0 || len(person.LastName) > 0 {
+			personList = append(personList, getPerson(person, typeName))
+		}
 	}
 	return personList
 }
