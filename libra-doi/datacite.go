@@ -105,18 +105,15 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 		doi = Cfg().IDService.Shoulder + "/" + suffix
 	}
 	payload.Data.Attributes = AttributesData{
-		DOI:    doi,
-		Prefix: Cfg().IDService.Shoulder,
-		Titles: []TitleData{{Title: work.Title}},
-		Descriptions: []DescriptionData{{
-			Description:     work.Abstract,
-			DescriptionType: "Abstract",
-		}},
-		Creators:          []PersonData{parseContributor(work.Author, "")},
-		Contributors:      parseContributors(work.Advisors, "RelatedPerson"),
-		Subjects:          parseKeywords(work.Keywords),
-		RightsList:        []RightsData{{Rights: work.License}},
-		FundingReferences: parseSponsors(work.Sponsors),
+		DOI:               doi,
+		Prefix:            Cfg().IDService.Shoulder,
+		Titles:            []TitleData{{Title: work.Title}},
+		Descriptions:      getDescription(work.Abstract),
+		Creators:          []PersonData{getPerson(work.Author, "")},
+		Contributors:      getPersonList(work.Advisors, "RelatedPerson"),
+		Subjects:          getKeywords(work.Keywords),
+		RightsList:        getRights(work.License),
+		FundingReferences: getSponsors(work.Sponsors),
 
 		Types: TypeData{
 			ResourceTypeGeneral: "Text",
@@ -126,6 +123,22 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 	}
 	addDates(&payload, fields["publish-date"])
 	return payload
+}
+
+func getDescription(abstract string) []DescriptionData {
+	if abstract == "" {
+		return []DescriptionData{}
+	}
+	return []DescriptionData{{
+		Description:     abstract,
+		DescriptionType: "Abstract",
+	}}
+}
+func getRights(rights string) []RightsData {
+	if rights == "" {
+		return []RightsData{}
+	}
+	return []RightsData{{Rights: rights}}
 }
 
 func addDates(payload *DataciteData, publishDate string) {
@@ -146,7 +159,7 @@ func addDates(payload *DataciteData, publishDate string) {
 	payload.Data.Attributes.PublicationYear = parsedDate.Format("2006")
 }
 
-func parseSponsors(s []string) []FundingData {
+func getSponsors(s []string) []FundingData {
 	fundingList := []FundingData{}
 	for _, sponsor := range s {
 		fundingList = append(fundingList, FundingData{FunderName: sponsor})
@@ -154,7 +167,7 @@ func parseSponsors(s []string) []FundingData {
 	return fundingList
 }
 
-func parseKeywords(keywords []string) []SubjectData {
+func getKeywords(keywords []string) []SubjectData {
 	// Keywords are mapped to subjects
 	subjects := []SubjectData{}
 	for _, keyword := range keywords {
@@ -215,15 +228,15 @@ func sendToDatacite(payload *DataciteData) (string, error) {
 	return responseData.Data.ID, nil
 }
 
-func parseContributors(contributors []librametadata.ContributorData, typeName string) []PersonData {
-	var contribList []PersonData
-	for _, contrib := range contributors {
-		contribList = append(contribList, parseContributor(contrib, typeName))
+func getPersonList(contributors []librametadata.ContributorData, typeName string) []PersonData {
+	var personList []PersonData
+	for _, person := range contributors {
+		personList = append(personList, getPerson(person, typeName))
 	}
-	return contribList
+	return personList
 }
 
-func parseContributor(contributor librametadata.ContributorData, contribType string) PersonData {
+func getPerson(contributor librametadata.ContributorData, contribType string) PersonData {
 	var person PersonData
 	person.GivenName = contributor.FirstName
 	person.FamilyName = contributor.LastName
@@ -249,7 +262,6 @@ func parseContributor(contributor librametadata.ContributorData, contribType str
 				NameIdentifierScheme: "ORCID",
 			}}
 		}
-
 	}
 	return person
 }
