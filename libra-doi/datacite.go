@@ -76,8 +76,6 @@ type AttributesData struct {
 	Dates             []DateData        `json:"dates,omitempty"`
 	PublicationYear   string            `json:"publicationYear,omitempty"`
 	Publisher         string            `json:"publisher,omitempty"`
-
-	Affiliation AffiliationData `json:"affiliation"`
 }
 
 type DataciteData struct {
@@ -120,7 +118,6 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 		RightsList:        []RightsData{{Rights: work.License}},
 		FundingReferences: parseSponsors(work.Sponsors),
 
-		Affiliation: UVAAffiliation(),
 		Types: TypeData{
 			ResourceTypeGeneral: "Text",
 			ResourceType:        "Dissertation",
