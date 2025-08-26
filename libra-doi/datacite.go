@@ -164,6 +164,9 @@ func getRights(rights string) []RightsData {
 
 func addDates(payload *DataciteData, publishDate string) {
 	if len(publishDate) == 0 {
+		currentYear := time.Now().Year()
+		fmt.Printf("INFO: setting empty PublicationYear to: %d\n", currentYear)
+		payload.Data.Attributes.PublicationYear = fmt.Sprintf("%d", currentYear)
 		return
 	}
 
