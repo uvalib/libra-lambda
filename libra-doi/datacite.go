@@ -24,12 +24,14 @@ type AffiliationData struct {
 
 type TitleData struct {
 	Title string `json:"title"`
+	Lang  string `json:"lang,omitempty"`
 }
 type DescriptionData struct {
 	Description     string `json:"description"`
 	DescriptionType string `json:"descriptionType"`
 }
 type PersonData struct {
+	Name            string               `json:"name,omitempty"`
 	GivenName       string               `json:"givenName"`
 	FamilyName      string               `json:"familyName"`
 	NameType        string               `json:"nameType,omitempty"`
@@ -60,6 +62,13 @@ type DateData struct {
 	DateType string `json:"dateType"`
 }
 
+type PublisherData struct {
+	Name                      string `json:"name"`
+	SchemeURI                 string `json:"schemeUri,omitempty"`
+	PublisherIdentifier       string `json:"publisherIdentifier,omitempty"`
+	PublisherIdentifierScheme string `json:"publisherIdentifierScheme,omitempty"`
+}
+
 type AttributesData struct {
 	Event             string            `json:"event,omitempty"` // eg: publish
 	DOI               string            `json:"doi,omitempty"`   // Datacite generates a DOI when empty
@@ -75,7 +84,7 @@ type AttributesData struct {
 	Types             TypeData          `json:"types,omitempty"`
 	Dates             []DateData        `json:"dates,omitempty"`
 	PublicationYear   string            `json:"publicationYear,omitempty"`
-	Publisher         string            `json:"publisher,omitempty"`
+	Publisher         PublisherData     `json:"publisher"`
 }
 
 type DataciteData struct {
@@ -85,12 +94,23 @@ type DataciteData struct {
 	} `json:"data"`
 }
 
+// UVAAffiliation with ROR ID
 func UVAAffiliation() AffiliationData {
 	return AffiliationData{
 		Name:                        "University of Virginia",
 		SchemeURI:                   "https://ror.org",
 		AffiliationIdentifier:       "https://ror.org/0153tk833",
 		AffiliationIdentifierScheme: "ROR",
+	}
+}
+
+// UVAPublisher with ROR ID
+func UVAPublisher() PublisherData {
+	return PublisherData{
+		Name:                      "University of Virginia",
+		PublisherIdentifier:       "https://ror.org/0153tk833",
+		SchemeURI:                 "https://ror.org",
+		PublisherIdentifierScheme: "ROR",
 	}
 }
 
@@ -104,6 +124,7 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 	if len(suffix) > 0 {
 		doi = Cfg().IDService.Shoulder + "/" + suffix
 	}
+
 	payload.Data.Attributes = AttributesData{
 		DOI:               doi,
 		Prefix:            Cfg().IDService.Shoulder,
@@ -119,7 +140,7 @@ func createETDPayload(work *librametadata.ETDWork, fields uvaeasystore.EasyStore
 			ResourceTypeGeneral: "Text",
 			ResourceType:        "Dissertation",
 		},
-		Publisher: "University of Virginia",
+		Publisher: UVAPublisher(),
 	}
 	addDates(&payload, fields["publish-date"])
 	return payload
@@ -148,7 +169,7 @@ func addDates(payload *DataciteData, publishDate string) {
 
 	parsedDate, err := time.Parse(time.RFC3339, publishDate)
 	if err != nil {
-		fmt.Printf("WARNING: unable to parse date %s\n", err.Error())
+		fmt.Printf("WARN: unable to parse publish date %s\n", err.Error())
 		return
 	}
 
@@ -242,6 +263,9 @@ func getPerson(contributor librametadata.ContributorData, contribType string) Pe
 	var person PersonData
 	person.GivenName = contributor.FirstName
 	person.FamilyName = contributor.LastName
+	if len(person.GivenName) > 0 && len(person.FamilyName) > 0 {
+		person.Name = fmt.Sprintf("%s, %s", person.FamilyName, person.GivenName)
+	}
 	person.ContributorType = contribType
 	person.NameType = "Personal"
 	if len(contributor.ComputeID) > 0 {

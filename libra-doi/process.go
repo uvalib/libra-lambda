@@ -122,6 +122,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		} else {
 			fmt.Printf("INFO: Update Event for [%s/%s] without DOI. One will be created.\n", ev.Namespace, ev.Identifier)
 		}
+		// default: no event type change
 	}
 
 	work, err := librametadata.ETDWorkFromBytes(mdBytes)
