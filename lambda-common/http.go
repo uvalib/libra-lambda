@@ -11,7 +11,7 @@ import (
 )
 
 var maxHttpRetries = 3
-var retrySleepTime = 100 * time.Millisecond
+var httpRetrySleepTime = 100 * time.Millisecond
 
 func newHttpClient(maxConnections int, timeout int) *http.Client {
 
@@ -114,7 +114,7 @@ func httpSend(client *http.Client, req *http.Request) ([]byte, error) {
 			fmt.Printf("ERROR: %s %s failed with error, retrying (%s)\n", req.Method, url, err)
 
 			// sleep for a bit before retrying
-			time.Sleep(retrySleepTime)
+			time.Sleep(httpRetrySleepTime)
 		} else {
 
 			defer response.Body.Close()
