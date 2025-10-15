@@ -160,9 +160,11 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 		fields = eso.Fields()
 
-		fields["doi"] = fmt.Sprintf("%s/%s", cfg.DOIBaseURL, doi)
+		doiFieldName := "doi"
+		fields[doiFieldName] = fmt.Sprintf("%s/%s", cfg.DOIBaseURL, doi)
 		eso.SetFields(fields)
-		err = putEasystoreObject(es, eso, uvaeasystore.Fields)
+		eso, err = putEasystoreFieldWithRetry(es, eso, uvaeasystore.Fields, doiFieldName, fields[doiFieldName])
+
 		if err != nil {
 			fmt.Printf("ERROR: unable to update object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 			fmt.Printf("ERROR: DOI created but not saved for [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, doi)

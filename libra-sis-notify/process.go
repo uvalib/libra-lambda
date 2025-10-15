@@ -85,7 +85,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		// update the field to note that we have notified SIS
 		fields[sisNotifiedFieldName] = time.DateTime
 		obj.SetFields(fields)
-		err = putEasystoreObject(es, obj, uvaeasystore.Fields)
+		obj, err = putEasystoreFieldWithRetry(es, obj, uvaeasystore.Fields, sisNotifiedFieldName, fields[sisNotifiedFieldName])
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err.Error())
 			return err
