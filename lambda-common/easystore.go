@@ -6,9 +6,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/uvalib/easystore/uvaeasystore"
 	"log"
 	"time"
+
+	"github.com/uvalib/easystore/uvaeasystore"
 )
 
 var maxEsRetries = 3
@@ -42,11 +43,19 @@ func createEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStore
 }
 
 func getEasystoreObjectByKey(es uvaeasystore.EasyStoreReadonly, namespace string, identifier string, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObject, error) {
-	return es.ObjectGetByKey(namespace, identifier, what)
+	obj, err := es.ObjectGetByKey(namespace, identifier, what)
+	if err == nil {
+		fmt.Printf("INFO: got easystore object [%s/%s]\n", obj.Namespace(), obj.Id())
+	}
+	return obj, err
 }
 
 func getEasystoreObjectsByFields(es uvaeasystore.EasyStoreReadonly, namespace string, fields uvaeasystore.EasyStoreObjectFields, what uvaeasystore.EasyStoreComponents) (uvaeasystore.EasyStoreObjectSet, error) {
-	return es.ObjectGetByFields(namespace, fields, what)
+	objSet, err := es.ObjectGetByFields(namespace, fields, what)
+	if err == nil {
+		fmt.Printf("INFO: got %d easystore objects\n", objSet.Count())
+	}
+	return objSet, err
 }
 
 func putEasystoreObject(es uvaeasystore.EasyStore, obj uvaeasystore.EasyStoreObject, what uvaeasystore.EasyStoreComponents) error {
@@ -68,6 +77,9 @@ func putEasystoreFieldWithRetry(es uvaeasystore.EasyStore, obj uvaeasystore.Easy
 	for retry := 0; retry < maxEsRetries; retry++ {
 		// if our object is stale
 		if err == uvaeasystore.ErrStaleObject {
+
+			fmt.Printf("WARNING: easystore object is stale [%s/%s], retry #%d\n", obj.Namespace(), obj.Id(), retry+1)
+
 			// sleep for a bit before retrying
 			time.Sleep(esRetrySleepTime)
 
@@ -91,11 +103,13 @@ func putEasystoreFieldWithRetry(es uvaeasystore.EasyStore, obj uvaeasystore.Easy
 			// otherwise, an error... if its stale, retry, otherwise abandon loop and return the error
 		} else {
 			// it's all over, return error
+			fmt.Printf("WARNING: abandoning retry for [%s/%s] (%s)\n", obj.Namespace(), obj.Id(), err.Error())
 			return obj, err
 		}
 	}
 
 	// we have retried and are giving up
+	fmt.Printf("WARNING: easystore object was stale [%s/%s], gave up\n", obj.Namespace(), obj.Id())
 	return obj, err
 }
 
