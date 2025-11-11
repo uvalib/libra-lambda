@@ -7,10 +7,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/uvalib/easystore/uvaeasystore"
-	"github.com/uvalib/librabus-sdk/uvalibrabus"
 	"strings"
 	"time"
+
+	"github.com/uvalib/easystore/uvaeasystore"
+	"github.com/uvalib/librabus-sdk/uvalibrabus"
 )
 
 // field name indicating sis notified
@@ -83,7 +84,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		}
 
 		// update the field to note that we have notified SIS
-		fields[sisNotifiedFieldName] = time.DateTime
+		fields[sisNotifiedFieldName] = time.Now().UTC().Format(time.RFC3339)
 		obj.SetFields(fields)
 		obj, err = putEasystoreFieldWithRetry(es, obj, uvaeasystore.Fields, sisNotifiedFieldName, fields[sisNotifiedFieldName])
 		if err != nil {
