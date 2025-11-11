@@ -109,7 +109,7 @@ func putEasystoreFieldWithRetry(es uvaeasystore.EasyStore, obj uvaeasystore.Easy
 	}
 
 	// we have retried and are giving up
-	fmt.Printf("WARNING: easystore object was stale [%s/%s], gave up\n", obj.Namespace(), obj.Id())
+	fmt.Printf("ERROR: easystore object was stale [%s/%s], gave up\n", obj.Namespace(), obj.Id())
 	return obj, err
 }
 
