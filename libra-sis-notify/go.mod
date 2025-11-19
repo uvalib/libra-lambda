@@ -6,7 +6,7 @@ toolchain go1.24.2
 
 require (
 	github.com/aws/aws-lambda-go v1.50.0
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20251117153410-4c2d85311d80
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20251119175859-3cc93fc44de6
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250801130056-157231a1fcac
 )
 

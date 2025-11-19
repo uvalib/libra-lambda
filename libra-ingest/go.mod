@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.39.6
 	github.com/aws/aws-sdk-go-v2/config v1.31.20
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.67.2
-	github.com/uvalib/easystore/uvaeasystore v0.0.0-20251117153410-4c2d85311d80
+	github.com/uvalib/easystore/uvaeasystore v0.0.0-20251119175859-3cc93fc44de6
 	github.com/uvalib/libra-metadata v0.0.0-20250513131340-aa4ee04ad7d1
 	github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20250801130056-157231a1fcac
 )
