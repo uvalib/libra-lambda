@@ -92,7 +92,17 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 						previous := md.Title
 						md.Title = o.Title
 
-						eso.SetMetadata(md)
+						// An ETDWork does not serialize the same way as an EasyStoreMetadata object
+						// does when being managed by json.Marshal/json.Unmarshal so we wrap it in an object that
+						// behaves appropriately
+						pl, err = md.Payload()
+						if err != nil {
+							log.Printf("ERROR: serializing ETDWork: %s, continuing", err.Error())
+							returnErr = err
+							continue
+						}
+
+						eso.SetMetadata(uvaeasystore.NewEasyStoreMetadata(md.MimeType(), pl))
 						err = putEasystoreObject(es, eso, uvaeasystore.Metadata)
 						if err != nil {
 							fmt.Printf("ERROR: updating easystore object [%s/%s], continuing (%s)\n", eso.Namespace(), eso.Id(), err.Error())
