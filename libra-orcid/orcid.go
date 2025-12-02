@@ -7,11 +7,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/uvalib/easystore/uvaeasystore"
-	"github.com/uvalib/libra-metadata"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/uvalib/easystore/uvaeasystore"
+	librametadata "github.com/uvalib/libra-metadata"
 )
 
 type OrcidActivityUpdateResponse struct {
@@ -126,7 +127,7 @@ func createUpdateSchema(eso uvaeasystore.EasyStoreObject) (*WorkSchema, error) {
 	}
 
 	schema.Authors = getEtdPersons(meta)
-	schema.Abstract = meta.Abstract
+	schema.Abstract = truncateString(meta.Abstract, 5000)
 	schema.PublicationDate = extractYYMMDD(fields["publish-date"])
 	schema.Title = meta.Title
 
@@ -165,6 +166,14 @@ func getWorkAuthor(eso uvaeasystore.EasyStoreObject) (string, error) {
 func getEtdPersons(meta *librametadata.ETDWork) []Person {
 	person := Person{Index: 0, FirstName: meta.Author.FirstName, LastName: meta.Author.LastName}
 	return []Person{person}
+}
+
+// truncateString limits a string to maxLen characters
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen]
 }
 
 // attempt to extract a 4 digit year from the date string (crap, I know)
