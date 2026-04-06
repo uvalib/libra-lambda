@@ -11,6 +11,7 @@ env.*
 auth.go
 definitions.go
 easystore.go
+env.go
 events.go
 http.go
 main-cmdline.go

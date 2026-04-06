@@ -24,6 +24,7 @@ deployable:
 	cd bin; zip deployment.zip $(DEPLOYNAME)
 
 common:
+	-ln -s $(COMMON)/env.go . 2> /dev/null || true
 	-ln -s $(COMMON)/main-lambda-apigw.go . 2> /dev/null || true
 
 clean:
