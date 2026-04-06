@@ -24,6 +24,8 @@ phases:
       #
       # build the assets
       #
+      - cd ${CODEBUILD_SRC_DIR}/libra-aptrust
+      - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-audit
       - make linux
       - cd ${CODEBUILD_SRC_DIR}/libra-audit-query
@@ -57,6 +59,9 @@ phases:
       #
       # copy to the results bucket
       #
+      #
+      # libra-aptrust function
+      - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-aptrust/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-aptrust/deployment.zip --quiet
       #
       # libra-audit function plus migrations
       - aws s3 cp ${CODEBUILD_SRC_DIR}/libra-audit/bin/deployment.zip s3://${deploy_bucket}/${BUILD_VERSION}/libra-audit/deployment.zip --quiet
