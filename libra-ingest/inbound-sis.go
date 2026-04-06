@@ -7,7 +7,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -97,7 +96,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 						// behaves appropriately
 						pl, err = md.Payload()
 						if err != nil {
-							log.Printf("ERROR: serializing ETDWork: %s, continuing", err.Error())
+							fmt.Printf("ERROR: serializing ETDWork: %s, continuing\n", err.Error())
 							returnErr = err
 							continue
 						}
@@ -148,7 +147,7 @@ func processSis(cfg *Config, objs []InboundSisItem, es uvaeasystore.EasyStore) e
 			// behaves appropriately
 			pl, err := meta.Payload()
 			if err != nil {
-				log.Printf("ERROR: serializing ETDWork: %s, continuing", err.Error())
+				fmt.Printf("ERROR: serializing ETDWork: %s, continuing\n", err.Error())
 				returnErr = err
 				continue
 			}

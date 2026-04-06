@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -152,15 +151,15 @@ func loadConfiguration() (*Config, error) {
 		Path: "etd",
 	}
 
-	log.Printf("INFO: loading data/resourceTypes.json")
+	fmt.Printf("INFO: loading data/resourceTypes.json\n")
 
 	bytes, err := os.ReadFile("./data/resourceTypes.json")
 	if err != nil {
-		log.Printf("ERROR: unable to load resourceTypes: %s", err.Error())
+		fmt.Printf("ERROR: unable to load resourceTypes: %s\n", err.Error())
 	} else {
 		err = json.Unmarshal(bytes, &cfg.ResourceTypes)
 		if err != nil {
-			log.Printf("ERROR: unable to parse resourceTypes.json: %s", err.Error())
+			fmt.Printf("ERROR: unable to parse resourceTypes.json: %s\n", err.Error())
 		}
 	}
 
