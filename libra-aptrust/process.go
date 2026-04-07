@@ -35,14 +35,6 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
-	// init the S3 client
-	//s3, err := newS3Client()
-	_, err = newS3Client()
-	if err != nil {
-		fmt.Printf("ERROR: creating S3 client (%s)\n", err.Error())
-		return err
-	}
-
 	// easystore access
 	esro, err := newEasystoreReadonlyProxy(cfg)
 	if err != nil {
@@ -53,25 +45,50 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	// important, cleanup properly
 	defer esro.Close()
 
-	//obj, err := getEasystoreObjectByKey(esro, ev.Namespace, ev.Identifier, uvaeasystore.AllComponents)
-	_, err = getEasystoreObjectByKey(esro, ev.Namespace, ev.Identifier, uvaeasystore.AllComponents)
+	obj, err := getEasystoreObjectByKey(esro, ev.Namespace, ev.Identifier, uvaeasystore.AllComponents)
 	if err != nil {
 		fmt.Printf("ERROR: getting object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
-	// populate the key template
-	//year := fmt.Sprintf("%04d", time.Now().Year())
-	//bucketKey := strings.Replace(cfg.BucketKeyTemplate, "{:year}", year, 1)
-	//bucketKey = strings.Replace(bucketKey, "{:namespace}", ev.Namespace, 1)
-	//bucketKey = strings.Replace(bucketKey, "{:id}", ev.Identifier, 1)
+	// get a new http client
+	httpClient := newHttpClient(1, 30)
+	// important, cleanup properly
+	defer httpClient.CloseIdleConnections()
+
+	// write the content to the local filesystem
+	bagName, err := createBagContent(cfg, httpClient, obj)
+	if err != nil {
+		fmt.Printf("ERROR: writing object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+		return err
+	}
+
+	// register the incoming submission
+	resp, err := registerSubmission(cfg, httpClient)
+	if err != nil {
+		fmt.Printf("ERROR: registering APTrust submission (%s)\n", err.Error())
+		return err
+	}
+
+	// init the S3 client
+	s3, err := newS3Client()
+	if err != nil {
+		fmt.Printf("ERROR: creating S3 client (%s)\n", err.Error())
+		return err
+	}
 
 	// upload to S3
-	//err = putS3(s3, cfg.BucketName, bucketKey, buf)
-	//if err != nil {
-	//	fmt.Printf("ERROR: uploading (%s)\n", err.Error())
-	//	return err
-	//}
+	err = uploadContent(cfg, s3, resp.DepositBucket, resp.DepositPath, bagName)
+	if err != nil {
+		return err
+	}
+
+	// initiate the submission
+	err = initiateSubmission(cfg, httpClient, resp.SubmissionIdentifier, bagName)
+	if err != nil {
+		fmt.Printf("ERROR: initiating APTrust submission (%s)\n", err.Error())
+		return err
+	}
 
 	// log the happy news
 	fmt.Printf("INFO: EVENT %s from %s processed OK\n", messageId, messageSrc)

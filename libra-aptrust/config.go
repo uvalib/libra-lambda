@@ -14,6 +14,10 @@ type Config struct {
 
 	// easystore proxy configuration
 	EsProxyUrl string // the easystore proxy endpoint
+
+	// other configuration
+	BagNameTemplate   string // the bag name template
+	ScratchFilesystem string // the scratch filesystem
 }
 
 // loadConfiguration will load the service configuration from env/cmdline
@@ -23,6 +27,8 @@ func loadConfiguration() (*Config, error) {
 	var cfg Config
 
 	var err error
+
+	// APTrust submission service configuration
 	cfg.APTServiceRegister, err = ensureSetAndNonEmpty("APT_REGISTER_URL")
 	if err != nil {
 		return nil, err
@@ -42,12 +48,27 @@ func loadConfiguration() (*Config, error) {
 		return nil, err
 	}
 
+	// other configuration
+	cfg.BagNameTemplate, err = ensureSetAndNonEmpty("BAG_NAME_TEMPLATE")
+	if err != nil {
+		return nil, err
+	}
+	cfg.ScratchFilesystem, err = ensureSetAndNonEmpty("SCRATCH_FS")
+	if err != nil {
+		return nil, err
+	}
+
+	// APTrust submission service configuration
 	fmt.Printf("[conf] APTServiceRegister = [%s]\n", cfg.APTServiceRegister)
 	fmt.Printf("[conf] APTServiceSubmit   = [%s]\n", cfg.APTServiceSubmit)
 	fmt.Printf("[conf] APTServiceClient   = [%s]\n", cfg.APTServiceClient)
 
 	// easystore proxy configuration
 	fmt.Printf("[conf] EsProxyUrl         = [%s]\n", cfg.EsProxyUrl)
+
+	// other configuration
+	fmt.Printf("[conf] BagNameTemplate    = [%s]\n", cfg.BagNameTemplate)
+	fmt.Printf("[conf] ScratchFilesystem  = [%s]\n", cfg.ScratchFilesystem)
 
 	return &cfg, nil
 }
