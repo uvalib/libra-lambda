@@ -39,7 +39,7 @@ func uploadContent(cfg *Config, s3 *s3.Client, bucket string, prefix string, bag
 func uploadFile(uploader *manager.Uploader, bucket string, key string, local string) error {
 
 	target := fmt.Sprintf("s3://%s/%s", bucket, key)
-	fmt.Printf("DEBUG: put from %s to %s\n", local, target)
+	//fmt.Printf("DEBUG: put from %s to %s\n", local, target)
 
 	// open the file
 	file, err := os.Open(local)
@@ -64,29 +64,13 @@ func uploadFile(uploader *manager.Uploader, bucket string, key string, local str
 		Body:   file,
 	})
 	if err != nil {
+		fmt.Printf("ERROR: uploading [%s] => [%s] (%s)\n", local, target, err.Error())
 		return err
 	}
 
 	duration := time.Since(start)
 	fmt.Printf("DEBUG: put %s complete in %0.2f seconds (%d bytes, %0.2f bytes/sec)\n", target, duration.Seconds(), fileSize, float64(fileSize)/duration.Seconds())
 	return nil
-}
-
-func fileList(dirname string) ([]string, error) {
-
-	files, err := os.ReadDir(dirname)
-	if err != nil {
-		fmt.Printf("ERROR: reading %s (%s)\n", dirname, err.Error())
-		return nil, err
-	}
-
-	results := make([]string, 0)
-	for _, file := range files {
-		if file.IsDir() == false {
-			results = append(results, file.Name())
-		}
-	}
-	return results, nil
 }
 
 //
