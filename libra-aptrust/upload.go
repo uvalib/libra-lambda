@@ -15,21 +15,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func uploadContent(cfg *Config, s3 *s3.Client, bucket string, prefix string, bagName string) error {
+func uploadContent(cfg *Config, s3 *s3.Client, bucket string, prefix string, bagName string, files []string) error {
 
-	// get the local list of files
+	// this is our content directory
 	contentDir := filepath.Join(cfg.ScratchFilesystem, bagName)
-	files, err := fileList(contentDir)
-	if err != nil {
-		return err
-	}
 
 	// create a new uploader
 	uploader := manager.NewUploader(s3)
 
+	fullPrefix := filepath.Join(prefix, bagName)
 	for _, fn := range files {
-		full := filepath.Join(contentDir, fn)
-		err = uploadFile(uploader, bucket, prefix, full)
+		remoteName := filepath.Join(fullPrefix, fn)
+		localName := filepath.Join(contentDir, fn)
+		err := uploadFile(uploader, bucket, remoteName, localName)
 		if err != nil {
 			return err
 		}

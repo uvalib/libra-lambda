@@ -83,6 +83,9 @@ func initiateSubmission(cfg *Config, httpClient *http.Client, sid string, bagNam
 
 	// post the request
 	pl, err = httpPost(httpClient, cfg.APTServiceSubmit, pl, "application/json")
+	if err != nil {
+		return err
+	}
 
 	// and process the response
 	resp := SubmitInitiateResponse{}

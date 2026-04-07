@@ -16,6 +16,7 @@ type Config struct {
 	EsProxyUrl string // the easystore proxy endpoint
 
 	// other configuration
+	AuditQuery        string // the work audit query URL
 	BagNameTemplate   string // the bag name template
 	ScratchFilesystem string // the scratch filesystem
 }
@@ -49,6 +50,10 @@ func loadConfiguration() (*Config, error) {
 	}
 
 	// other configuration
+	cfg.AuditQuery, err = ensureSetAndNonEmpty("AUDIT_QUERY_TEMPLATE")
+	if err != nil {
+		return nil, err
+	}
 	cfg.BagNameTemplate, err = ensureSetAndNonEmpty("BAG_NAME_TEMPLATE")
 	if err != nil {
 		return nil, err
@@ -67,6 +72,7 @@ func loadConfiguration() (*Config, error) {
 	fmt.Printf("[conf] EsProxyUrl         = [%s]\n", cfg.EsProxyUrl)
 
 	// other configuration
+	fmt.Printf("[conf] AuditQuery         = [%s]\n", cfg.AuditQuery)
 	fmt.Printf("[conf] BagNameTemplate    = [%s]\n", cfg.BagNameTemplate)
 	fmt.Printf("[conf] ScratchFilesystem  = [%s]\n", cfg.ScratchFilesystem)
 

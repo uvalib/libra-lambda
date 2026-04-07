@@ -57,9 +57,9 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	defer httpClient.CloseIdleConnections()
 
 	// write the content to the local filesystem
-	bagName, err := createBagContent(cfg, httpClient, obj)
+	bagName, files, err := createBagContent(cfg, httpClient, obj)
 	if err != nil {
-		fmt.Printf("ERROR: writing object ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
+		fmt.Printf("ERROR: creating bag content for ns/oid [%s/%s] (%s)\n", ev.Namespace, ev.Identifier, err.Error())
 		return err
 	}
 
@@ -78,7 +78,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// upload to S3
-	err = uploadContent(cfg, s3, resp.DepositBucket, resp.DepositPath, bagName)
+	err = uploadContent(cfg, s3, resp.DepositBucket, resp.DepositPath, bagName, files)
 	if err != nil {
 		return err
 	}

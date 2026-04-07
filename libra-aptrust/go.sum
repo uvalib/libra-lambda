@@ -54,6 +54,8 @@ github.com/stretchr/testify v1.7.2 h1:4jaiDzPyXQvSd7D0EjG45355tLlV3VOECpq10pLC+8
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
 github.com/uvalib/easystore/uvaeasystore v0.0.0-20260406122410-049755e28072 h1:yTDA2zXWFCv8C1gjbTRSyFp/njy4+XZg0uglPXQmYyY=
 github.com/uvalib/easystore/uvaeasystore v0.0.0-20260406122410-049755e28072/go.mod h1:+BLW/pPFUbVSuXIvu+5xystGyD2IG7iVhSkaDt3FJcU=
+github.com/uvalib/libra-metadata v0.0.0-20250513131340-aa4ee04ad7d1 h1:eSDmfVQk1tehn1bgnCwvMxS8kmIXNE1jlXeYlXM8ZI4=
+github.com/uvalib/libra-metadata v0.0.0-20250513131340-aa4ee04ad7d1/go.mod h1:DsXjFKToNw2VE28Lf9pkV+sHhP3OS+Yr8NM0Cwy+7Lo=
 github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20260406142030-486f51674d88 h1:Vlt703J1r3wPo1o81hqLrR9OS6wTMhzidKg2VkZTVmg=
 github.com/uvalib/librabus-sdk/uvalibrabus v0.0.0-20260406142030-486f51674d88/go.mod h1:cITJrlIM3D+iX5y0dnyFWg45MfnmYKFvyHU1Ghj8Tjk=
 golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 h1:jiDhWWeC7jfWqR9c/uplMOqJ0sbNlNWv0UkzE0vX1MA=
