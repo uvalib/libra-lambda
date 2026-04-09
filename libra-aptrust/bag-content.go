@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -31,8 +32,15 @@ func createBagContent(cfg *Config, httpClient *http.Client, obj uvaeasystore.Eas
 	workDir := filepath.Join(cfg.ScratchFilesystem, bagName)
 	files := make([]string, 0)
 
+	// clean the scratch filesystem (it can persist across lambda executions, who knew)
+	err := cleanScratchFilesystem(cfg.ScratchFilesystem)
+	if err != nil {
+		fmt.Printf("ERROR: cleaning scratch filesystem [%s] (%s)\n", cfg.ScratchFilesystem, err.Error())
+		return bagName, files, err
+	}
+
 	// create the working directory
-	err := os.MkdirAll(workDir, 0755)
+	err = os.MkdirAll(workDir, 0755)
 	if err != nil {
 		fmt.Printf("ERROR: creating work directory [%s] (%s)\n", workDir, err.Error())
 		return bagName, files, err
@@ -195,6 +203,23 @@ func writeFile(filename string, buffer []byte) error {
 		fmt.Printf("ERROR: writing [%s] (%s)\n", filename, err.Error())
 		return err
 	}
+	return nil
+}
+
+func cleanScratchFilesystem(dir string) error {
+
+	de, err := os.ReadDir(dir)
+	if err != nil {
+		return err
+	}
+
+	for _, d := range de {
+		err = os.RemoveAll(path.Join(dir, d.Name()))
+		if err != nil {
+			return err
+		}
+	}
+	
 	return nil
 }
 
