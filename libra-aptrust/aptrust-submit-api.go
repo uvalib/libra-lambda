@@ -95,7 +95,7 @@ func initiateSubmission(cfg *Config, httpClient *http.Client, sid string, bagNam
 		return err
 	}
 
-	fmt.Printf("INFO: submit initiate complete")
+	fmt.Printf("INFO: submit initiate complete\n")
 	return nil
 }
 
