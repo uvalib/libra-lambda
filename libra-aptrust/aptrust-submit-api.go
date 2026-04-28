@@ -42,6 +42,8 @@ type SubmitInitiateResponse struct {
 
 func registerSubmission(cfg *Config, httpClient *http.Client) (*SubmitRegisterResponse, error) {
 
+	start := time.Now()
+
 	req := SubmitRegisterRequest{}
 	req.ClientIdentifier = cfg.APTServiceClient
 	pl, err := json.Marshal(req)
@@ -64,11 +66,14 @@ func registerSubmission(cfg *Config, httpClient *http.Client) (*SubmitRegisterRe
 		return nil, err
 	}
 
-	fmt.Printf("INFO: submit register complete (%s)\n", resp.SubmissionIdentifier)
+	duration := time.Since(start)
+	fmt.Printf("INFO: submit register complete in %d ms [%s]\n", duration.Milliseconds(), resp.SubmissionIdentifier)
 	return &resp, nil
 }
 
 func initiateSubmission(cfg *Config, httpClient *http.Client, sid string, bagName string) error {
+
+	start := time.Now()
 
 	req := SubmitInitiateRequest{}
 	req.ClientIdentifier = cfg.APTServiceClient
@@ -95,7 +100,8 @@ func initiateSubmission(cfg *Config, httpClient *http.Client, sid string, bagNam
 		return err
 	}
 
-	fmt.Printf("INFO: submit initiate complete\n")
+	duration := time.Since(start)
+	fmt.Printf("INFO: submit initiate complete in %d ms\n", duration.Milliseconds())
 	return nil
 }
 

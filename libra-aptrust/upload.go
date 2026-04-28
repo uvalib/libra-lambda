@@ -69,7 +69,7 @@ func uploadFile(uploader *manager.Uploader, bucket string, key string, local str
 	}
 
 	duration := time.Since(start)
-	fmt.Printf("DEBUG: put %s complete in %0.2f seconds (%d bytes, %0.2f bytes/sec)\n", target, duration.Seconds(), fileSize, float64(fileSize)/duration.Seconds())
+	fmt.Printf("DEBUG: put %s complete in %d ms (%d bytes, %0.2f bytes/sec)\n", target, duration.Milliseconds(), fileSize, float64(fileSize)/duration.Seconds())
 	return nil
 }
 
