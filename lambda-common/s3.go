@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -25,6 +27,7 @@ func putS3(client *s3.Client, bucket string, key string, buffer []byte) error {
 
 	fmt.Printf("DEBUG: uploading s3://%s/%s\n", bucket, key)
 
+	start := time.Now()
 	_, err := client.PutObject(context.TODO(),
 		&s3.PutObjectInput{
 			Bucket: aws.String(bucket),
@@ -36,6 +39,8 @@ func putS3(client *s3.Client, bucket string, key string, buffer []byte) error {
 		return err
 	}
 
+	duration := time.Since(start)
+	fmt.Printf("DEBUG: upload complete in %d ms\n", duration.Milliseconds())
 	return nil
 }
 
