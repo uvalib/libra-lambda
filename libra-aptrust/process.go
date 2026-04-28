@@ -51,6 +51,12 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 		return err
 	}
 
+	// only published content to APTrust
+	if obj.Fields()["draft"] == "true" {
+		fmt.Printf("WARNING: object ns/oid [%s/%s] is a draft; not sending to APTrust\n", ev.Namespace, ev.Identifier)
+		return nil
+	}
+
 	// get a new http client
 	httpClient := newHttpClient(1, 30)
 	// important, cleanup properly
@@ -64,7 +70,7 @@ func process(messageId string, messageSrc string, rawMsg json.RawMessage) error 
 	}
 
 	// register the incoming submission
-	resp, err := registerSubmission(cfg, httpClient)
+	resp, err := registerSubmission(cfg, httpClient, bagName)
 	if err != nil {
 		fmt.Printf("ERROR: registering APTrust submission (%s)\n", err.Error())
 		return err

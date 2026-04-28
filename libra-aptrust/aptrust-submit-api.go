@@ -18,7 +18,6 @@ import (
 type SubmitRegisterRequest struct {
 	ClientIdentifier string `json:"cid"`        // the client identifier
 	Collection       string `json:"collection"` // the collection name for the submission (optional)
-	Storage          string `json:"storage"`    // the APT storage to use for this submission (optional)
 }
 
 type SubmitRegisterResponse struct {
@@ -40,12 +39,14 @@ type SubmitInitiateResponse struct {
 	// other stuff
 }
 
-func registerSubmission(cfg *Config, httpClient *http.Client) (*SubmitRegisterResponse, error) {
+func registerSubmission(cfg *Config, httpClient *http.Client, bagName string) (*SubmitRegisterResponse, error) {
 
 	start := time.Now()
 
 	req := SubmitRegisterRequest{}
 	req.ClientIdentifier = cfg.APTServiceClient
+	req.Collection = bagName
+
 	pl, err := json.Marshal(req)
 	if err != nil {
 		fmt.Printf("ERROR: json marshal of SubmitRegisterRequest (%s)\n", err.Error())
